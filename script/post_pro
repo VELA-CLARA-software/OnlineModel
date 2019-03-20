@@ -1,0 +1,89 @@
+#!/bin/tcsh
+# script to create post_pro and process data from astra
+# run with:
+#          ./post_pro < input1, input2, input3, input4 >
+# written by bdm 10/08/06
+# any constructive comments very welcome :)
+
+set input1 = $1  # number of first astra run to compare (see readme.txt)
+set input2 = $2  # number of second astra run to compare
+set input3 = $3  # description - first word
+set input4 = $4  # description - second word
+
+echo ${input1} ${input2} ${input3} ${input4} >> post_pro_log.txt
+ 
+mkdir -p plots
+
+mkdir -p results
+
+cd run${input1}/
+
+cp ../run${input2}/set_${input2}.txt fort.22
+
+# edit the line below as appropriate according to whether you have
+# tracked more or less than 10 m ... remember to do all the changes
+# for the corresponding astra running (./run_astra) scripts as well !
+
+gfortran settings.f
+#gfortran settings_gt_10m.f
+
+mv a.exe compare
+
+./compare
+
+cp fort.23 comp.txt
+
+cat comp.txt | \
+    sed -e "s/%ret/\\/g" > comp_${input1}_${input2}
+
+chmod +x comp_${input1}_${input2}
+
+./comp_${input1}_${input2} ${input1} ${input2} ${input3} ${input4}
+
+#cat gpastra_${input1}_mask2.txt | \
+#    sed -e "s/%sub1/${input1}/g" \
+#        -e "s/%sub2/${input2}/g" \
+#        -e "s/%sub3/${input3}/g" \
+#        -e "s/%sub4/${input4}/g" > ../gpastra_${input1}_${input2}_old.txt
+
+#cat merge_${input1}_mask2.tex | \
+#    sed -e "s/%sub1/${input1}/g" \
+#        -e "s/%sub2/${input2}/g" \
+#        -e "s/%sub3/${input3}/g" \
+#        -e "s/%sub4/${input4}/g" > ../merge_${input1}_${input2}_old.tex
+
+cat conv_${input1}_mask2 | \
+    sed -e "s/%sub2/${input2}/g" > ../conv_${input1}_${input2}
+
+cd ..
+
+chmod +x conv_${input1}_${input2}
+
+gnuplot gpastra_${input1}_${input2}.txt
+
+latex merge_${input1}_${input2}
+dvips merge_${input1}_${input2}.dvi -o
+
+./conv_${input1}_${input2}
+
+cd plots
+
+mkdir -p run_${input1}_${input2}
+
+cd run_${input1}_${input2}
+
+mkdir -p eps
+mkdir -p pdf
+
+cd ../../
+
+mv *.eps plots/run_${input1}_${input2}/eps/
+mv *.pdf plots/run_${input1}_${input2}/pdf/
+mv *.ps  plots/run_${input1}_${input2}/
+cp plots/run_${input1}_${input2}/pdf/merge_${input1}_${input2}.pdf results/
+#rm *_${input1}_${input2}.tex
+#rm *_${input1}_${input2}.txt
+#rm *_${input1}_${input2}
+rm *.dvi
+rm *.log
+rm *.aux
