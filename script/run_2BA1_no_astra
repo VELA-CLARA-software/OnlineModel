@@ -1,0 +1,711 @@
+#!/bin/tcsh
+# script to create run_2BA1 & run astra for the clara injector & on to BA1
+# run with:
+#          ./run_2BA1 input1, input2, input3, ..., input35 > file.out
+#
+# you do not have to have the file "file.out" but ... there are a few things
+# which get output to the screen & they give a check that all is ok ... :)
+#
+# "If you have an apple and I have an apple and we exchange these apples,
+# then you and I will still each have one apple.  But if you have an idea
+# and I have an idea and we exchange these ideas, then each of us will have
+# two ideas" - George Bernard Shaw ... :)
+#
+# "When you argue with a fool, chances are he is doing just the same" ... :)
+# Anon.
+#
+# "Experience is the name everyone gives to their mistakes" - Oscar Wilde ... :)
+#
+# note that it is only possible to change one strength for both the solenoid
+# and bucking coil - the reason for this is that it is assumed that the coil
+# has been set to the minimum emittance setting ... this shall be changed at
+# some point but not in the immediate future (it is now 03/11/18) ... :)
+#
+# written by bdm 01/15/19, comments welcome :)
+# last updated by bdm 01/27/19
+
+set input1 = $1  # number of the astra run (see readme.txt)
+set input2 = $2  # number of macro-particles (in 1000's) - nominal: 1
+set input3 = $3  # laser pulse length (ps) - nominal: 3
+set input4 = $4  # spot size (sig in mm so x4 for diameter) - nominal: 0.25
+set input5 = $5  # charge (nC) - nominal: 0.25
+set input6 = $6  # gun gradient (MV/m) - nominal: 71.5
+set input7 = $7  # gun phase (deg.) - nominal: -9
+set input8 = $8  # linac1 gradient (MV/m) - nominal: 21
+set input9 = $9  # linac1 phase (deg.) - nominal: -16
+set inputa = $10 # bucking coil & solenoid strength (A) - nominal: 0.345
+set inputb = $11 # linac1 solenoid1 strength (A) - nominal: 0.05
+set inputc = $12 # linac1 solenoid2 strength (A) - nominal: -0.05
+set inputd = $13 # end of the line (cm) - nominal: 337
+set inpute = $14 # switch space charge on/off in injector (T/F)
+set inputf = $15 # quad1 strength in SO2 (k) - nominal: 3.012 or 2.671
+set inputg = $16 # quad2 strength in SO2 (k) - nominal: -4.719 or -4.186
+set inputh = $17 # quad3 strength in SO2 (k) - nominal: -4.07 or -3.611
+set inputi = $18 # quad4 strength in SO2 (k) - nominal: 13.316 or 11.813
+set inputj = $19 # quad1 strength in C2V (k) - nominal: 54.756 or 48.574
+set inputk = $20 # quad2 strength in C2V (k) - nominal: -46.099 or -40.895
+set inputl = $21 # quad3 strength in C2V (k) - nominal: 55.974 or 49.655
+set inputm = $22 # quad1 strength in VELA (k) - nominal: 20.743 or 18.402
+set inputn = $23 # quad2 strength in VELA (k) - nominal: -18.492 or -16.404
+set inputo = $24 # quad3 strength in VELA (k) - nominal: 5.267 or 4.673
+set inputp = $25 # quad4 strength in VELA (k) - nominal: -5.527 or -4.903
+set inputq = $26 # quad5 strength in VELA (k) - nominal: 6.721 or 5.962
+set inputr = $27 # quad6 strength in VELA (k) - nominal: 8.891 or 7.887
+set inputs = $28 # quad1 strength in BA1 (k) - nominal: -3.8 (my 'match')
+set inputt = $29 # quad2 strength in BA1 (k) - nominal: 9.9 (my 'match')
+set inputu = $30 # quad3 strength in BA1 (k) - nominal: -11.5 (my 'match')
+set inputv = $31 # quad4 strength in BA1 (k) - nominal: 5.0 (my 'match')
+set inputw = $32 # quad5 strength in BA1 (k) - nominal: -3.5 (my 'match')
+set inputx = $33 # quad6 strength in BA1 (k) - nominal: -3.5 (my 'match')
+set inputy = $34 # quad7 strength in BA1_dipole (k) - nominal: 2.5 (my 'match')
+set inputz = $35 # switch space charge on/off in rest of line (T/F)
+
+# note space charge above is switched on for the injector only because it
+# is deemed to have little to no effect at high energy ... :) please *be*
+# aware of this in case you decide to run at low energies - if so then you
+# will need to edit all the mask files to turn space charge on in astra ...
+
+#@ x = ${input1}
+#if (${inputf} == 1) then
+#while ($x <= ${inputg})
+#echo $x
+#@ x += 1
+#end
+#else
+#echo ${input1}
+#endif
+
+mkdir -p run${input1}
+
+mkdir -p run_sum
+
+cd run${input1}/
+
+echo run mp pl ss ch gg gp l1g l1p bc/s l1s1 l1s2 end sc \
+s02q1 s02q2 s02q3 s02q4 c2vq1 c2vq2 c2vq3 \
+velq1 velq2 velq3 velq4 velq5 velq6 \
+ba1q1 ba1q2 ba1q3 ba1q4 ba1q5 ba1q6 ba1q7 msc > param_${input1}.txt
+
+echo ${input1} ${input2} ${input3} ${input4} ${input5} ${input6} ${input7} \
+     ${input8} ${input9} ${inputa} ${inputb} ${inputc} ${inputd} ${inpute} \
+     ${inputf} ${inputg} ${inputh} ${inputi} ${inputj} ${inputk} ${inputl} \
+     ${inputm} ${inputn} ${inputo} ${inputp} ${inputq} ${inputr} ${inputs} \
+     ${inputt} ${inputu} ${inputv} ${inputw} ${inputx} ${inputy} ${inputz} \
+>> param_${input1}.txt
+
+echo ${input1} ${input2} ${input3} ${input4} ${input5} ${input6} ${input7} \
+     ${input8} ${input9} ${inputa} ${inputb} ${inputc} ${inputd} %${inpute} \
+     ${inputf} ${inputg} ${inputh} ${inputi} ${inputj} ${inputk} ${inputl} \
+     ${inputm} ${inputn} ${inputo} ${inputp} ${inputq} ${inputr} ${inputs} \
+     ${inputt} ${inputu} ${inputv} ${inputw} ${inputx} ${inputy} %${inputz} \
+> set_mask.txt
+
+echo >> ../runs_made.txt
+whoami >> ../runs_made.txt
+date >> ../runs_made.txt
+
+echo run mp pl ss ch gg gp l1g l1p bc/s l1s1 l1s2 end sc \
+s02q1 s02q2 s02q3 s02q4 c2vq1 c2vq2 c2vq3 \
+velq1 velq2 velq3 velq4 velq5 velq6 \
+ba1q1 ba1q2 ba1q3 ba1q4 ba1q5 ba1q6 ba1q7 msc\
+>> ../runs_made.txt
+
+echo ${input1} ${input2}k MP ${input3} ps ${input4} mm ${input5} nC \
+${input6} MV/m ${input7} deg ${input8} MV/m ${input9} deg ${inputa} A \
+${inputb} A ${inputc} A ${inputd} m ${inpute} ${inputf} k ${inputg} k \
+${inputh} k ${inputi} k ${inputj} k ${inputk} k ${inputl} k ${inputm} k \
+${inputn} k ${inputo} k ${inputp} k ${inputq} k ${inputr} k ${inputs} k \
+${inputt} k ${inputu} k ${inputv} k ${inputw} k ${inputx} k ${inputy} k \
+${inputz} >> ../runs_made.txt
+
+echo >> ../runs_made.txt
+
+cat set_mask.txt | \
+    sed -e "s/%T/1/g" \
+        -e "s/%F/0/g" > set_${input1}.txt
+
+cp set_${input1}.txt fort.21
+
+echo ./run_inj_no_astra ${input1} ${input2} ${input3} ${input4} ${input5} \
+${input6} ${input7} ${input8} ${input9} ${inputa} ${inputb} ${inputc} \
+${inputd} ${inpute} ${inputf} ${inputg} ${inputh} ${inputi} ${inputj} \
+${inputk} ${inputl} ${inputm} ${inputn} ${inputo} ${inputp} ${inputq} \
+${inputr} ${inputs} ${inputt} ${inputu} ${inputv} ${inputw} ${inputx} \
+${inputy} ${inputz} >> ../rerun
+
+chmod +x ../rerun
+
+cp param_${input1}.txt ../run_sum/
+
+cat ../laser_mask.in | \
+    sed -e "s/%subme2/${input2}/g" \
+	-e "s/%subme3/${input3}/g" \
+	-e "s/%subme4/${input4}/g" \
+        -e "s/%subme5/${input5}/g" > laser.in
+
+generator laser.in
+
+mv laser.generator laser.astra
+
+cat ../gpastra_mask1_mask2.txt | \
+    sed -e "s/%subme1/${input1}/g" \
+        -e "s/%subme2/${input2}/g" \
+        -e "s/%subme3/${input3}/g" \
+        -e "s/%subme4/${input4}/g" \
+        -e "s/%subme5/${input5}/g" \
+        -e "s/%subme6/${input6}/g" \
+        -e "s/%subme7/${input7}/g" \
+        -e "s/%subme8/${input8}/g" \
+        -e "s/%subme9/${input9}/g" \
+        -e "s/%submea/${inputa}/g" \
+        -e "s/%submeb/${inputb}/g" \
+        -e "s/%submec/${inputc}/g" \
+        -e "s/%submed/${inputd}/g" \
+        -e "s/%submee/${inpute}/g" \
+        -e "s/%submef/${inputf}/g" \
+        -e "s/%submeg/${inputg}/g" \
+        -e "s/%submeh/${inputh}/g" \
+        -e "s/%submei/${inputi}/g" \
+        -e "s/%submej/${inputj}/g" \
+        -e "s/%submek/${inputk}/g" \
+        -e "s/%submel/${inputl}/g" \
+        -e "s/%submem/${inputm}/g" \
+        -e "s/%submen/${inputn}/g" \
+        -e "s/%submeo/${inputo}/g" \
+        -e "s/%submep/${inputp}/g" \
+        -e "s/%submeq/${inputq}/g" \
+        -e "s/%submer/${inputr}/g" \
+        -e "s/%submes/${inputs}/g" \
+        -e "s/%submet/${inputt}/g" \
+        -e "s/%submeu/${inputu}/g" \
+        -e "s/%submev/${inputv}/g" \
+        -e "s/%submew/${inputw}/g" \
+        -e "s/%submex/${inputx}/g" \
+        -e "s/%submey/${inputy}/g" \
+        -e "s/%submez/${inputz}/g" > gpastra_${input1}_mask2.txt
+
+cat ../merge_mask1_mask2.tex | \
+    sed -e "s/%submed/${inputd}/g" \
+        -e "s/%submej/${inputj}/g" > merge_${input1}_mask2.tex
+
+cat ../injector_mask.in | \
+    sed -e "s/%subme1/${input1}/g" \
+        -e "s/%subme2/${input2}/g" \
+        -e "s/%subme3/${input3}/g" \
+        -e "s/%subme4/${input4}/g" \
+        -e "s/%subme5/${input5}/g" \
+        -e "s/%subme6/${input6}/g" \
+        -e "s/%subme7/${input7}/g" \
+        -e "s/%subme8/${input8}/g" \
+        -e "s/%subme9/${input9}/g" \
+        -e "s/%submea/${inputa}/g" \
+        -e "s/%submeb/${inputb}/g" \
+        -e "s/%submec/${inputc}/g" \
+	-e "s/%submed/${inputd}/g" \
+        -e "s/%submee/${inpute}/g" > injector_${input1}.in
+
+cat ../conv_mask1_mask2 | \
+    sed -e "s/%subme1/${input1}/g" \
+        -e "s/%submed/${inputd}/g" > conv_${input1}_mask2
+
+# note that the above "j" in conv_mask1_mask2 has to be replaced with "d"
+# depending on whether you want to go down the c2v line or not ... :) this
+# file is best described as a "hack" of what needs to be done but has not
+# yet been done for a variety of reasons ... :) one day i will catch up &
+# get with the program & do things on time but ... not yet ... :) also
+# remember to take away the additional inputs (f, ..., j) in the lines above
+# at the start of this file ... :)
+
+cat ../sec_mask.f | \
+    sed -e "s/%subme2/${input2}/g" > sec_${input1}.f
+
+gfortran sec_${input1}.f
+
+mv a.exe profiles
+#mv a.out profiles
+
+cp ../../*.dat .
+
+cp ../settings.f .
+#cp ../settings_gt_10m.f .
+
+#Astra injector_${input1}.in > injector_${input1}.out
+
+# the lines involving fort.7 below are for debugging only & have no
+# real meaning ... well ... they do but only to me ... :) there is no
+# physics it sends the contents of fort.7 to a file to be specified ...
+# in this case they are the files maxmin_pos.txt ... in the main directory
+# the contents of fort.7 are the average between the maximum & minimum
+# points on the profiles as calculated by the 'profiles' program just to
+# make sure the values are not *crazy* ... :) if you make a scan of one
+# parameter in a certain sequence then you can look at the maxmin files
+# created as a function of that parameter (scaled as it shall be the run
+# number that is used - if you want to plot this you need to generate an
+# extra column with the row number and then multiply this by the paramater
+# being scanned ... not much fun but the only way i know how to do this :)
+# clearly this method depends crucially on the parameter being scanned
+# sequentially in terms of astra run number & with equal steps from one
+# astra run to the next ... :)
+
+#########################################################################
+# very important note !!! the files with the label "ren" below are for  #
+# plotting purposes *only* !!! the columns are *not* in standard astra  #
+# format & factors have been taken out / put in to make the units nicer #
+# for plotting ... :) if you want proper astra files then use the rot.f #
+# files instead ... :)                                                  #
+#########################################################################
+
+grep -e ' 1 -' injector_${input1}.0088.${input1} | wc
+cp injector_${input1}.0088.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0088.txt
+cp fort.99 injector.ren_${input1}.0088.${input1}
+cp fort.11 injector_${input1}.0088.Prof.${input1}
+
+grep -e ' 1 -' injector_${input1}.0098.${input1} | wc
+cp injector_${input1}.0098.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0098.txt
+cp fort.99 injector.ren_${input1}.0098.${input1}
+cp fort.11 injector_${input1}.0098.Prof.${input1}
+
+grep -e ' 1 -' injector_${input1}.0337.${input1} | wc
+cp injector_${input1}.0337.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0337.txt
+cp fort.99 injector.ren_${input1}.0337.${input1}
+cp fort.11 injector_${input1}.0337.Prof.${input1}
+
+# edit the line below as appropriate according to whether you have
+# tracked more or less than 10 m ... remember to do all the changes
+# for the corresponding post-processing (./post_pro) scripts as well !
+# actually ... :) it seems the file which needs to be modified is
+# called by *this* script already ... if only i had written all of
+# this down more clearly ... :) ... actually - that is not entirely
+# correct either ... the file settings.f needs to be changed as well
+# so i have now created the file 'settings_gt_10m.f' which needs to
+# be copied to the directories created for each astra run from the very
+# beginning (i.e. when running this script) so the easiest is just to
+# copy it to all directories whether it is used or not ... :) however
+
+#####################################################################
+# you need to remember to change the post_pro script as well !!!!!!!#
+#####################################################################
+
+# below is used only if there is an arbitrary end of line ...
+
+grep -e ' 1 -' injector_${input1}.0${inputd}.${input1} | wc
+cp injector_${input1}.0${inputd}.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0${inputd}.txt
+cp fort.99 injector.ren_${input1}.0${inputd}.${input1}
+cp fort.11 injector_${input1}.0${inputd}.Prof.${input1}
+
+# below we look at the various bits that make up the line all the way
+# to BA1 - the sequence required is the following:
+# injector.in - S02.in - C2V.in - VELA.in - BA1.in - BA1_dipole.in
+# we also create new files that will include all the Xemit & Yemit &
+# Zemit files for the individual sections in the *same* file so we
+# can plot all pieces of the line on the same plot ... :) this could
+# slow down the script & maybe there is a better way (at least i hope
+# so) so we can change it at a later date ... :)
+
+cp injector_${input1}.Xemit.${input1} 2BA1_${input1}.Xemit.${input1}
+cp injector_${input1}.Yemit.${input1} 2BA1_${input1}.Yemit.${input1}
+cp injector_${input1}.Zemit.${input1} 2BA1_${input1}.Zemit.${input1}
+
+#####################################################################
+#                     now we go through S02                         #
+#####################################################################
+
+cat ../S02_mask.in | \
+    sed -e "s/%subme1/${input1}/g" \
+        -e "s/%submef/${inputf}/g" \
+        -e "s/%submeg/${inputg}/g" \
+        -e "s/%submeh/${inputh}/g" \
+        -e "s/%submei/${inputi}/g" \
+        -e "s/%submez/${inputz}/g" > S02_${input1}.in
+
+set zoff = 0.0
+
+set theta = 0
+
+cat ../rot_mask.f | \
+    sed -e "s/%subme2/${input2}/g" \
+        -e "s/%subzoff/${zoff}/g" \
+        -e "s/%subtheta/${theta}/g" > rot_S02_${input1}.f
+
+gfortran rot_S02_${input1}.f
+
+mv a.exe rot_S02
+
+cp injector_${input1}.0337.${input1} fort.9
+./rot_S02
+cp fort.15 CLA-S02-APER-01.astra
+
+#Astra S02_${input1}.in > S02_${input1}.out
+
+grep -e ' 1 -' S02_${input1}.0023.${input1} | wc
+cp S02_${input1}.0023.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0023.txt
+cp fort.99 S02.ren_${input1}.0023.${input1}
+cp fort.11 S02_${input1}.0023.Prof.${input1}
+
+grep -e ' 1 -' S02_${input1}.0072.${input1} | wc
+cp S02_${input1}.0072.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0072.txt
+cp fort.99 S02.ren_${input1}.0072.${input1}
+cp fort.11 S02_${input1}.0072.Prof.${input1}
+
+grep -e ' 1 -' S02_${input1}.0164.${input1} | wc
+cp S02_${input1}.0164.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0164.txt
+cp fort.99 S02.ren_${input1}.0164.${input1}
+cp fort.11 S02_${input1}.0164.Prof.${input1}
+
+grep -e ' 1 -' S02_${input1}.0236.${input1} | wc
+cp S02_${input1}.0236.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0236.txt
+cp fort.99 S02.ren_${input1}.0236.${input1}
+cp fort.11 S02_${input1}.0236.Prof.${input1}
+
+# below is the strict invcrease required in z however this appears not
+# to be sufficient ... :| i think the increase required needs to take
+# into account the path length in the dipoles & this is why it is not
+# working perfectly yet ... the difference appears to be around 0.4 m
+
+awk '$1+=3.37147' S02_${input1}.Xemit.${input1} > S02_${input1}.Xemit.${input1}_temp
+awk '$1+=3.37147' S02_${input1}.Yemit.${input1} > S02_${input1}.Yemit.${input1}_temp
+awk '$1+=3.37147' S02_${input1}.Zemit.${input1} > S02_${input1}.Zemit.${input1}_temp
+
+cat S02_${input1}.Xemit.${input1}_temp >> 2BA1_${input1}.Xemit.${input1}
+cat S02_${input1}.Yemit.${input1}_temp >> 2BA1_${input1}.Yemit.${input1}
+cat S02_${input1}.Zemit.${input1}_temp >> 2BA1_${input1}.Zemit.${input1}
+
+#####################################################################
+#                     now we go through C2V                         #
+#####################################################################
+
+cat ../C2V_mask.in | \
+    sed -e "s/%subme1/${input1}/g" \
+        -e "s/%submej/${inputj}/g" \
+        -e "s/%submek/${inputk}/g" \
+        -e "s/%submel/${inputl}/g" \
+        -e "s/%submez/${inputz}/g" > C2V_${input1}.in
+
+set zoff = -0.4308
+
+set theta = -45
+
+cat ../rot_mask.f | \
+    sed -e "s/%subme2/${input2}/g" \
+        -e "s/%subzoff/${zoff}/g" \
+        -e "s/%subtheta/${theta}/g" > rot_C2V_${input1}.f
+
+gfortran rot_C2V_${input1}.f
+
+mv a.exe rot_C2V
+
+cp S02_${input1}.0236.${input1} fort.9
+./rot_C2V
+cp fort.15 CLA-C2V-MARK-01.astra
+
+#Astra C2V_${input1}.in > C2V_${input1}.out
+
+grep -e ' 1 -' C2V_${input1}.0074.${input1} | wc
+cp C2V_${input1}.0074.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0074.txt
+cp fort.99 C2V.ren_${input1}.0074.${input1}
+cp fort.11 C2V_${input1}.0074.Prof.${input1}
+
+grep -e ' 1 -' C2V_${input1}.0155.${input1} | wc
+cp C2V_${input1}.0155.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0155.txt
+cp fort.99 C2V.ren_${input1}.0155.${input1}
+cp fort.11 C2V_${input1}.0155.Prof.${input1}
+
+awk '$1+=6.15771' C2V_${input1}.Xemit.${input1} > C2V_${input1}.Xemit.${input1}_temp
+awk '$1+=6.15771' C2V_${input1}.Yemit.${input1} > C2V_${input1}.Yemit.${input1}_temp
+awk '$1+=6.15771' C2V_${input1}.Zemit.${input1} > C2V_${input1}.Zemit.${input1}_temp
+
+cat C2V_${input1}.Xemit.${input1}_temp >> 2BA1_${input1}.Xemit.${input1}
+cat C2V_${input1}.Yemit.${input1}_temp >> 2BA1_${input1}.Yemit.${input1}
+cat C2V_${input1}.Zemit.${input1}_temp >> 2BA1_${input1}.Zemit.${input1}
+
+#####################################################################
+#                     now we go through VELA                        #
+#####################################################################
+
+cat ../VELA_mask.in | \
+    sed -e "s/%subme1/${input1}/g" \
+        -e "s/%submem/${inputm}/g" \
+        -e "s/%submen/${inputn}/g" \
+        -e "s/%submeo/${inputo}/g" \
+        -e "s/%submep/${inputp}/g" \
+        -e "s/%submeq/${inputq}/g" \
+        -e "s/%submer/${inputr}/g" \
+        -e "s/%submez/${inputz}/g" > VELA_${input1}.in
+
+set zoff = -0.5169
+
+set theta = 45
+
+cat ../rot_mask.f | \
+    sed -e "s/%subme2/${input2}/g" \
+        -e "s/%subzoff/${zoff}/g" \
+        -e "s/%subtheta/${theta}/g" > rot_VELA_${input1}.f
+
+gfortran rot_VELA_${input1}.f
+
+mv a.exe rot_VELA
+
+cp C2V_${input1}.0155.${input1} fort.9
+./rot_VELA
+cp fort.15 CLA-C2V-DIA-SCR-01-W.astra
+
+#Astra VELA_${input1}.in > VELA_${input1}.out
+
+grep -e ' 1 -' VELA_${input1}.0085.${input1} | wc
+cp VELA_${input1}.0085.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0085.txt
+cp fort.99 VELA.ren_${input1}.0085.${input1}
+cp fort.11 VELA_${input1}.0085.Prof.${input1}
+
+grep -e ' 1 -' VELA_${input1}.0256.${input1} | wc
+cp VELA_${input1}.0256.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0256.txt
+cp fort.99 VELA.ren_${input1}.0256.${input1}
+cp fort.11 VELA_${input1}.0256.Prof.${input1}
+
+grep -e ' 1 -' VELA_${input1}.0291.${input1} | wc
+cp VELA_${input1}.0291.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0291.txt
+cp fort.99 VELA.ren_${input1}.0291.${input1}
+cp fort.11 VELA_${input1}.0291.Prof.${input1}
+
+grep -e ' 1 -' VELA_${input1}.0355.${input1} | wc
+cp VELA_${input1}.0355.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0355.txt
+cp fort.99 VELA.ren_${input1}.0355.${input1}
+cp fort.11 VELA_${input1}.0355.Prof.${input1}
+
+grep -e ' 1 -' VELA_${input1}.0511.${input1} | wc
+cp VELA_${input1}.0511.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0511.txt
+cp fort.99 VELA.ren_${input1}.0511.${input1}
+cp fort.11 VELA_${input1}.0511.Prof.${input1}
+
+grep -e ' 1 -' VELA_${input1}.0693.${input1} | wc
+cp VELA_${input1}.0693.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0693.txt
+cp fort.99 VELA.ren_${input1}.0693.${input1}
+cp fort.11 VELA_${input1}.0693.Prof.${input1}
+
+grep -e ' 1 -' VELA_${input1}.0861.${input1} | wc
+cp VELA_${input1}.0861.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0861.txt
+cp fort.99 VELA.ren_${input1}.0861.${input1}
+cp fort.11 VELA_${input1}.0861.Prof.${input1}
+
+grep -e ' 1 -' VELA_${input1}.1016.${input1} | wc
+cp VELA_${input1}.1016.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_1016.txt
+cp fort.99 VELA.ren_${input1}.1016.${input1}
+cp fort.11 VELA_${input1}.1016.Prof.${input1}
+
+grep -e ' 1 -' VELA_${input1}.1126.${input1} | wc
+cp VELA_${input1}.1126.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_1126.txt
+cp fort.99 VELA.ren_${input1}.1126.${input1}
+cp fort.11 VELA_${input1}.1126.Prof.${input1}
+
+awk '$1+=7.79471' VELA_${input1}.Xemit.${input1} > VELA_${input1}.Xemit.${input1}_temp
+awk '$1+=7.79471' VELA_${input1}.Yemit.${input1} > VELA_${input1}.Yemit.${input1}_temp
+awk '$1+=7.79471' VELA_${input1}.Zemit.${input1} > VELA_${input1}.Zemit.${input1}_temp
+
+cat VELA_${input1}.Xemit.${input1}_temp >> 2BA1_${input1}.Xemit.${input1}
+cat VELA_${input1}.Yemit.${input1}_temp >> 2BA1_${input1}.Yemit.${input1}
+cat VELA_${input1}.Zemit.${input1}_temp >> 2BA1_${input1}.Zemit.${input1}
+
+#####################################################################
+#                     now we go through BA1                         #
+#####################################################################
+
+cat ../BA1_mask.in | \
+    sed -e "s/%subme1/${input1}/g" \
+        -e "s/%submes/${inputs}/g" \
+        -e "s/%submet/${inputt}/g" \
+        -e "s/%submeu/${inputu}/g" \
+        -e "s/%submev/${inputv}/g" \
+        -e "s/%submew/${inputw}/g" \
+        -e "s/%submex/${inputx}/g" \
+        -e "s/%submez/${inputz}/g" > BA1_${input1}.in
+
+set zoff = 0.0
+
+set theta = 0
+
+cat ../rot_mask.f | \
+    sed -e "s/%subme2/${input2}/g" \
+        -e "s/%subzoff/${zoff}/g" \
+        -e "s/%subtheta/${theta}/g" > rot_BA1_${input1}.f
+
+gfortran rot_BA1_${input1}.f
+
+mv a.exe rot_BA1
+
+cp VELA_${input1}.1126.${input1} fort.9
+./rot_BA1
+cp fort.15 EBT-INJ-PSS-SHUT-02.astra
+
+#Astra BA1_${input1}.in > BA1_${input1}.out
+
+grep -e ' 1 -' BA1_${input1}.0303.${input1} | wc
+cp BA1_${input1}.0303.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0303.txt
+cp fort.99 BA1.ren_${input1}.0303.${input1}
+cp fort.11 BA1_${input1}.0303.Prof.${input1}
+
+grep -e ' 1 -' BA1_${input1}.0314.${input1} | wc
+cp BA1_${input1}.0314.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0314.txt
+cp fort.99 BA1.ren_${input1}.0314.${input1}
+cp fort.11 BA1_${input1}.0314.Prof.${input1}
+
+grep -e ' 1 -' BA1_${input1}.0482.${input1} | wc
+cp BA1_${input1}.0482.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0482.txt
+cp fort.99 BA1.ren_${input1}.0482.${input1}
+cp fort.11 BA1_${input1}.0482.Prof.${input1}
+
+grep -e ' 1 -' BA1_${input1}.0544.${input1} | wc
+cp BA1_${input1}.0544.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0544.txt
+cp fort.99 BA1.ren_${input1}.0544.${input1}
+cp fort.11 BA1_${input1}.0544.Prof.${input1}
+
+grep -e ' 1 -' BA1_${input1}.0609.${input1} | wc
+cp BA1_${input1}.0609.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0609.txt
+cp fort.99 BA1.ren_${input1}.0609.${input1}
+cp fort.11 BA1_${input1}.0609.Prof.${input1}
+
+grep -e ' 1 -' BA1_${input1}.0619.${input1} | wc
+cp BA1_${input1}.0619.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0619.txt
+cp fort.99 BA1.ren_${input1}.0619.${input1}
+cp fort.11 BA1_${input1}.0619.Prof.${input1}
+
+grep -e ' 1 -' BA1_${input1}.0724.${input1} | wc
+cp BA1_${input1}.0724.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0724.txt
+cp fort.99 BA1.ren_${input1}.0724.${input1}
+cp fort.11 BA1_${input1}.0724.Prof.${input1}
+
+grep -e ' 1 -' BA1_${input1}.0855.${input1} | wc
+cp BA1_${input1}.0855.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0855.txt
+cp fort.99 BA1.ren_${input1}.0855.${input1}
+cp fort.11 BA1_${input1}.0855.Prof.${input1}
+
+grep -e ' 1 -' BA1_${input1}.0867.${input1} | wc
+cp BA1_${input1}.0867.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0867.txt
+cp fort.99 BA1.ren_${input1}.0867.${input1}
+cp fort.11 BA1_${input1}.0867.Prof.${input1}
+
+grep -e ' 1 -' BA1_${input1}.0991.${input1} | wc
+cp BA1_${input1}.0991.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0991.txt
+cp fort.99 BA1.ren_${input1}.0991.${input1}
+cp fort.11 BA1_${input1}.0991.Prof.${input1}
+
+awk '$1+=18.54471' BA1_${input1}.Xemit.${input1} > BA1_${input1}.Xemit.${input1}_temp
+awk '$1+=18.54471' BA1_${input1}.Yemit.${input1} > BA1_${input1}.Yemit.${input1}_temp
+awk '$1+=18.54471' BA1_${input1}.Zemit.${input1} > BA1_${input1}.Zemit.${input1}_temp
+
+cat BA1_${input1}.Xemit.${input1}_temp >> 2BA1_${input1}.Xemit.${input1}
+cat BA1_${input1}.Yemit.${input1}_temp >> 2BA1_${input1}.Yemit.${input1}
+cat BA1_${input1}.Zemit.${input1}_temp >> 2BA1_${input1}.Zemit.${input1}
+
+#####################################################################
+#                  now we go through BA1_dipole                     #
+#####################################################################
+
+cat ../BA1_dipole_mask.in | \
+    sed -e "s/%subme1/${input1}/g" \
+        -e "s/%submey/${inputy}/g" \
+        -e "s/%submez/${inputz}/g" > BA1_dipole_${input1}.in
+
+set zoff = -0.6125
+
+set theta = -45
+
+cat ../rot_mask.f | \
+    sed -e "s/%subme2/${input2}/g" \
+        -e "s/%subzoff/${zoff}/g" \
+        -e "s/%subtheta/${theta}/g" > rot_BA1_dipole_${input1}.f
+
+gfortran rot_BA1_dipole_${input1}.f
+
+mv a.exe rot_BA1_dipole
+
+cp BA1_${input1}.0991.${input1} fort.9
+./rot_BA1_dipole
+cp fort.15 EBT-BA1-DIA-YAG-02.astra
+
+#Astra BA1_dipole_${input1}.in > BA1_dipole_${input1}.out
+
+grep -e ' 1 -' BA1_dipole_${input1}.0150.${input1} | wc
+cp BA1_dipole_${input1}.0150.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0150.txt
+cp fort.99 BA1_dipole.ren_${input1}.0150.${input1}
+cp fort.11 BA1_dipole_${input1}.0150.Prof.${input1}
+
+grep -e ' 1 -' BA1_dipole_${input1}.0258.${input1} | wc
+cp BA1_dipole_${input1}.0258.${input1} fort.9
+./profiles
+#cat fort.7 >> ../maxmin_0258.txt
+cp fort.99 BA1_dipole.ren_${input1}.0258.${input1}
+cp fort.11 BA1_dipole_${input1}.0258.Prof.${input1}
+
+awk '$1+=29.06771' BA1_dipole_${input1}.Xemit.${input1} > BA1_dipole_${input1}.Xemit.${input1}_temp
+awk '$1+=29.06771' BA1_dipole_${input1}.Yemit.${input1} > BA1_dipole_${input1}.Yemit.${input1}_temp
+awk '$1+=29.06771' BA1_dipole_${input1}.Zemit.${input1} > BA1_dipole_${input1}.Zemit.${input1}_temp
+
+cat BA1_dipole_${input1}.Xemit.${input1}_temp >> 2BA1_${input1}.Xemit.${input1}
+cat BA1_dipole_${input1}.Yemit.${input1}_temp >> 2BA1_${input1}.Yemit.${input1}
+cat BA1_dipole_${input1}.Zemit.${input1}_temp >> 2BA1_${input1}.Zemit.${input1}
+
+dos2unix *
+
+#rm fort.*
+#rm *temp
+
+cd ..
