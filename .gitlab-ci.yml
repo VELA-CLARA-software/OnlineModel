@@ -1,2 +1,2 @@
 list_tools:
-  script: "where python"
+  script: "which python"
