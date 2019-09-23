@@ -1,5 +1,6 @@
 import sys, os, shutil
 import sqlite3
+import uuid
 sys.path.append(os.path.dirname(os.path.dirname( os.path.abspath(__file__))))
 import data.data as data
 
@@ -24,17 +25,17 @@ class TemporaryDirectory(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         shutil.rmtree(self.name)
-
-'CREATE TABLE IF NOT EXISTS "magnets" ( \
-    directory varchar(200),\
-    date int(100),\
-    \
-    );'
-
-connall = sqlite3.connect('astra_runner.db')
-setsdball = connall.cursor()
-setsdball.execute()
-connall.commit()
+#
+# 'CREATE TABLE IF NOT EXISTS "magnets" ( \
+#     directory varchar(200),\
+#     date int(100),\
+#     \
+#     );'
+#
+# connall = sqlite3.connect('astra_runner.db')
+# setsdball = connall.cursor()
+# setsdball.execute()
+# connall.commit()
 
 def sqlite_insert(c, table, row):
     result = None
