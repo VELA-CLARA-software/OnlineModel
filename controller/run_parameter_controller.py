@@ -25,16 +25,15 @@ class GenericThread(QThread):
             self.object = self.function(*self.args, **self.kwargs)
 
 
-class Controller(QObject):
+class RunParameterController(QObject):
 
     def __init__(self, app, view, model):
-        super(Controller, self).__init__()
-        self.my_name = 'controller'
+        super(RunParameterController, self).__init__()
+        self.my_name = 'RunParameterController'
         self.app = app
         self.model = model
         self.view = view
         self.model.data.initialise_data()
-        self.view.runButton.clicked.connect(self.run_astra)
 
     def run_thread(self, func):
         self.thread = GenericThread(func)
@@ -66,6 +65,7 @@ class Controller(QObject):
         return
 
     def enable_run_button(self):
+        print 'called run_button_enabled'
         self.view.runButton.setEnabled(True)
         return
 
@@ -83,11 +83,7 @@ class Controller(QObject):
             self.model.run_script()
         return
 
-    def run_astra(self):
-        self.disable_run_button()
-        self.run_thread(self.app_sequence)
-        self.thread.start()
-
     @pyqtSlot()
     def handle_existent_file(self):
         print('Directory '+self.model.data.data_values['directory_line_edit'] + 'already exists')
+
