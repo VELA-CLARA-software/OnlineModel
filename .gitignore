@@ -1,2 +1,10 @@
-*.pyc
-*.autosave
+controller/*.pyc
+controller/*.autosave
+data/*.pyc
+data/*.autosave
+database/*.pyc
+database/*.autosave
+model/*.pyc
+model/*.autosave
+view/*.pyc
+view/*.autosave
