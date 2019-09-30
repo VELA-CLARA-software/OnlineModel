@@ -62,7 +62,9 @@ class Model(object):
                 continue
 
         for files in sftp.listdir():
-            if files == 'run'+str(self.data.data_values['astra_run_number_line_edit']):
+		    # removed astra_run_number from GUI 
+			# this part of the code will have to be adapted
+            if files == 'run'+ '001'#str(self.data.data_values['astra_run_number_line_edit']):
                 self.path_exists = True
                 break
                 return

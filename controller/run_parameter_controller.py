@@ -1,6 +1,6 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
+import run_parameters_parser as yaml_parser
 
 class GenericThread(QThread):
     signal = pyqtSignal()
@@ -59,6 +59,51 @@ class RunParameterController(QObject):
             else:
                 self.model.data.data_values.update({str(widget.objectName()): 'F'})
         return
+	
+	def import_parameter_values_from_yaml_file(self):
+	    dialog = Qt.FileDialog()
+	    filename = Qt.QFileDialog.getOpenFileName(dialog, caption='Open file',
+                                                  directory='c:\\',
+											      filter="YAML files (*.YAML *.YML *.yaml *.yml)")	
+	    if not filename.isEmpty():
+		    loaded_parameter_list = yaml_parser.parse_parameter_input_file(filename)
+			line_edit_list = self.get_all_line_edits_in_main_window()
+			self.set_all_line_edits_in_main_window(line_edit_list,loaded_parameter_list)
+			# get all check boxes
+			# set all check box
+			
+			
+	def get_all_line_edits_in_main_window(self):
+		line_edit_list = []
+		main_window = self.ui.centralwidget
+		# gather all the children of the central widget
+		# which will be the gird layouts containing the line-edits
+		# and check-box widgets
+		grid_layouts = main_window.children()
+		for widget in grid_layouts:
+			if isinstance(widget, Qt.QLineEdit):
+				line_edit_list.append(widget)
+		return line_edit_list
+
+    def get_all_check_boxes_in_main_window(self):
+        check_box_list = []
+        main_window = self.ui.centralwidget
+        # gather all the children of the central widget
+        # which will be the gird layouts containing the line-edits
+        # and check-box widgets
+        grid_layouts = main_window.children()
+        for widget in grid_layouts:
+            if isinstance(widget, Qt.QCheckBox):
+                check_box_list.append(widget)
+        return check_box_list	
+        @staticmethod
+    def set_all_line_edits_in_main_window(line_edit_list, values_to_set_dict):
+        print values_to_set_dict
+        for line_edit in line_edit_list:
+            # our YAML values dict has keys without the '_line_edit' suffix, so we must add this suffix to
+            # access the line_edit dict which has keys containing the '_line_edit' suffix.
+            parameter_value_str = str(values_to_set_dict[str(line_edit.objectName()).replace('_line_edit', '')])
+            line_edit.setText(parameter_value_str)
 
     def disable_run_button(self):
         self.view.runButton.setEnabled(False)

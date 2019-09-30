@@ -182,36 +182,16 @@
         <number>5</number>
        </property>
        <property name="verticalSpacing">
-        <number>25</number>
+        <number>32</number>
        </property>
        <item row="0" column="0">
-        <widget class="QLabel" name="astra_run_number_label">
-         <property name="inputMethodHints">
-          <set>Qt::ImhNone</set>
-         </property>
-         <property name="text">
-          <string>Astra Run No.</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="astra_run_number_line_edit">
-         <property name="inputMethodHints">
-          <set>Qt::ImhDigitsOnly</set>
-         </property>
-         <property name="placeholderText">
-          <string>001</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
         <widget class="QLabel" name="macro_particle_label_2">
          <property name="text">
           <string>No. Macro Particles</string>
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="0" column="1">
         <widget class="QLineEdit" name="macro_particle_line_edit">
          <property name="inputMethodHints">
           <set>Qt::ImhDigitsOnly</set>
@@ -221,14 +201,14 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="1" column="0">
         <widget class="QLabel" name="laser_pulse_length_label">
          <property name="text">
           <string>Laser Pulse Length (ps)</string>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="1" column="1">
         <widget class="QLineEdit" name="laser_pulse_length_line_edit">
          <property name="inputMethodHints">
           <set>Qt::ImhDigitsOnly</set>
@@ -238,14 +218,14 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="spot_size_label">
          <property name="text">
           <string>Spot Size (sig in mm)</string>
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="2" column="1">
         <widget class="QLineEdit" name="spot_size_line_edit">
          <property name="inputMethodHints">
           <set>Qt::ImhDigitsOnly</set>
@@ -255,14 +235,14 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="charge_label">
          <property name="text">
           <string>Charge (nC)</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="3" column="1">
         <widget class="QLineEdit" name="charge_line_edit">
          <property name="inputMethodHints">
           <set>Qt::ImhDigitsOnly</set>
@@ -272,14 +252,14 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="4" column="0">
         <widget class="QLabel" name="gun_gradient_label">
          <property name="text">
           <string>Gun Gradient (MV/m)</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="4" column="1">
         <widget class="QLineEdit" name="gun_gradient_line_edit">
          <property name="inputMethodHints">
           <set>Qt::ImhDigitsOnly</set>
@@ -289,14 +269,14 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="5" column="0">
         <widget class="QLabel" name="gun_phase_label">
          <property name="text">
           <string>Gun Phase (deg.)</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="5" column="1">
         <widget class="QLineEdit" name="gun_phase_line_edit">
          <property name="inputMethodHints">
           <set>Qt::ImhDigitsOnly</set>
@@ -320,108 +300,6 @@
      </rect>
     </property>
     <layout class="QGridLayout" name="magnet_quad_strength_layout">
-     <item row="3" column="1">
-      <layout class="QFormLayout" name="ba1_quads_layout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="ba1_quad1_strength_label">
-         <property name="text">
-          <string>QUAD1 Strength (k)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="ba1_quad1_strength_line_edit">
-         <property name="placeholderText">
-          <string>-3.8</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="ba1_quad2_strength_label">
-         <property name="text">
-          <string>QUAD2 Strength (k)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="ba1_quad2_strength_line_edit">
-         <property name="placeholderText">
-          <string>9.9</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="ba1_quad3_strength_label">
-         <property name="text">
-          <string>QUAD3 Strength (k)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="ba1_quad3_strength_line_edit">
-         <property name="placeholderText">
-          <string>-11.5</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="ba1_quad4_strength_label">
-         <property name="text">
-          <string>QUAD4 Strength (k)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="ba1_quad4_strength_line_edit">
-         <property name="placeholderText">
-          <string>5.0</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="ba1_quad5_strength_label">
-         <property name="text">
-          <string>QUAD5 Strength (k)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QLineEdit" name="ba1_quad5_strength_line_edit">
-         <property name="placeholderText">
-          <string>-3.5</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="ba1_quad6_strength_label">
-         <property name="text">
-          <string>QUAD6 Strength (k)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QLineEdit" name="ba1_quad6_strength_line_edit">
-         <property name="placeholderText">
-          <string>-3.5</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="ba1_quad7_strength_label">
-         <property name="text">
-          <string>QUAD7 Strength in Dipole (k)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QLineEdit" name="ba1_quad7_strength_line_edit">
-         <property name="placeholderText">
-          <string>2.5</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
      <item row="3" column="0">
       <layout class="QFormLayout" name="c2v_quads_layout">
        <item row="0" column="1">
@@ -463,151 +341,6 @@
         <widget class="QLabel" name="c2v_quad1_strength_label">
          <property name="text">
           <string>QUAD1 Strength (k)</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLabel" name="label_3">
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>BA1</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>S02</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0" colspan="2">
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0">
-        <layout class="QFormLayout" name="formLayout_11">
-         <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-         </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="directory_label">
-           <property name="text">
-            <string>Directory</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLineEdit" name="directory_line_edit"/>
-         </item>
-        </layout>
-       </item>
-       <item row="0" column="1">
-        <widget class="QPushButton" name="runButton">
-         <property name="text">
-          <string>Run ASTRA</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="label_4">
-       <property name="font">
-        <font>
-         <pointsize>11</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>VELA</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <layout class="QFormLayout" name="s02_quads_layout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="s02_quad1_strength_label">
-         <property name="text">
-          <string>QUAD1 Strength (k)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="s02_quad1_strength_line_edit">
-         <property name="contextMenuPolicy">
-          <enum>Qt::DefaultContextMenu</enum>
-         </property>
-         <property name="inputMethodHints">
-          <set>Qt::ImhDigitsOnly</set>
-         </property>
-         <property name="placeholderText">
-          <string>3.012</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="s02_quad2_strength_line_edit">
-         <property name="inputMethodHints">
-          <set>Qt::ImhDigitsOnly</set>
-         </property>
-         <property name="placeholderText">
-          <string>-4.719</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="s02_quad3_strength_label">
-         <property name="text">
-          <string>QUAD3 Strength (k)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="s02_quad3_strength_line_edit">
-         <property name="inputMethodHints">
-          <set>Qt::ImhDigitsOnly</set>
-         </property>
-         <property name="placeholderText">
-          <string>-4.07</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="s02_quad4_strength_label">
-         <property name="text">
-          <string>QUAD4 Strength (k)</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QLineEdit" name="s02_quad4_strength_line_edit">
-         <property name="inputMethodHints">
-          <set>Qt::ImhDigitsOnly</set>
-         </property>
-         <property name="placeholderText">
-          <string>13.316</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="s02_quad2_strength_label">
-         <property name="text">
-          <string>QUAD2 Strength (k)</string>
          </property>
         </widget>
        </item>
@@ -715,6 +448,257 @@
        </item>
       </layout>
      </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="label_3">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>BA1</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_4">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>VELA</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <layout class="QFormLayout" name="ba1_quads_layout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="ba1_quad1_strength_label">
+         <property name="text">
+          <string>QUAD1 Strength (k)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="ba1_quad1_strength_line_edit">
+         <property name="placeholderText">
+          <string>-3.8</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="ba1_quad2_strength_label">
+         <property name="text">
+          <string>QUAD2 Strength (k)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="ba1_quad2_strength_line_edit">
+         <property name="placeholderText">
+          <string>9.9</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="ba1_quad3_strength_label">
+         <property name="text">
+          <string>QUAD3 Strength (k)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="ba1_quad3_strength_line_edit">
+         <property name="placeholderText">
+          <string>-11.5</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="ba1_quad4_strength_label">
+         <property name="text">
+          <string>QUAD4 Strength (k)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="ba1_quad4_strength_line_edit">
+         <property name="placeholderText">
+          <string>5.0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="ba1_quad5_strength_label">
+         <property name="text">
+          <string>QUAD5 Strength (k)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLineEdit" name="ba1_quad5_strength_line_edit">
+         <property name="placeholderText">
+          <string>-3.5</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="ba1_quad6_strength_label">
+         <property name="text">
+          <string>QUAD6 Strength (k)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLineEdit" name="ba1_quad6_strength_line_edit">
+         <property name="placeholderText">
+          <string>-3.5</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="ba1_quad7_strength_label">
+         <property name="text">
+          <string>QUAD7 Strength in Dipole (k)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLineEdit" name="ba1_quad7_strength_line_edit">
+         <property name="placeholderText">
+          <string>2.5</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>S02</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <layout class="QFormLayout" name="s02_quads_layout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="s02_quad1_strength_label">
+         <property name="text">
+          <string>QUAD1 Strength (k)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="s02_quad1_strength_line_edit">
+         <property name="contextMenuPolicy">
+          <enum>Qt::DefaultContextMenu</enum>
+         </property>
+         <property name="inputMethodHints">
+          <set>Qt::ImhDigitsOnly</set>
+         </property>
+         <property name="placeholderText">
+          <string>3.012</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="s02_quad2_strength_line_edit">
+         <property name="inputMethodHints">
+          <set>Qt::ImhDigitsOnly</set>
+         </property>
+         <property name="placeholderText">
+          <string>-4.719</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="s02_quad3_strength_label">
+         <property name="text">
+          <string>QUAD3 Strength (k)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="s02_quad3_strength_line_edit">
+         <property name="inputMethodHints">
+          <set>Qt::ImhDigitsOnly</set>
+         </property>
+         <property name="placeholderText">
+          <string>-4.07</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="s02_quad4_strength_label">
+         <property name="text">
+          <string>QUAD4 Strength (k)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="s02_quad4_strength_line_edit">
+         <property name="inputMethodHints">
+          <set>Qt::ImhDigitsOnly</set>
+         </property>
+         <property name="placeholderText">
+          <string>13.316</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="s02_quad2_strength_label">
+         <property name="text">
+          <string>QUAD2 Strength (k)</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="4" column="0" colspan="2">
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <layout class="QFormLayout" name="formLayout_11">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="directory_label">
+           <property name="text">
+            <string>Directory</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="directory_line_edit">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="runButton">
+         <property name="text">
+          <string>Run ASTRA</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
     </layout>
    </widget>
   </widget>
@@ -724,11 +708,29 @@
      <x>0</x>
      <y>0</y>
      <width>1231</width>
-     <height>21</height>
+     <height>17</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionImport_YAML"/>
+    <addaction name="actionExport_YAML"/>
+   </widget>
+   <addaction name="menuFile"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionImport_YAML">
+   <property name="text">
+    <string>Import YAML</string>
+   </property>
+  </action>
+  <action name="actionExport_YAML">
+   <property name="text">
+    <string>Export YAML</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

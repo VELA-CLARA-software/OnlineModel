@@ -1,6 +1,5 @@
 import collections
 
-astra_run_number = 'astra_run_number_line_edit'
 macro_particle ='macro_particle_line_edit'
 laser_pulse_length = 'laser_pulse_length_line_edit'
 spot_size = 'spot_size_line_edit'
@@ -37,7 +36,7 @@ ba1_quad6_strength='ba1_quad6_strength_line_edit'
 ba1_quad7_strength='ba1_quad7_strength_line_edit'
 directory = 'directory_line_edit'
 
-data_keys = [astra_run_number, macro_particle,laser_pulse_length,spot_size,charge,gun_gradient,
+data_keys = [macro_particle,laser_pulse_length,spot_size,charge,gun_gradient,
              gun_phase, linac_1_gradient,linac_1_phase,bucking_coil_and_sol_strength,
              linac_1_sol1_strength, linac_2_sol1_strength,end_of_line,injector_space_charge,
              s02_quad1_strength, s02_quad2_strength,s02_quad3_strength,s02_quad4_strength,
@@ -47,7 +46,7 @@ data_keys = [astra_run_number, macro_particle,laser_pulse_length,spot_size,charg
              ba1_quad3_strength,ba1_quad4_strength,ba1_quad5_strength,ba1_quad6_strength,
              ba1_quad7_strength,rest_of_line_space_charge, directory]
 
-data_v = [101, 1,3,0.25,0.25,71.5,5,21,-10,0.237,0.05,-0.05,337,'T',3.012,-4.719,-4.07,
+data_v = [1,3,0.25,0.25,71.5,5,21,-10,0.237,0.05,-0.05,337,'T',3.012,-4.719,-4.07,
           13.316,54.756,-46.099,55.974,20.743,-18.492,5.267,-5.527,6.721,8.891,-3.8,
           9.9,-11.5,5.0,-3.5,-3.5,2.5,'T','/home/qfi29231/B_1/']
 
