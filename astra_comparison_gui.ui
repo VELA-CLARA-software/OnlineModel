@@ -36,7 +36,7 @@
         <number>30</number>
        </property>
        <item row="0" column="0">
-        <widget class="QLabel" name="linac1_gradient_label">
+        <widget class="QLabel" name="linac_1_gradient_label">
          <property name="text">
           <string>Linac 1 Gradient (MV/m)</string>
          </property>
@@ -53,14 +53,14 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QLabel" name="linac1_phase_label">
+        <widget class="QLabel" name="linac_1_phase_label">
          <property name="text">
           <string>Linac 1 Phase (deg.)</string>
          </property>
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLineEdit" name="linac1_phase_line_edit">
+        <widget class="QLineEdit" name="linac_1_phase_line_edit">
          <property name="inputMethodHints">
           <set>Qt::ImhDigitsOnly</set>
          </property>
@@ -87,14 +87,14 @@
         </widget>
        </item>
        <item row="3" column="0">
-        <widget class="QLabel" name="linac1_sol1_strength_label">
+        <widget class="QLabel" name="linac_1_sol1_strength_label">
          <property name="text">
           <string>Linac 1 Solenoid 1 Strength (A)</string>
          </property>
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QLineEdit" name="linac1_sol1_strength_line_edit">
+        <widget class="QLineEdit" name="linac_1_sol1_strength_line_edit">
          <property name="inputMethodHints">
           <set>Qt::ImhDigitsOnly</set>
          </property>
@@ -104,14 +104,14 @@
         </widget>
        </item>
        <item row="4" column="0">
-        <widget class="QLabel" name="linac1_sol2_strength_label">
+        <widget class="QLabel" name="linac_1_sol2_strength_label">
          <property name="text">
           <string>Linac 1 Solenoid 2 Strength (A)</string>
          </property>
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QLineEdit" name="linac1_sol2_strength_line_edit">
+        <widget class="QLineEdit" name="linac_1_sol2_strength_line_edit">
          <property name="inputMethodHints">
           <set>Qt::ImhDigitsOnly</set>
          </property>
@@ -377,7 +377,7 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLineEdit" name="lineEdit_13">
+        <widget class="QLineEdit" name="vela_quad2_strength_line_edit">
          <property name="placeholderText">
           <string>-18.492</string>
          </property>
@@ -391,7 +391,7 @@
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QLineEdit" name="lineEdit_14">
+        <widget class="QLineEdit" name="vela_quad3_strength_line_edit">
          <property name="placeholderText">
           <string>5.267</string>
          </property>
@@ -405,7 +405,7 @@
         </widget>
        </item>
        <item row="3" column="1">
-        <widget class="QLineEdit" name="lineEdit_15">
+        <widget class="QLineEdit" name="vela_quad4_strength_line_edit">
          <property name="placeholderText">
           <string>-5.527</string>
          </property>
@@ -419,7 +419,7 @@
         </widget>
        </item>
        <item row="4" column="1">
-        <widget class="QLineEdit" name="lineEdit_16">
+        <widget class="QLineEdit" name="vela_quad5_strength_line_edit">
          <property name="placeholderText">
           <string>6.721</string>
          </property>
@@ -433,14 +433,14 @@
         </widget>
        </item>
        <item row="5" column="1">
-        <widget class="QLineEdit" name="lineEdit_17">
+        <widget class="QLineEdit" name="vela_quad6_strength_line_edit">
          <property name="placeholderText">
           <string>8.891</string>
          </property>
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLineEdit" name="lineEdit_6">
+        <widget class="QLineEdit" name="vela_quad1_strength_line_edit">
          <property name="placeholderText">
           <string>20.743</string>
          </property>
@@ -708,7 +708,7 @@
      <x>0</x>
      <y>0</y>
      <width>1231</width>
-     <height>17</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
