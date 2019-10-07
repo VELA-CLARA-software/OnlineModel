@@ -25,7 +25,7 @@ class GenericThread(QThread):
 			self.object = self.function(*self.args, **self.kwargs)
 
 
-class Controller(QObject):
+class RunParameterController(QObject):
 
 	def __init__(self, app, view, model):
 		super(Controller, self).__init__()
@@ -117,3 +117,4 @@ class Controller(QObject):
 	@pyqtSlot()
 	def handle_existent_file(self):
 		print('Directory '+self.model.data.data_values['directory_line_edit'] + 'already exists')
+
