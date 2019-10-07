@@ -28,7 +28,7 @@ class GenericThread(QThread):
 class RunParameterController(QObject):
 
 	def __init__(self, app, view, model):
-		super(Controller, self).__init__()
+		super(RunParameterController, self).__init__()
 		self.my_name = 'controller'
 		self.app = app
 		self.model = model
@@ -37,7 +37,6 @@ class RunParameterController(QObject):
 		self.model.data.initialise_scan()
 		self.model.data.initialise_scan_parameters()
 		self.populate_scan_combo_box()
-		self.view.runButton.clicked.connect(self.run_astra)
 
 	def populate_scan_combo_box(self):
 		parameter_scan_combo_box = self.view.centralwidget.findChild(QComboBox, 'parameter_scan_combo_box')
