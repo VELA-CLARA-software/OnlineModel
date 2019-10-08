@@ -7,7 +7,7 @@ class UnifiedController():
             self.rpc = m_RunParameterController
             self.ppc = m_PostProcessingController
             self.rpc.enable_run_button()
-            self.rpc.view.runButton.clicked.connect(self.run_rpc_process)
+            self.rpc.view.runButton.clicked.connect(self.rpc.run_astra)
             
     
         def run_rpc_process(self):
