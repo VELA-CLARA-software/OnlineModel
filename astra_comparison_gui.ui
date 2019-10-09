@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1500</width>
-    <height>639</height>
+    <height>553</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -39,7 +39,7 @@
        <enum>QLayout::SetDefaultConstraint</enum>
       </property>
       <item row="0" column="0">
-       <layout class="QFormLayout" name="formLayout">
+       <layout class="QFormLayout" name="gun_parameter_form_layout">
         <property name="sizeConstraint">
          <enum>QLayout::SetDefaultConstraint</enum>
         </property>
@@ -244,7 +244,7 @@
        </layout>
       </item>
       <item row="0" column="1">
-       <layout class="QFormLayout" name="formLayout_7">
+       <layout class="QFormLayout" name="linac_1_parameter_form_layout">
         <property name="sizeConstraint">
          <enum>QLayout::SetDefaultConstraint</enum>
         </property>
@@ -584,7 +584,7 @@
        </layout>
       </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="ba1_label">
         <property name="font">
          <font>
           <pointsize>11</pointsize>
@@ -781,7 +781,7 @@
        </layout>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="label_4">
+       <widget class="QLabel" name="vela_label">
         <property name="font">
          <font>
           <pointsize>11</pointsize>
@@ -886,7 +886,7 @@
        </layout>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="c2v_label">
         <property name="font">
          <font>
           <pointsize>11</pointsize>
@@ -900,12 +900,12 @@
        </widget>
       </item>
       <item row="4" column="0" colspan="2">
-       <layout class="QGridLayout" name="gridLayout_3">
+       <layout class="QGridLayout" name="directory_and_run_button_grid_layout">
         <property name="sizeConstraint">
          <enum>QLayout::SetDefaultConstraint</enum>
         </property>
         <item row="0" column="0">
-         <layout class="QFormLayout" name="formLayout_11">
+         <layout class="QFormLayout" name="directory_form_layout">
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
@@ -934,7 +934,7 @@
        </layout>
       </item>
       <item row="0" column="0">
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="s02_label">
         <property name="font">
          <font>
           <pointsize>11</pointsize>
@@ -957,7 +957,7 @@
      <x>0</x>
      <y>0</y>
      <width>1500</width>
-     <height>17</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
