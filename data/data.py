@@ -40,7 +40,7 @@ parameter_to_scan = 'parameter_scan_combo_box'
 parameter_scan_from_value = 'parameter_scan_from_value_line_edit'
 parameter_scan_to_value = 'parameter_scan_to_value_line_edit'
 parameter_scan_step_size = 'parameter_scan_step_size_line_edit'
-
+parameter_scan = 'parameter_scan_check_box'
 data_keys = [astra_run_number, macro_particle,laser_pulse_length,spot_size,charge,gun_gradient,
 			 gun_phase, linac_1_gradient,linac_1_phase,bucking_coil_and_sol_strength,
 			 linac_1_sol1_strength, linac_2_sol1_strength,end_of_line,injector_space_charge,
@@ -64,10 +64,10 @@ scannable_data_list = [laser_pulse_length,spot_size,charge,gun_gradient,
 					   ba1_quad1_strength,ba1_quad2_strength, ba1_quad3_strength,ba1_quad4_strength,
 					   ba1_quad5_strength,ba1_quad6_strength, ba1_quad7_strength]
 
-scan_keys = [parameter_to_scan, parameter_scan_from_value, parameter_scan_to_value,
+scan_keys = [parameter_scan, parameter_to_scan, parameter_scan_from_value, parameter_scan_to_value,
 			 parameter_scan_step_size]
 
-scan_v = ['charge', 25, 75, 25]
+scan_v = [True,'charge', 25, 75, 25]
 
 scan_parameter_keys = ['parameter', 'from', 'to', 'step']
 
