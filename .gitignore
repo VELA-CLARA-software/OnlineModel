@@ -8,3 +8,4 @@ model/*.pyc
 model/*.autosave
 view/*.pyc
 view/*.autosave
+*/__pycache__*
