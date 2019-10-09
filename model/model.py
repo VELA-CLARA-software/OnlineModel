@@ -30,7 +30,7 @@ class Model(object):
             return
 
     def create_subdirectory(self):
-        path = self.data.data_values['directory_line_edit']
+        path = self.data.data_values['directory']
         if not path.endswith('/'):
             path = path + '/'
         self.check_if_directory_exists()
@@ -55,22 +55,19 @@ class Model(object):
     def check_if_directory_exists(self):
         sftp = self.client.open_sftp()
         for files in sftp.listdir():
-            if files == self.data.data_values['directory_line_edit']:
-                sftp.chdir(self.data.data_values['directory_line_edit'])
+            if files == self.data.data_values['directory']:
+                sftp.chdir(self.data.data_values['directory'])
                 break
             else:
                 continue
-
         for files in sftp.listdir():
-		    # removed astra_run_number from GUI 
-			# this part of the code will have to be adapted
-            if files == 'run'+ '001': #str(self.data.data_values['astra_run_number_line_edit']):
+            # removed astra_run_number from GUI 
+            # this part of the code will have to be adapted
+            if files == 'run'+ '101': #str(self.data.data_values['astra_run_number_line_edit']):
                 self.path_exists = True
                 break
-                return
             else:
                 continue
-
         self.path_exists = False
         sftp.close()
         return
@@ -80,13 +77,25 @@ class Model(object):
 
     def run_script(self):
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
-        path_command = 'export PATH=$PATH:/opt/ASTRA:' + self.pathscript
-        self.client.exec_command(path_command)
-        path_command = 'cd ' + self.data.data_values['directory_line_edit'] + '; '
+        #path_command = 'export PATH=$PATH:/opt/ASTRA:' + self.pathscript
+        #self.client.exec_command(path_command)
+        path_command = 'cd ' + self.data.data_values['directory'] + '; '
         path_command = path_command + self.pathscript+'script/./run_2BA1 '
-        for key, value in self.data.data_values.iteritems():
-            path_command = path_command + str(value) + ' '
-
-        stdin, stdout, stderr = self.client.exec_command(path_command)
-        print(stderr.readlines())
+        try:
+            current_scan_value = float(self.data.scan_values['parameter_scan_from'])
+            scan_end = float(self.data.scan_values['parameter_scan_to'])
+            scan_step_size = float(self.data.scan_values['parameter_scan_step_size'])
+        except ValueError:
+            print "Enter a numerical value to conduct a scan"
+        while current_scan_value <= scan_end:
+            for key, value in self.data.data_values.iteritems():
+                if str(key).replace('_line_edit','') == self.data.scan_values['parameter_scan']:
+                    path_command = path_command + str(current_scan_value) + ' '
+                    current_scan_value += scan_step_size
+                else:
+                    path_command = path_command + str(value) + ' '  
+            print 'Running with command: ' + path_command
+            path_command = '' + self.pathscript+'script/./run_2BA1 '
+        #stdin, stdout, stderr = self.client.exec_command(path_command)
+        #print(stderr.readlines())
         return
