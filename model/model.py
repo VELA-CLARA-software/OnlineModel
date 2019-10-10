@@ -78,13 +78,32 @@ class Model(object):
 
     def run_script(self):
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
-        path_command = 'export PATH=$PATH:/opt/ASTRA:' + self.pathscript
-        self.client.exec_command(path_command)
+        #path_command = 'export PATH=$PATH:/opt/ASTRA:' + self.pathscript
+        #self.client.exec_command(path_command)
         path_command = 'cd ' + self.data.data_values['directory_line_edit'] + '; '
         path_command = path_command + self.pathscript+'script/./run_2BA1 '
-        for key, value in self.data.data_values.iteritems():
-            path_command = path_command + str(value) + ' '
+        if self.data.scan_parameter['parameter_scan_check_box']:
+            try:
+                current_scan_value = float(self.data.scan_values['from'])
+                scan_end = float(self.data.scan_values['to'])
+                scan_step_size = float(self.data.scan_values['step'])
+            except ValueError:
+                print "Enter a numerical value to conduct a scan"
+            while current_scan_value <= scan_end:
+                for key, value in self.data.data_values.iteritems():
+                    if str(key).replace('_line_edit','') == self.data.scan_values['parameter']:
+                        path_command = path_command + str(current_scan_value) + ' '
+                        current_scan_value += scan_step_size
+                    else:
+                        path_command = path_command + str(value) + ' '  
+                print 'Running with command: ' + path_command
+                path_command = '' + self.pathscript+'script/./run_2BA1 '
+            #stdin, stdout, stderr = self.client.exec_command(path_command)
+            #print(stderr.readlines())
+            return
+        else:
+            for key, value in self.data.data_values.iteritems():
+                path_command = path_command + str(value) + ' '
+            print 'Running with command: ' + path_command
 
-        stdin, stdout, stderr = self.client.exec_command(path_command)
-        print(stderr.readlines())
-        return
+            
