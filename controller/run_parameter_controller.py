@@ -1,6 +1,6 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-
+from copy import copy,deepcopy
 
 class GenericThread(QThread):
     signal = pyqtSignal()
@@ -33,7 +33,6 @@ class RunParameterController(QObject):
         self.app = app
         self.model = model
         self.view = view
-        self.model.data.initialise_data()
         self.model.data.initialise_scan()
         self.model.data.initialise_scan_parameters()
         self.populate_scan_combo_box()
@@ -41,10 +40,17 @@ class RunParameterController(QObject):
         self.view.parameter_scan_check_box.setChecked(True)
 
     def toggle_scan_parameters_state(self, state):
-        parameter_scan_combo_box = self.view.centralwidget.findChild(QComboBox, 'parameter_scan_combo_box')
-        parameter_scan_from_value_line_edit = self.view.centralwidget.findChild(QLineEdit, 'parameter_scan_from_value_line_edit')
-        parameter_scan_to_value_line_edit = self.view.centralwidget.findChild(QLineEdit, 'parameter_scan_to_value_line_edit')
-        parameter_scan_step_size_line_edit = self.view.centralwidget.findChild(QLineEdit, 'parameter_scan_step_size_line_edit')
+        # parameter_scan_combo_box = self.view.centralwidget.findChild(QComboBox, 'parameter_scan_combo_box')
+        # parameter_scan_from_value_line_edit = self.view.centralwidget.findChild(QLineEdit,
+        #                                                                         'parameter_scan_from_value_line_edit')
+        # parameter_scan_to_value_line_edit = self.view.centralwidget.findChild(QLineEdit,
+        #                                                                       'parameter_scan_to_value_line_edit')
+        # parameter_scan_step_size_line_edit = self.view.centralwidget.findChild(QLineEdit,
+        #                                                                        'parameter_scan_step_size_line_edit')
+        parameter_scan_combo_box = self.view.layoutWidget.findChild(QComboBox, 'parameter_scan_combo_box')
+        parameter_scan_from_value_line_edit = self.view.layoutWidget.findChild(QLineEdit, 'parameter_scan_from_value_line_edit')
+        parameter_scan_to_value_line_edit = self.view.layoutWidget.findChild(QLineEdit, 'parameter_scan_to_value_line_edit')
+        parameter_scan_step_size_line_edit = self.view.layoutWidget.findChild(QLineEdit, 'parameter_scan_step_size_line_edit')
         if (state > 0):
             parameter_scan_combo_box.setEnabled(True)
             parameter_scan_from_value_line_edit.setEnabled(True)
@@ -57,7 +63,8 @@ class RunParameterController(QObject):
             parameter_scan_step_size_line_edit.setEnabled(False)
 
     def populate_scan_combo_box(self):
-        parameter_scan_combo_box = self.view.centralwidget.findChild(QComboBox, 'parameter_scan_combo_box')
+        # parameter_scan_combo_box = self.view.centralwidget.findChild(QComboBox, 'parameter_scan_combo_box')
+        parameter_scan_combo_box = self.view.layoutWidget.findChild(QComboBox, 'parameter_scan_combo_box')
         for parameter in self.model.data.scan_parameter_list:
             parameter_scan_combo_box.addItem(str(parameter).replace('_line_edit', ''))
 
@@ -66,9 +73,14 @@ class RunParameterController(QObject):
         self.thread.finished.connect(self.enable_run_button)
 
     def collect_parameters(self):
-        layout_list = self.view.centralwidget.findChildren(QGridLayout)
-        for layout in layout_list:
-            self.widgets_in_layout(layout)
+        #layout_list = self.view.centralwidget.findChildren(QGridLayout)
+        for layout_lst in ['centralwidget','layoutWidget','layoutWidget_2']:
+            layout_list = (getattr(self.view, layout_lst)).findChildren(QGridLayout)
+            for layout in layout_list:
+                self.widgets_in_layout(layout)
+        #layout_list = self.view.layoutWidget.findChildren(QGridLayout)
+        #for layout in layout_list:
+        #    self.widgets_in_layout(layout)
 
     def widgets_in_layout(self, layout):
         for children in layout.children():
@@ -95,7 +107,6 @@ class RunParameterController(QObject):
                 else:
                     self.model.data.data_values.update({str(widget.objectName()): 'F'})
             elif str(widget.objectName()) in self.model.data.scan_parameter:
-                print str(widget.objectName())
                 if widget.isChecked():
                    self.model.data.scan_parameter.update({str(widget.objectName()) : True})
                 else:
@@ -103,11 +114,13 @@ class RunParameterController(QObject):
         elif isinstance(widget, QComboBox):
             self.model.data.scan_parameter.update({str(widget.objectName()) : str(widget.currentText())})
         return
+
     def collect_scan_parameters(self):
         self.model.data.scan_values['parameter'] = self.model.data.scan_parameter['parameter_scan_combo_box']
         self.model.data.scan_values['from'] = self.model.data.scan_parameter['parameter_scan_from_value_line_edit']
         self.model.data.scan_values['to'] = self.model.data.scan_parameter['parameter_scan_to_value_line_edit']
         self.model.data.scan_values['step'] = self.model.data.scan_parameter['parameter_scan_step_size_line_edit']
+
     def disable_run_button(self):
         self.view.runButton.setEnabled(False)
         return
@@ -119,24 +132,24 @@ class RunParameterController(QObject):
     def app_sequence(self):
         self.collect_parameters()
         self.collect_scan_parameters()
-        # self.model.ssh_to_server()
-        # self.model.create_subdirectory()
-        # if self.model.path_exists:
-            # self.thread.stop()
-            # self.thread.finished.connect(self.enable_run_button())
-            # self.thread.signal.connect(self.handle_existent_file)
+        self.model.ssh_to_server()
+        self.model.create_subdirectory()
+        if self.model.path_exists:
+            self.thread.stop()
+            self.thread.finished.connect(self.enable_run_button())
+            self.thread.signal.connect(self.handle_existent_file)
 
-        # else:
-            # self.thread._stopped = False
+        else:
+            self.thread._stopped = False
         self.model.run_script()
         return
 
     def run_astra(self):
         self.disable_run_button()
-        self.app_sequence()
-        self.enable_run_button()
-        #self.run_thread(self.app_sequence)
-        #self.thread.start()
+        #self.app_sequence()
+        #self.enable_run_button()
+        self.run_thread(self.app_sequence)
+        self.thread.start()
 
     @pyqtSlot()
     def handle_existent_file(self):
