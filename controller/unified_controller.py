@@ -19,8 +19,10 @@ class UnifiedController():
 
         def run_ppc_process(self):
             self.ppc.disable_run_postproc_button()
-            self.ppc.run_thread(self.ppc.app_sequence_post)
-            self.ppc.thread.start()
+            self.ppc.app_sequence_post()
+            self.ppc.enable_run_postproc_button()
+            #self.ppc.run_thread(self.ppc.app_sequence_post)
+            #self.ppc.thread.start()
 
 
 
