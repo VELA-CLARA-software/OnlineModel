@@ -673,5 +673,3 @@ class Ui_MainWindow(object):
         self.postprocessing_tab_widget.setTabText(self.postprocessing_tab_widget.indexOf(self.post_tab), _translate("MainWindow", "Post-processing", None))
         self.options_post_runs_label.setText(_translate("MainWindow", "Runs ", None))
         self.options_post_plot_label.setText(_translate("MainWindow", "Beam Dynamics Plots", None))
-
-

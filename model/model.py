@@ -3,17 +3,16 @@ import os
 import sys
 import stat
 from copy import deepcopy
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 
 sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'data'))
 from data import data
 
 
 class Model(object):
-
+    output_directory = 'C:/Users/qfi29231/Documents/'
+    width = 1000
+    height = 600
     def __init__(self):
-
         self.my_name = 'model'
         self.username = ''
         self.password = ''
@@ -133,14 +132,7 @@ class Model(object):
         stdin, stdout, stderr = self.client.exec_command(path_command_exp)
         print(stderr.readlines())
 
-    # def path_run_command_post(self, command, initial_path):
-    #     path_command_exp = 'cd ' + self.data.data_values_post['directory_post_line_edit'] + '; '
-    #     path_command_exp += command
-    #     print('Running with command {}'.format(path_command_exp))
-    #     stdin, stdout, stderr = self.client.exec_command(path_command_exp)
-    #     print(stderr.readlines())
-
-    def run_script_post(self): #To be implemented
+    def run_script_post(self):
         dictionary = deepcopy(self.data.data_values_post)
         del(dictionary['directory_post_combo_box_3'])
         del(dictionary['directory_post_combo_box_4'])
@@ -151,9 +143,33 @@ class Model(object):
         except OSError:
             print('Post-processing script failed')
 
+    def conversion_routine(self, file_to_import):
+        sftp = self.client.open_sftp()
+        directory = self.data.data_values_post['directory_post_line_edit']
+        run1 = self.data.data_values_post['directory_post_combo_box']
+        run2 = self.data.data_values_post['directory_post_combo_box_2']
+        sftp.chdir(directory + '/plots/run_' + str(run1) + '_' + str(run2) + '/eps/')
+        path_sftp = sftp.getcwd()
+        for fil in sftp.listdir():
+            if str(fil).find(file_to_import) != -1:
+                try:
+                    sftp.stat(str(fil).replace('eps', 'png'))
+                    print('file {} has already been converted to png'.format(path_sftp + '/' + str(fil)))
+                except IOError:
+                    if str(fil).endswith('2BA1.eps'):
+                        command = self.convert_eps2png(str(fil))
+                        self.path_run_command(command, path_sftp)
+                        print('file {} has been converted to {}'.format(path_sftp + '/' + str(fil),
+                                                                        path_sftp + '/' + str(fil).replace('.eps', '.png')))
+                fil = str(fil).replace('eps', 'png')
+                sftp.get(path_sftp + '/' + fil, self.output_directory + fil)
+                return file_to_import
+            else:
+                continue
+        sftp.close()
 
-    def retrieve_plots(self): #To be implemented
-        """migrate from jupyter-notebook, load pictures method of the class"""
-        pass
-
-
+    def convert_eps2png(self, epsfile):
+        path = deepcopy(epsfile)
+        path = path.replace('.eps', '.png')
+        return 'convert -density 600 ' + epsfile + ' -rotate 90 -resize ' + str(self.width) + \
+               'x'+str(self.height) + ' ' + path

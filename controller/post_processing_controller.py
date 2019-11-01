@@ -31,9 +31,6 @@ class GenericThread(QThread):
 
 
 class PostProcessingController(QObject):
-    output_directory = 'C:/Users/qfi29231/Documents/'
-    width = 1000
-    height = 600
 
     def __init__(self, app, view, model):
         super(PostProcessingController, self).__init__()
@@ -46,9 +43,9 @@ class PostProcessingController(QObject):
         self.post_proc_run = False
         self.populate_plot_combo_box()
 
-    def run_thread(self, func):
-        self.thread = GenericThread(func)
-        self.thread.finished.connect(self.enable_run_postproc_button)
+    # def run_thread(self, func):
+    #    self.thread = GenericThread(func)
+    #    self.thread.finished.connect(self.enable_run_postproc_button)
 
     def disable_run_postproc_button(self):
         self.view.runButton_post.setEnabled(False)
@@ -78,22 +75,28 @@ class PostProcessingController(QObject):
             for par in parameters:
                 widget.addItem(par)
 
+    def fill_in_run_combo_boxes(self, widget):
+        parameters = self.model.get_runs_directories(self.model.data.data_values_post['directory_post_line_edit'])
+
+        for par in parameters:
+            widget.addItem(par)
+
     def check_if_directory_exists_post(self):
         run1 = self.model.data.data_values_post['directory_post_combo_box']
         run2 = self.model.data.data_values_post['directory_post_combo_box_2']
         sftp = self.model.client.open_sftp()
         sftp.chdir(self.model.data.data_values_post['directory_post_line_edit'] + 'plots')
         try:
-            filestat = sftp.stat('run_' + str(run1) + '_' + str(run2))
+            sftp.stat('run_' + str(run1) + '_' + str(run2))
             self.post_proc_run = True
         except Exception as e:
             self.post_proc_run = False
 
     def collect_post_proc_parameters(self):
-        print(self.model.data.data_values_post)
+        self.disable_run_postproc_button()
         self.collect_post_proc_directory()
-        print(self.model.data.data_values_post)
         self.collect_plots_combo_boxes()
+        return
 
     def collect_post_proc_directory(self):
         for widget in self.widgets_in_layout(self.view.formLayoutWidget_2):
@@ -109,29 +112,44 @@ class PostProcessingController(QObject):
             else:
                 continue
 
-
     def collect_plots_combo_boxes(self):
         """ To be implemented: Extension to update combo boxes from the server (runs existent in the directory) """
         for widget in self.widgets_in_layout(self.view.horizontalLayoutWidget):
             if isinstance(widget, QComboBox):
-                if str(widget.objectName()).endswith('box_3') or str(widget.objectName()).endswith('box_4') :
-                    if str(widget.currentText()).find('(x)') !=-1:
+                if not (str(widget.objectName()).endswith('box_3') or str(widget.objectName()).endswith('box_4')):
+                    self.model.data.data_values_post.update({str(widget.objectName()): str(widget.currentText())})
+                else:
+                    if str(widget.currentText()).rfind('(x)') != -1:
                         l_axis = '_x_'
-                    elif str(widget.currentText()).find('(y)') !=-1:
+                    elif str(widget.currentText()).rfind('(y)') != -1:
                         l_axis = '_y_'
+                    elif str(widget.currentText()).rfind('(z)') != -1 and str(widget.currentText()).rfind('emit') != -1:
+                        l_axis = '_z_'
                     else:
                         l_axis = '_'
-                    file_name = self.model.data.data_plot_parameters['Energy spread']
-                    file_name += '_'+self.model.data.data_values_post['directory_post_combo_box']
-                    file_name += '_'+self.model.data.data_values_post['directory_post_combo_box_2'] + l_axis
+                    file_name = self.model.data.data_plot_parameters[str(widget.currentText())]
+                    file_name += '_' + self.model.data.data_values_post['directory_post_combo_box']
+                    file_name += '_' + self.model.data.data_values_post['directory_post_combo_box_2'] + l_axis + '2BA1'
                     self.model.data.data_values_post.update({str(widget.objectName()): file_name})
-                else:
-                    self.model.data.data_values_post.update({str(widget.objectName()): str(widget.currentText())})
             else:
                 continue
 
-    def app_sequence_post(self):
+    def retrieve_plots(self):
+        self.disable_run_postproc_button()
+        widget_list = self.widgets_in_layout(self.view.gridLayoutWidget)
+        print([widget.objectName() for widget in widget_list])
+        for view, scene, key in zip([self.view.graphics_post_graphics_view_2, self.view.graphics_post_graphics_view_1],
+                                    [self.view.graphics_post_scene_2, self.view.graphics_post_scene_1],
+                                    ['directory_post_combo_box_3', 'directory_post_combo_box_4']):
+            file_to_import = self.model.data.data_values_post[key]
+            img_gui = self.model.conversion_routine(file_to_import)
+            if not img_gui.endswith('.png'):
+                img_gui += '.png'
 
+            self.show_image(img_gui, view, scene)
+
+    def app_sequence_post(self):
+        self.disable_run_postproc_button()
         self.model.ssh_to_server()
         self.collect_post_proc_parameters()
         self.check_if_directory_exists_post()
@@ -139,8 +157,12 @@ class PostProcessingController(QObject):
             self.model.run_script_post()
         else:
             print(' ++++++++++ results of comparison are already available  +++++++++++++')
-        # self.model.retrieve_plots()
-        self.thread._stopped = False
+        self.retrieve_plots()
         return
 
-
+    def show_image(self, filename, view, scene):
+        scene.clear()
+        pixmap = QPixmap(self.model.output_directory + filename)
+        pixmap_scaled = pixmap.scaled(0.75 * self.model.width, 0.6 * self.model.height, Qt.KeepAspectRatio)
+        scene.addPixmap(pixmap_scaled)
+        view.setScene(scene)
