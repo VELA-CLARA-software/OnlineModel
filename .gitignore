@@ -1,2 +1,4 @@
 *.pyc
 *.autosave
+.idea/*
+sh.exe.stackdump
