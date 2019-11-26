@@ -27,7 +27,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="scan_tab">
        <attribute name="title">
@@ -82,7 +82,7 @@
               <set>Qt::ImhDigitsOnly</set>
              </property>
              <property name="placeholderText">
-              <string>001</string>
+              <string>101</string>
              </property>
             </widget>
            </item>
@@ -99,7 +99,7 @@
               <set>Qt::ImhDigitsOnly</set>
              </property>
              <property name="placeholderText">
-              <string>1000</string>
+              <string>32</string>
              </property>
             </widget>
            </item>
@@ -1131,13 +1131,49 @@
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>20</y>
+          <y>-3</y>
           <width>1181</width>
-          <height>41</height>
+          <height>61</height>
          </rect>
         </property>
-        <layout class="QHBoxLayout" name="variables_dyn_plot_layout">
-         <item>
+        <layout class="QGridLayout" name="variables_dyn_plot_layout">
+         <item row="1" column="1">
+          <widget class="QComboBox" name="variables_dyn_plot_combo_box_1"/>
+         </item>
+         <item row="1" column="2">
+          <widget class="QComboBox" name="variables_dyn_plot_combo_box_2"/>
+         </item>
+         <item row="0" column="2">
+          <widget class="QLineEdit" name="directory_dyn_plot_line_edit"/>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="directory_dyn_plot_label">
+           <property name="font">
+            <font>
+             <pointsize>11</pointsize>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>Run directory</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <spacer name="dyn_plot_horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="1" column="0">
           <widget class="QLabel" name="variables_dyn_plot_label">
            <property name="font">
             <font>
@@ -1150,12 +1186,6 @@
             <string>Variables to plot</string>
            </property>
           </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="variables_dyn_plot_combo_box_1"/>
-         </item>
-         <item>
-          <widget class="QComboBox" name="variables_dyn_plot_combo_box_2"/>
          </item>
         </layout>
        </widget>
@@ -1264,14 +1294,14 @@
        <widget class="QWidget" name="horizontalLayoutWidget_3">
         <property name="geometry">
          <rect>
-          <x>0</x>
-          <y>0</y>
-          <width>1181</width>
-          <height>80</height>
+          <x>20</x>
+          <y>10</y>
+          <width>1011</width>
+          <height>46</height>
          </rect>
         </property>
-        <layout class="QHBoxLayout" name="summary_title_layout">
-         <item>
+        <layout class="QGridLayout" name="summary_title_layout">
+         <item row="0" column="0">
           <widget class="QLabel" name="summary_title_label">
            <property name="font">
             <font>
@@ -1284,6 +1314,9 @@
             <string>Summary Plot</string>
            </property>
           </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="directory_summary_line_edit"/>
          </item>
         </layout>
        </widget>
