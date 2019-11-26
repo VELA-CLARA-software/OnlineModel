@@ -85,8 +85,10 @@ class PostProcessingController(QObject):
         run1 = self.model.data.data_values_post['directory_post_combo_box']
         run2 = self.model.data.data_values_post['directory_post_combo_box_2']
         sftp = self.model.client.open_sftp()
-        sftp.chdir(self.model.data.data_values_post['directory_post_line_edit'] + 'plots')
+
         try:
+            sftp.stat(self.model.data.data_values_post['directory_post_line_edit'] + 'plots')
+            sftp.chdir(self.model.data.data_values_post['directory_post_line_edit'] + 'plots')
             sftp.stat('run_' + str(run1) + '_' + str(run2))
             self.post_proc_run = True
         except Exception as e:
@@ -137,7 +139,6 @@ class PostProcessingController(QObject):
     def retrieve_plots(self):
         self.disable_run_postproc_button()
         widget_list = self.widgets_in_layout(self.view.gridLayoutWidget)
-        print([widget.objectName() for widget in widget_list])
         for view, scene, key in zip([self.view.graphics_post_graphics_view_2, self.view.graphics_post_graphics_view_1],
                                     [self.view.graphics_post_scene_2, self.view.graphics_post_scene_1],
                                     ['directory_post_combo_box_3', 'directory_post_combo_box_4']):
