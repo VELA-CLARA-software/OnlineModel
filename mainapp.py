@@ -20,8 +20,8 @@ class MainApp(QObject):
         self.app = app
         self.view = view.Ui_MainWindow()
         self.model = model.Model()
-        self.model.username = 'qfi29231'
-        self.model.password = "qd'3xk.mr6&&"
+        self.model.username = 'DLERLP'
+        self.model.password = "3r!pc0~1"
         self.MainWindow = QMainWindow()
         self.view.setupUi(self.MainWindow)
         self.RunParameterController = run_parameter_controller.RunParameterController(app, self.view, self.model)
