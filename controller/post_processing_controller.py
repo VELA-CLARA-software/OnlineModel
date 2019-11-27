@@ -77,7 +77,6 @@ class PostProcessingController(QObject):
 
     def fill_in_run_combo_boxes(self, widget):
         parameters = self.model.get_runs_directories(self.model.data.data_values_post['directory_post_line_edit'])
-
         for par in parameters:
             widget.addItem(par)
 
@@ -87,9 +86,8 @@ class PostProcessingController(QObject):
         sftp = self.model.client.open_sftp()
 
         try:
-            sftp.stat(self.model.data.data_values_post['directory_post_line_edit'] + 'plots')
+            sftp.stat(self.model.data.data_values_post['directory_post_line_edit'] + 'plots/'+'run_' + str(run1) + '_' + str(run2))
             sftp.chdir(self.model.data.data_values_post['directory_post_line_edit'] + 'plots')
-            sftp.stat('run_' + str(run1) + '_' + str(run2))
             self.post_proc_run = True
         except Exception as e:
             self.post_proc_run = False
@@ -167,3 +165,4 @@ class PostProcessingController(QObject):
         pixmap_scaled = pixmap.scaled(0.75 * self.model.width, 0.6 * self.model.height, Qt.KeepAspectRatio)
         scene.addPixmap(pixmap_scaled)
         view.setScene(scene)
+
