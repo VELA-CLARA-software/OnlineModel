@@ -49,7 +49,10 @@ directory_run_post_2 = 'directory_post_combo_box_2'
 directory_run_post_3 = 'directory_post_combo_box_3'
 directory_run_post_4 = 'directory_post_combo_box_4'
 
-
+# Summary post-processing dictionary
+directory_summary = 'directory_summary_line_edit'
+summary_save_plot = 'summary_save_plot_check_box'
+summary_output_file = 'summary_output_file_line_edit'
 data_keys = [astra_run_number, macro_particle, laser_pulse_length, spot_size, charge, gun_gradient,
              gun_phase, linac_1_gradient, linac_1_phase, bucking_coil_and_sol_strength,
              linac_1_sol1_strength, linac_2_sol1_strength, end_of_line, injector_space_charge,
@@ -61,6 +64,7 @@ data_keys = [astra_run_number, macro_particle, laser_pulse_length, spot_size, ch
              ba1_quad7_strength, rest_of_line_space_charge, directory]
 
 data_keys_post = [directory_post, directory_run_post_1, directory_run_post_2,directory_run_post_3,directory_run_post_4]
+data_keys_post_summary = [directory_summary, summary_save_plot, summary_output_file]
 
 post_scan_plot_keys = ['emittance (x)', 'emittance (y)', 'emittance (z)', 'rms (x)', 'rms (y)', 'rms (z)',
                        'Average (x)', 'Average (y)', 'Energy spread', 'Kinetic Energy']
@@ -71,6 +75,7 @@ data_v = [101, 1, 3, 0.25, 0.25, 120, -9, 21, -16, 0.345, 0.05, -0.05, 337, 'T',
           9.9, -11.5, 5.0, -3.5, -3.5, 2.5, 'T', '/home/qfi29231/B_1/']
 
 data_v_post = ['', '', '', '', '']
+data_v_summary = ['', '', '']
 
 scannable_data_list = [laser_pulse_length, spot_size, charge, gun_gradient,
                        gun_phase, linac_1_gradient, linac_1_phase, bucking_coil_and_sol_strength,
@@ -98,6 +103,7 @@ class Data(object):
     scan_parameter_list = scannable_data_list
     data_values_post = collections.OrderedDict()
     data_plot_parameters = collections.OrderedDict()
+    data_summary_plot_parameters = collections.OrderedDict()
 
     def __init__(self):
         object.__init__(self)
@@ -116,6 +122,9 @@ class Data(object):
         [self.data_values_post.update({key: value}) for key, value in zip(data_keys_post, data_v_post)]
         [self.data_plot_parameters.update({key: value}) for key, value in zip(post_scan_plot_keys, post_scan_plot_v)]
         self.data_values_post['directory_post_line_edit'] = self.data_values['directory_line_edit']
+
+    def initialise_data_summary_post(self):
+        [self.data_summary_plot_parameters.update({key:value}) for key, value in zip(data_keys_post_summary, data_v_summary)]
     #def initialise_data(self):
     #    for key_dict, d_key, d_val in zip(['data_values', 'scan_values', 'scan_parameter', 'data_values_post'],
     #                                      ['data_v', 'scan_parameter_v', 'scan_v', 'data_v_post'],
