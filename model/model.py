@@ -2,6 +2,7 @@ from paramiko import *
 import os
 import sys
 import stat
+import numpy as np
 from copy import deepcopy
 
 sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'data'))
@@ -122,12 +123,15 @@ class Model(object):
     def path_command_ensemble(self, script, dictionary):
         path_command = self.pathscript + script
         for key, value in dictionary.iteritems():
-            path_command = path_command + str(value) + ' '
+            if key != 'directory_line_edit':
+                path_command = path_command + str(value) + ' '
+            else:
+                continue
         return path_command
 
     def path_run_command(self, command, initial_path):
-        path_command_exp = 'cd ' + initial_path + '; '
-        path_command_exp += command
+        path_command_exp = 'cd ' + str(initial_path) + '; '
+        path_command_exp += str(command) + ';'
         print('Running with command {}'.format(path_command_exp))
         stdin, stdout, stderr = self.client.exec_command(path_command_exp)
         print(stderr.readlines())
@@ -137,11 +141,24 @@ class Model(object):
         del(dictionary['directory_post_combo_box_3'])
         del(dictionary['directory_post_combo_box_4'])
         del (dictionary['directory_post_line_edit'])
-        path_command = self.path_command_ensemble('script/post_pro  ', dictionary)
+        path_command = 'cd ' + self.data.data_values_post['directory_post_line_edit'] + ' ;'
+        path_command += self.path_command_ensemble('script/post_pro  ', dictionary)
         try:
             self.path_run_command(path_command, self.data.data_values_post['directory_post_line_edit'])
         except OSError:
             print('Post-processing script failed')
+
+    def run_script_summary(self):
+        list_runs = self.get_runs_directories(self.data.data_summary_plot_parameters['directory_summary_line_edit'])
+        list_runs = sorted([int(l_runs.replace('run', '')) for l_runs in list_runs if l_runs.startswith('run') and l_runs.find('_') == -1])
+        path_command = 'cp ' + self.pathscript + 'tails_script/* ' + str(remote_path)+';'
+        path_command += './make_tails ' + str(np.amin(list_runs)) + ' ' + str(np.amax(list_runs)) + ';'
+        path_command += 'cd tls_'+str(np.amin(list_runs)) + '_' + str(np.amax(list_runs)) + ';'
+        path_command += './fit 0.1 0.1 0.3 15 20 0.1;'
+        try:
+            self.path_run_command(path_command, self.data.data_summary_plot_parameters['directory_summary_line_edit'])
+        except OSError:
+            print('Summary Plot Post-Processing script failed')
 
     def conversion_routine(self, file_to_import):
         sftp = self.client.open_sftp()
