@@ -9,3 +9,8 @@ model/*.autosave
 view/*.pyc
 view/*.autosave
 */__pycache__*
+*.pyc
+*.autosave
+.idea/*
+sh.exe.stackdump
+
