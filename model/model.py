@@ -10,13 +10,13 @@ from data import data
 
 
 class Model(object):
-    output_directory = 'C:/Users/qfi29231/Documents/'
+    output_directory = 'C:/Users/ujo48515/Documents/'
     width = 1000
     height = 600
     def __init__(self):
         self.my_name = 'model'
-        self.username = 'ujo48515'
-        self.password = 'jt3ec)yv4?'
+        self.username = ''
+        self.password = ''
         self.hostname = 'apclara1.dl.ac.uk'
         self.port = 22
         self.pathscript = '/opt/ControlRoomApps/OnlineModel/'
@@ -76,8 +76,8 @@ class Model(object):
 
         if self.data.scan_parameter['parameter_scan_check_box']:
             try:
-                current_scan_value = float(self.data.scan_values['parameter_scan_from'])
-                scan_end = float(self.data.scan_values['parameter_scan_to'])
+                current_scan_value = float(self.data.scan_values['parameter_scan_from_value'])
+                scan_end = float(self.data.scan_values['parameter_scan_to_value'])
                 scan_step_size = float(self.data.scan_values['parameter_scan_step_size'])
             except ValueError:
                 print "Enter a numerical value to conduct a scan"
@@ -130,7 +130,7 @@ class Model(object):
         return path_command
 
     def path_run_command(self, command, initial_path):
-        path_command_exp = 'cd ' + str(initial_path) + '; '
+        path_command_exp = 'cd ' + str(initial_path) + ' && '
         path_command_exp += str(command) + ';'
         print('Running with command {}'.format(path_command_exp))
         stdin, stdout, stderr = self.client.exec_command(path_command_exp)
@@ -190,4 +190,3 @@ class Model(object):
         path = path.replace('.eps', '.png')
         return 'convert -density 600 ' + epsfile + ' -rotate 90 -resize ' + str(self.width) + \
                'x'+str(self.height) + ' ' + path
-
