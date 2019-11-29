@@ -25,9 +25,9 @@ class MainApp(QObject):
         self.MainWindow = QMainWindow()
         self.view.setupUi(self.MainWindow)
         self.RunParameterController = run_parameter_controller.RunParameterController(app, self.view, self.model)
-        self.PostProcessingController = post_processing_controller.PostProcessingController(app, self.view, self.model)
-        self.UnifiedController = unified_controller.UnifiedController(self.RunParameterController,
-                                                                      self.PostProcessingController)
+        #self.PostProcessingController = post_processing_controller.PostProcessingController(app, self.view, self.model)
+        self.UnifiedController = unified_controller.UnifiedController(self.RunParameterController)
+        #                                                              self.PostProcessingController)
         self.MainWindow.show()
 
 
