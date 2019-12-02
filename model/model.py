@@ -102,6 +102,9 @@ class Model(object):
                 # path_command = self.path_command_ensemble()
                 # stdin, stdout, stderr = self.client.exec_command(path_command)
                 # print(stderr.readlines())
+                '''
+                  ASTRA RUN NUMBER NO LONGER INCLUDED, NEEDS TO BE ADDED IMPLICITLY HERE
+                '''
                 if int(self.data.data_values['astra_run_number_line_edit']) < 100:
                     self.data.data_values['astra_run_number_line_edit'] = '00' + str(
                         int(self.data.data_values['astra_run_number_line_edit']) + 1)
