@@ -1,7 +1,9 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from copy import copy,deepcopy
+from decimal import Decimal
 import run_parameters_parser as yaml_parser
+import sys, os
 class GenericThread(QThread):
     signal = pyqtSignal()
 
@@ -38,11 +40,8 @@ class RunParameterController(QObject):
         self.populate_scan_combo_box()
         self.model.data.parameterScanDict = self.initialize_parameter_scan_data()
         self.model.data.directoryDict = self.initialize_directory_data()
-        #self.model.data.initialise_scan()
-        #self.model.data.initialise_scan_parameters()
+        self.view.parameter_scan.stateChanged.connect(self.toggle_scan_parameters_state)
 
-        #self.view.parameter_scan_check_box.stateChanged.connect(self.toggle_scan_parameters_state)
-        #self.view.parameter_scan_check_box.setChecked(True)
     @pyqtSlot()
     def update_value_in_run_parameter_data(self):
         widget = self.sender()
@@ -145,7 +144,7 @@ class RunParameterController(QObject):
             for childIndex in range(0, childCount):
                 widget = layout.itemAt(childIndex).widget()
                 if type(widget) == QLineEdit:
-                    value = self.model.data.runParameterDict[str(widget.objectName())]
+                    value = str(self.model.data.runParameterDict[str(widget.objectName())])
                     widget.setText(value)
 
     def set_check_box_states_for_run_parameters(self):
@@ -169,8 +168,7 @@ class RunParameterController(QObject):
         for child in range(0, childCount):
             widget = parameterScanLayout.itemAt(child).widget()
             if type(widget) is QLineEdit:
-                print str(widget.objectName())
-                widget.setText(self.model.data.parameterScanDict[str(widget.objectName())])
+                widget.setText(str(self.model.data.parameterScanDict[str(widget.objectName())]))
 
     def set_check_box_states_for_scan_parameters(self):
         parameterScanLayout = self.view.parameter_scan_layout
@@ -178,7 +176,6 @@ class RunParameterController(QObject):
         for child in range(0, childCount):
             widget = parameterScanLayout.itemAt(child).widget()
             if type(widget) is QCheckBox:
-                print str(widget.objectName())
                 widget.setChecked(self.model.data.parameterScanDict[str(widget.objectName())])
 
     def set_combo_box_text_for_scan_parameters(self):
@@ -187,7 +184,6 @@ class RunParameterController(QObject):
         for child in range(0, childCount):
             widget = parameterScanLayout.itemAt(child).widget()
             if type(widget) is QComboBox:
-                print str(widget.objectName())
                 itemIndex = widget.findText(self.model.data.parameterScanDict[str(widget.objectName())])
                 widget.setCurrentIndex(itemIndex)
                 
@@ -197,12 +193,11 @@ class RunParameterController(QObject):
         for child in range(0, childCount):
             widget = directoryLayout.itemAt(child).widget()
             if type(widget) is QLineEdit:
-                widget.setText(self.model.data.directoryDict[str(widget.objectName())])
+                widget.setText(str(self.model.data.directoryDict[str(widget.objectName())]))
 
     ## Need to port this to the unified controller
     @pyqtSlot()
     def import_parameter_values_from_yaml_file(self):
-        print 'IMPORT CALLED'
         dialog = QFileDialog()
         filename = QFileDialog.getOpenFileName(dialog, caption='Open file',
                                                      directory='c:\\',
@@ -212,62 +207,72 @@ class RunParameterController(QObject):
             for (parameter, value) in loaded_parameter_dict.items():
                 if parameter in self.model.data.runParameterDict:
                     self.model.data.runParameterDict.update({parameter : value})
-                elif parameter in self.model.data.parameterScanDict:
-                    self.model.data.parameterScanDict.update({parameter : value})
+                #elif parameter in self.model.data.parameterScanDict:
+                #    self.model.data.parameterScanDict.update({parameter : value})
                 elif parameter in self.model.data.directoryDict:
                     self.model.data.directoryDict.update({parameter : value})
-                # NEED TO SET LINE EDITS TO RUN PARAMETER DICT VALUES
             self.set_line_edit_text_for_run_parameters()
             self.set_check_box_states_for_run_parameters()
-            self.set_line_edit_text_for_scan_parameters()
-            self.set_check_box_states_for_scan_parameters()
-            self.set_combo_box_text_for_scan_parameters()
+            #self.set_line_edit_text_for_scan_parameters()
+            #self.set_check_box_states_for_scan_parameters()
+            #self.set_combo_box_text_for_scan_parameters()
             self.set_line_edit_text_for_directory()
         else:
             print 'Failed to import, please provide a filename'
     @pyqtSlot()
     def export_parameter_values_to_yaml_file(self):
-        dialog = QFileDialog()
-        dialog.setFileMode(QFileDialog.DirectoryOnly)
-        filename, _filter = QFileDialog.getSaveFileNameAndFilter(dialog, caption='Save File', directory='c:\\',
-                                                                    filter="YAML Files (*.YAML *.YML *.yaml *.yml")
-        if not filename.isEmpty():
             export_dict = dict()
-            data_dicts = [self.model.data.runParameterDict,
-                          self.model.data.parameterScanDict,
-                          self.model.data.directoryDict]
-            for dictionary in data_dicts:
-                for key, value in dictionary.items():
-                    export_dict.update({key : value})
-            yaml_parser.write_parameter_output_file(filename, export_dict)
-            # ELSE: RAISE EXCEPTION/DISPLAY INVALID INPUT TO USER
+            if self.model.data.parameterScanDict['parameter_scan']:
+                dialog = QFileDialog()
+                directory = QFileDialog.getExistingDirectory(dialog,"Select Directory")
+                if not directory.isEmpty():
+                    scanFrom = float(self.model.data.parameterScanDict['parameter_scan_from_value'])
+                    scanTo = float(self.model.data.parameterScanDict['parameter_scan_to_value'])
+                    scanStepSize = float(self.model.data.parameterScanDict['parameter_scan_step_size'])
+                    currentScanValue = scanFrom
+                    parameterToScan = self.model.data.parameterScanDict['parameter']
+                    runData = self.model.data.runParameterDict
+                    while(currentScanValue <= scanTo):
+                        progress = int(100*(currentScanValue/scanTo))
+                        print ' Progression: ', str(progress)
+                        self.view.progressBar.setValue(progress)
+                        runData[parameterToScan] = currentScanValue 
+                        filename = os.path.join(str(directory), self.model.data.parameterScanDict['parameter'] + '_' + str(currentScanValue).replace('.','_') + '.YAML')
+                        data_dicts = [runData, self.model.data.directoryDict]
+                        for dictionary in data_dicts:
+                            for key, value in dictionary.items():
+                                export_dict.update({key : value})
+                        yaml_parser.write_parameter_output_file(filename, export_dict)
+                        currentScanValue += scanStepSize
+                    self.view.progressBar.setValue(0)
+                    self.view.progressBar.format()
+                else:
+                    print 'Failed to export, please provide a directory.'
+            else:
+                dialog = QFileDialog()
+                filename, _filter = QFileDialog.getSaveFileNameAndFilter(dialog, caption='Save File', directory='c:\\',
+                                                                         filter="YAML Files (*.YAML *.YML *.yaml *.yml")
+                if not filename.isEmpty():
+                    data_dicts = [self.model.data.runParameterDict, self.model.data.directoryDict]
+                    for dictionary in data_dicts:
+                        for key, value in dictionary.items():
+                            export_dict.update({key:value})
+                    yaml_parser.write_parameter_output_file(str(filename), export_dict)
+                else:
+                    print 'Failed to export, please provide a filename.'
+    
+    def toggle_scan_parameters_state(self):
+        performScanCheckbox = self.sender()
+        if performScanCheckbox.isChecked():
+            self.view.parameter.setEnabled(True)
+            self.view.parameter_scan_from_value.setEnabled(True)
+            self.view.parameter_scan_to_value.setEnabled(True)
+            self.view.parameter_scan_step_size.setEnabled(True)
         else:
-            print 'Failed to export, please provide a filename.'
-            
-    # def toggle_scan_parameters_state(self, state):
-        # # parameter_scan_combo_box = self.view.centralwidget.findChild(QComboBox, 'parameter_scan_combo_box')
-        # # parameter_scan_from_value_line_edit = self.view.centralwidget.findChild(QLineEdit,
-        # #                                                                         'parameter_scan_from_value_line_edit')
-        # # parameter_scan_to_value_line_edit = self.view.centralwidget.findChild(QLineEdit,
-        # #                                                                       'parameter_scan_to_value_line_edit')
-        # # parameter_scan_step_size_line_edit = self.view.centralwidget.findChild(QLineEdit,
-        # #                                                                        'parameter_scan_step_size_line_edit')
-        # parameter_scan_combo_box = self.view.layoutWidget.findChild(QComboBox, 'parameter_scan_combo_box')
-        # parameter_scan_from_value_line_edit = self.view.layoutWidget.findChild(QLineEdit, 'parameter_scan_from_value_line_edit')
-        # parameter_scan_to_value_line_edit = self.view.layoutWidget.findChild(QLineEdit, 'parameter_scan_to_value_line_edit')
-        # parameter_scan_step_size_line_edit = self.view.layoutWidget.findChild(QLineEdit, 'parameter_scan_step_size_line_edit')
-        # if (state > 0):
-            # parameter_scan_combo_box.setEnabled(True)
-            # parameter_scan_from_value_line_edit.setEnabled(True)
-            # parameter_scan_to_value_line_edit.setEnabled(True)
-            # parameter_scan_step_size_line_edit.setEnabled(True)
-        # else:
-            # parameter_scan_combo_box.setEnabled(False)
-            # parameter_scan_from_value_line_edit.setEnabled(False)
-            # parameter_scan_to_value_line_edit.setEnabled(False)
-            # parameter_scan_step_size_line_edit.setEnabled(False)
-
-
+            self.view.parameter.setEnabled(False)
+            self.view.parameter_scan_from_value.setEnabled(False)
+            self.view.parameter_scan_to_value.setEnabled(False)
+            self.view.parameter_scan_step_size.setEnabled(False)
 
     # def run_thread(self, func):
         # self.thread = GenericThread(func)
@@ -316,12 +321,6 @@ class RunParameterController(QObject):
             # self.model.data.scan_parameter.update({str(widget.objectName()) : str(widget.currentText())})
         # return
 
-    # def collect_scan_parameters(self):
-        # self.model.data.scan_values['parameter_scan'] = self.model.data.scan_parameter['parameter_scan_combo_box']
-        # self.model.data.scan_values['parameter_scan_from_value'] = self.model.data.scan_parameter['parameter_scan_from_value_line_edit']
-        # self.model.data.scan_values['parameter_scan_to_value'] = self.model.data.scan_parameter['parameter_scan_to_value_line_edit']
-        # self.model.data.scan_values['parameter_scan_step_size'] = self.model.data.scan_parameter['parameter_scan_step_size_line_edit']
-
     # def disable_run_button(self):
         # self.view.runButton.setEnabled(False)
         # return
@@ -356,49 +355,6 @@ class RunParameterController(QObject):
     # def handle_existent_file(self):
         # print('Directory '+self.model.data.data_values['directory_line_edit'] + 'already exists')
 
-
-
-    # def get_all_line_edits_in_main_window(self):
-        # line_edit_list = []
-        # main_window = self.view.layoutWidget
-        # # gather all the children of the central widget
-        # # which will be the gird layouts containing the line-edits
-        # # and check-box widgets
-        # grid_layouts = main_window.children()
-        # for widget in grid_layouts:
-            # if isinstance(widget, QLineEdit):
-                # line_edit_list.append(widget)
-        # return line_edit_list
-
-    # def get_all_check_boxes_in_main_window(self):
-        # check_box_list = []
-        # main_window = self.view.layoutWidget
-        # # gather all the children of the central widget
-        # # which will be the gird layouts containing the line-edits
-        # # and check-box widgets
-        # grid_layouts = main_window.children()
-        # for widget in grid_layouts:
-            # if isinstance(widget, QCheckBox):
-                # check_box_list.append(widget)
-        # return check_box_list   
-
-    # def set_all_line_edits_in_main_window(self, line_edit_list, values_to_set_dict):
-        # print values_to_set_dict
-        # for line_edit in line_edit_list:
-            # # our YAML values dict has keys without the '_line_edit' suffix, so we must add this suffix to
-            # # access the line_edit dict which has keys containing the '_line_edit' suffix.
-            # print str(line_edit.objectName()).replace("_line_edit", "")
-            # parameter_value_str = str(values_to_set_dict[str(line_edit.objectName()).replace("_line_edit", "")])
-            # line_edit.setText(parameter_value_str)
-
-    # def set_combo_box_in_main_window(self, combo_box_list, values_to_set_dict):
-        # for combo_box in combo_box_list:
-            # print str(line_edit.objectName()).replace("_combo_box", "")
-            # combo_box_value_str = str(values_to_set_dict[str(combo_box.objectName()).replace("_combo_box", "")])
-            # if combo_box_value_str == 'T':
-              # combo_box.setChecked(True)
-            # if combo_box_value_str == 'F':
-              # combo_box.setChecked(False)
 
 
 
