@@ -61,7 +61,7 @@
             <number>30</number>
            </property>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="linac_1_gradient_line">
+            <widget class="QLineEdit" name="linac_1_gradient">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -96,7 +96,7 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="linac1_phase_line">
+            <widget class="QLineEdit" name="linac1_phase">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                <horstretch>0</horstretch>
@@ -386,7 +386,7 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="spot_size_line">
+            <widget class="QLineEdit" name="spot_size">
              <property name="inputMethodHints">
               <set>Qt::ImhDigitsOnly</set>
              </property>
@@ -872,7 +872,11 @@
           </widget>
          </item>
          <item row="2" column="3">
-          <widget class="QLineEdit" name="parameter_scan_to_value"/>
+          <widget class="QLineEdit" name="parameter_scan_to_value">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
          <item row="2" column="4">
           <widget class="QLabel" name="parameter_scan_step_size_label">
@@ -889,13 +893,25 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QLineEdit" name="parameter_scan_from_value"/>
+          <widget class="QLineEdit" name="parameter_scan_from_value">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
          <item row="2" column="5">
-          <widget class="QLineEdit" name="parameter_scan_step_size"/>
+          <widget class="QLineEdit" name="parameter_scan_step_size">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
          <item row="1" column="1" colspan="5">
-          <widget class="QComboBox" name="parameter"/>
+          <widget class="QComboBox" name="parameter">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
          <item row="0" column="3">
           <widget class="QCheckBox" name="parameter_scan">
@@ -957,6 +973,19 @@
           <widget class="QPushButton" name="runButton">
            <property name="text">
             <string>Run ASTRA</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="2">
+          <widget class="QProgressBar" name="progressBar">
+           <property name="value">
+            <number>0</number>
+           </property>
+           <property name="textVisible">
+            <bool>true</bool>
+           </property>
+           <property name="format">
+            <string>%p%</string>
            </property>
           </widget>
          </item>
