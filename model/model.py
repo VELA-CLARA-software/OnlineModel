@@ -23,6 +23,7 @@ class Model(object):
         self.path_exists = False
         self.data = data.Data()
         self.client = SSHClient()
+        self.generator_params = ['number_of_particles', 'dist_x', 'dist_y', 'dist_z', 'sig_x', 'sig_y', 'sig_z']
 
     def ssh_to_server(self):
         try:
@@ -34,27 +35,27 @@ class Model(object):
             return
 
     def create_subdirectory(self):
-        if not self.data.data_values['directory_line_edit'].endswith('/'):
-            self.data.data_values['directory_line_edit'] = self.data.data_values['directory_line_edit'] + '/'
+        if not self.data.runParameterDict['directory_line_edit'].endswith('/'):
+            self.data.runParameterDict['directory_line_edit'] = self.data.runParameterDict['directory_line_edit'] + '/'
         self.check_if_directory_exists()
 
     def check_if_directory_exists(self):
         sftp = self.client.open_sftp()
         for files in sftp.listdir():
-            if files == self.data.data_values['directory_line_edit']:
+            if files == self.data.runParameterDict['directory_line_edit']:
                 for runfiles in sftp.listdir(files):
-                    if runfiles == 'run' + str(self.data.data_values['astra_run_number_line_edit']):
+                    if runfiles == 'run' + str(self.data.runParameterDict['astra_run_number_line_edit']):
                         self.path_exists = True
                         print('Top level directory {} with Run  {} already exists'.format(
-                            self.data.data_values['directory_line_edit'],
-                            str(self.data.data_values['astra_run_number_line_edit'])))
+                            self.data.runParameterDict['directory_line_edit'],
+                            str(self.data.runParameterDict['astra_run_number_line_edit'])))
                         return
                     else:
                         continue
         self.path_exists = False
         sftp.close()
-        print('Top level directory to be created at {}'.format(self.data.data_values['directory_line_edit']))
-        self.client.exec_command('mkdir ' + self.data.data_values['directory_line_edit'])
+        print('Top level directory to be created at {}'.format(self.data.runParameterDict['directory_line_edit']))
+        self.client.exec_command('mkdir ' + self.data.runParameterDict['directory_line_edit'])
         return
 
     def get_runs_directories(self, remote_path):
@@ -73,31 +74,42 @@ class Model(object):
 
     def run_script(self):
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
-
-        if self.data.scan_parameter['parameter_scan_check_box']:
+        if self.data.parameterScanDict['parameter_scan']:
             try:
-                current_scan_value = float(self.data.scan_values['parameter_scan_from_value'])
-                scan_end = float(self.data.scan_values['parameter_scan_to_value'])
-                scan_step_size = float(self.data.scan_values['parameter_scan_step_size'])
+                current_scan_value = float(self.data.parameterScanDict['parameter_scan_from_value'])
+                scan_end = float(self.data.parameterScanDict['parameter_scan_to_value'])
+                scan_step_size = float(self.data.parameterScanDict['parameter_scan_step_size'])
             except ValueError:
-                print "Enter a numerical value to conduct a scan"
+                print("Enter a numerical value to conduct a scan")
             while current_scan_value <= scan_end:
                 # path_command = 'cd ' + self.data.data_values['directory_line_edit'] + '; '
                 # path_command = path_command + self.pathscript + 'script/./run_2BA1 '
-                for key, value in self.data.data_values.iteritems():
-
-                    par = self.data.scan_values['parameter_scan'] + '_line_edit'
-
+                for key, value in self.data.runParameterDict.items():
+                    par = self.data.parameterScanDict['parameter']# + '_line_edit'
                     if key == par:
-                        self.data.data_values[key] = current_scan_value
+                        if self.strip_text_before(key, ':') in self.generator_params:
+                            self.modify_framework(scan=True, type=self.strip_text_before(key, ':'),
+                                                  modify=current_scan_value,
+                                                  generator_param=self.strip_text_after(key, ':'))
+                        elif not self.strip_text_before(key, ':') in self.generator_params:
+                            if self.data.runParameterDict[self.strip_text_before(key, ':')]['type'] == 'cavity':
+                                self.modify_framework(scan=True, type=self.strip_text_before(key, ':'),
+                                                      modify=current_scan_value,
+                                                      cavity_params=self.strip_text_after(key, ':'))
+                            else:
+                                self.modify_framework(scan=True, type=self.strip_text_before(key, ':'),
+                                                      modify=current_scan_value)
                         # path_command += str(current_scan_value) + ' '
+                        subdir = par + '-' + str(current_scan_value)
                         current_scan_value += scan_step_size
+                        self.data.Framework.setSubDirectory(subdir)
+                        self.data.Framework.track(startfile='generator', endfile='S02')
                     else:
                         continue
 
                         # path_command = path_command + str(value) + ' '
-                path_command = self.path_command_ensemble('script/run_2BA1 ', self.data.data_values)
-                self.path_run_command(path_command, self.data.data_values['directory_line_edit'])
+                #path_command = self.path_command_ensemble('script/run_2BA1 ', self.data.data_values)
+                #self.path_run_command(path_command, self.data.data_values['directory_line_edit'])
                 # print 'Running with command: ' + path_command
                 # path_command = self.path_command_ensemble()
                 # stdin, stdout, stderr = self.client.exec_command(path_command)
@@ -105,23 +117,142 @@ class Model(object):
                 '''
                   ASTRA RUN NUMBER NO LONGER INCLUDED, NEEDS TO BE ADDED IMPLICITLY HERE
                 '''
-                if int(self.data.data_values['astra_run_number_line_edit']) < 100:
-                    self.data.data_values['astra_run_number_line_edit'] = '00' + str(
-                        int(self.data.data_values['astra_run_number_line_edit']) + 1)
-                else:
-                    self.data.data_values['astra_run_number_line_edit'] = str(
-                        int(self.data.data_values['astra_run_number_line_edit']) + 1)
+                #if int(self.data.data_values['astra_run_number_line_edit']) < 100:
+                #    self.data.data_values['astra_run_number_line_edit'] = '00' + str(
+                #        int(self.data.data_values['astra_run_number_line_edit']) + 1)
+                #else:
+                #    self.data.data_values['astra_run_number_line_edit'] = str(
+                #        int(self.data.data_values['astra_run_number_line_edit']) + 1)
 
                 # print 'Running with command: ' + path_command
                 # path_command = '' + self.pathscript+'script/./run_2BA1 '
         else:
-            path_command = self.path_command_ensemble('script/run_2BA1 ', self.data.data_values)
-            # path_command = 'cd ' + self.data.data_values['directory_line_edit'] + '; '
-            # path_command = path_command + self.pathscript + 'script/./run_2BA1 '
-            # for key, value in self.data.data_values.iteritems():
-            #     path_command = path_command + str(value) + ' '
-            self.path_run_command(path_command, self.data.data_values['directory_line_edit'])
-        # return
+            self.modify_framework(scan=False)
+        self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
+
+    def modify_framework(self, scan=False, type=None, modify=None, cavity_params=None, generator_param=None):
+        for key, value in self.data.runParameterDict.items():
+            if self.data.runParameterDict[key]['type'] == 'quadrupole':
+                self.data.Framework.modifyElement(key, 'k1l', value['k1l'])
+            elif self.data.runParameterDict[key]['type'] == 'cavity':
+                self.data.Framework.modifyElement(key, 'field_amplitude', value['field_amplitude'])
+                self.data.Framework.modifyElement(key, 'phase', value['phase'])
+            elif self.data.runParameterDict[key]['type'] == 'solenoid':
+                tempcav = self.data.runParameterDict[key]['cavity']
+                # print(self.data.runParameterDict[tempcav]['sub_elements'][key])
+                self.data.Framework.modifyElement(key, 'field_amplitude', value['field_amplitude'])
+            # elif self.data.runParameterDict[self.strip_text_before(key, ':')]['type'] == 'generator':
+            #     self.data.Framework.modifyElement(key,key,value)
+        self.data.Framework.generator.number_of_particles = self.data.runParameterDict['number_of_particles']['value']
+        self.data.Framework.generator.dist_x = self.data.runParameterDict['dist_x']['value']
+        self.data.Framework.generator.dist_y = self.data.runParameterDict['dist_y']['value']
+        self.data.Framework.generator.dist_z = self.data.runParameterDict['dist_z']['value']
+        self.data.Framework.generator.sig_x = self.data.runParameterDict['sig_x']['value']
+        self.data.Framework.generator.sig_y = self.data.runParameterDict['sig_y']['value']
+        self.data.Framework.generator.sig_z = self.data.runParameterDict['sig_z']['value']
+        if scan==True and type is not None:
+            for key, value in self.data.runParameterDict.items():
+                if type == 'quadrupole':
+                    self.data.Framework.modifyElement(key, 'k1l', modify)
+                elif type == 'cavity':
+                    if cavity_params == "AMP":
+                        self.data.Framework.modifyElement(key, 'field_amplitude', modify)
+                    elif cavity_params == "PHASE":
+                        self.data.Framework.modifyElement(key, 'phase', modify)
+                elif type == 'solenoid':
+                    tempcav = self.data.runParameterDict[key]['cavity']
+                    # print(self.data.runParameterDict[tempcav]['sub_elements'][key])
+                    self.data.Framework.modifyElement(key, 'field_amplitude', modify)
+                # elif self.data.runParameterDict[self.strip_text_before(key, ':')]['type'] == 'generator':
+                #     self.data.Framework.modifyElement(key,key,value)
+        elif scan==True and generator_param in self.generator_params:
+            if generator_param == 'number_of_particles':
+                self.data.Framework.generator.number_of_particles = modify
+            elif generator_param == 'dist_x':
+                self.data.Framework.generator.dist_x = modify
+            elif generator_param == 'dist_y':
+                self.data.Framework.generator.dist_y = modify
+            elif generator_param == 'dist_z':
+                self.data.Framework.generator.dist_z = modify
+            elif generator_param == 'sig_x':
+                self.data.Framework.generator.sig_x = modify
+            elif generator_param == 'sig_y':
+                self.data.Framework.generator.sig_y = modify
+            elif generator_param == 'sig_z':
+                self.data.Framework.generator.sig_z = modify
+
+        # if self.data.scan_parameter['parameter_scan_check_box']:
+        #     try:
+        #         current_scan_value = float(self.data.scan_values['parameter_scan_from_value'])
+        #         scan_end = float(self.data.scan_values['parameter_scan_to_value'])
+        #         scan_step_size = float(self.data.scan_values['parameter_scan_step_size'])
+        #     except ValueError:
+        #         print( "Enter a numerical value to conduct a scan")
+        #     while current_scan_value <= scan_end:
+        #         # path_command = 'cd ' + self.data.runParameterDict['directory_line_edit'] + '; '
+        #         # path_command = path_command + self.pathscript + 'script/./run_2BA1 '
+        #         for key, value in self.data.runParameterDict.iteritems():
+        #
+        #             par = self.data.scan_values['parameter_scan'] + '_line_edit'
+        #
+        #             if key == par:
+        #                 self.data.runParameterDict[key] = current_scan_value
+        #                 # path_command += str(current_scan_value) + ' '
+        #                 current_scan_value += scan_step_size
+        #             else:
+        #                 continue
+        #
+        #                 # path_command = path_command + str(value) + ' '
+        #         path_command = self.path_command_ensemble('script/run_2BA1 ', self.data.runParameterDict)
+        #         self.path_run_command(path_command, self.data.runParameterDict['directory_line_edit'])
+        #         # print 'Running with command: ' + path_command
+        #         # path_command = self.path_command_ensemble()
+        #         # stdin, stdout, stderr = self.client.exec_command(path_command)
+        #         # print(stderr.readlines())
+        #         '''
+        #           ASTRA RUN NUMBER NO LONGER INCLUDED, NEEDS TO BE ADDED IMPLICITLY HERE
+        #         '''
+        #         if int(self.data.runParameterDict['astra_run_number_line_edit']) < 100:
+        #             self.data.runParameterDict['astra_run_number_line_edit'] = '00' + str(
+        #                 int(self.data.runParameterDict['astra_run_number_line_edit']) + 1)
+        #         else:
+        #             self.data.runParameterDict['astra_run_number_line_edit'] = str(
+        #                 int(self.data.runParameterDict['astra_run_number_line_edit']) + 1)
+        #
+        #         # print 'Running with command: ' + path_command
+        #         # path_command = '' + self.pathscript+'script/./run_2BA1 '
+        # else:
+        #     for key, value in self.data.runParameterDict.items():
+        #         if self.data.runParameterDict[key]['type'] == 'quadrupole':
+        #             self.data.Framework.modifyElement(key, 'k1l', value['k1l'])
+        #         elif self.data.runParameterDict[key]['type'] == 'cavity':
+        #             self.data.Framework.modifyElement(key, 'field_amplitude', value['field_amplitude'])
+        #             self.data.Framework.modifyElement(key, 'phase', value['phase'])
+        #         elif self.data.runParameterDict[key]['type'] == 'solenoid':
+        #             tempcav = self.data.runParameterDict[key]['cavity']
+        #             # print(self.data.runParameterDict[tempcav]['sub_elements'][key])
+        #             self.data.Framework.modifyElement(key, 'field_amplitude', value['field_amplitude'])
+        #         # elif self.data.runParameterDict[self.strip_text_before(key, ':')]['type'] == 'generator':
+        #         #     self.data.Framework.modifyElement(key,key,value)
+        #     self.data.Framework.generator.number_of_particles = self.data.runParameterDict['number_of_particles']['value']
+        #     self.data.Framework.generator.dist_x = self.data.runParameterDict['dist_x']['value']
+        #     self.data.Framework.generator.dist_y = self.data.runParameterDict['dist_y']['value']
+        #     self.data.Framework.generator.dist_z = self.data.runParameterDict['dist_z']['value']
+        #     self.data.Framework.generator.sig_x = self.data.runParameterDict['sig_x']['value']
+        #     self.data.Framework.generator.sig_y = self.data.runParameterDict['sig_y']['value']
+        #     self.data.Framework.generator.sig_z = self.data.runParameterDict['sig_z']['value']
+        #     self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
+
+    # return
+    def strip_text_before(self, string, condition):
+        sep = condition
+        rest = string.split(sep, 1)[0]
+        return rest
+
+    def strip_text_after(self, string, condition):
+        sep = condition
+        rest = string.split(sep, 1)[1]
+        return rest
 
     def path_command_ensemble(self, script, dictionary):
         path_command = self.pathscript + script
@@ -140,14 +271,14 @@ class Model(object):
         print(stderr.readlines())
 
     def run_script_post(self):
-        dictionary = deepcopy(self.data.data_values_post)
+        dictionary = deepcopy(self.data.runParameterDict_post)
         del(dictionary['directory_post_combo_box_3'])
         del(dictionary['directory_post_combo_box_4'])
         del (dictionary['directory_post_line_edit'])
-        path_command = 'cd ' + self.data.data_values_post['directory_post_line_edit'] + ' ;'
+        path_command = 'cd ' + self.data.runParameterDict_post['directory_post_line_edit'] + ' ;'
         path_command += self.path_command_ensemble('script/post_pro  ', dictionary)
         try:
-            self.path_run_command(path_command, self.data.data_values_post['directory_post_line_edit'])
+            self.path_run_command(path_command, self.data.runParameterDict_post['directory_post_line_edit'])
         except OSError:
             print('Post-processing script failed')
 
@@ -165,9 +296,9 @@ class Model(object):
 
     def conversion_routine(self, file_to_import):
         sftp = self.client.open_sftp()
-        directory = self.data.data_values_post['directory_post_line_edit']
-        run1 = self.data.data_values_post['directory_post_combo_box']
-        run2 = self.data.data_values_post['directory_post_combo_box_2']
+        directory = self.data.runParameterDict_post['directory_post_line_edit']
+        run1 = self.data.runParameterDict_post['directory_post_combo_box']
+        run2 = self.data.runParameterDict_post['directory_post_combo_box_2']
         sftp.chdir(directory + '/plots/run_' + str(run1) + '_' + str(run2) + '/eps/')
         path_sftp = sftp.getcwd()
         for fil in sftp.listdir():
