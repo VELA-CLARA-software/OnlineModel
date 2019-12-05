@@ -4,9 +4,9 @@ import numpy as np
 import ruamel.yaml
 # sys.path.append('\\\\apclara1\\ControlRoomApps\\OnlineModel')
 # sys.path.append('\\\\apclara1\\ControlRoomApps\\OnlineModel\\MasterLattice')
-sys.path.append(os.path.abspath(__file__+'/../../../../VELA-CLARA-software/OnlineModel/SimulationFramework/'))
-sys.path.append(os.path.abspath(__file__+'/../../../../VELA-CLARA-software/OnlineModel/'))
-import SimulationFramework.Framework_3 as Fw
+sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/SimulationFramework/'))
+sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
+import SimulationFramework.Framework as Fw
 import view as view
 # Post-processing dictionary
 directory_post = 'directory_post_line_edit'
@@ -45,8 +45,8 @@ class Data(object):
         self.parameterScanDict = collections.OrderedDict()
         self.directoryDict = collections.OrderedDict()
         self.scannableParametersDict = collections.OrderedDict()
-        self.Framework = Fw.Framework(directory=directory_summary, clean=True)
-        self.Framework.loadSettings('Lattices/CLA10-BA1.def')
+        self.Framework = Fw.Framework(directory=directory_summary, clean=False, verbose=False)
+        self.Framework.loadSettings('Lattices/CLA10-BA1_OM.def')
         self.my_name = "data"
         self.get_data()
         self.initialise_data()
@@ -174,9 +174,9 @@ class Data(object):
         self.laser_values.update({'sig_y': collections.OrderedDict()})
         self.laser_values['sig_y'].update({'type': 'generator'})
         self.laser_values['sig_y'].update({'value': self.Framework.generator.parameters['sig_y']})
-        self.laser_values.update({'sig_z': collections.OrderedDict()})
-        self.laser_values['sig_z'].update({'type': 'generator'})
-        self.laser_values['sig_z'].update({'value': self.Framework.generator.parameters['sig_z']})
+        # self.laser_values.update({'sig_z': collections.OrderedDict()})
+        # self.laser_values['sig_z'].update({'type': 'generator'})
+        # self.laser_values['sig_z'].update({'value': self.Framework.generator.parameters['sig_z']})
 
     # def initialise_data_post(self):
         # [self.runParameterDict_post.update({key: value}) for key, value in zip(data_keys_post, data_v_post)]

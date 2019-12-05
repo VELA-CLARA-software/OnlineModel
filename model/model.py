@@ -128,7 +128,16 @@ class Model(object):
                 # path_command = '' + self.pathscript+'script/./run_2BA1 '
         else:
             self.modify_framework(scan=False)
-        self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
+        self.data.Framework.track(startfile="S02", endfile='BA1_dipole')
+
+    ##### Find Starting Filename based on z-position ####
+    def find_starting_lattice(self, z):
+        lattices = self.data.Framework.latticeObjects.values()
+        for l in lattices:
+            for e in l.elements:
+                    if e.position_end[2] <= z:
+                        return l
+        return 'generator'
 
     def modify_framework(self, scan=False, type=None, modify=None, cavity_params=None, generator_param=None):
         for key, value in self.data.runParameterDict.items():
@@ -149,7 +158,7 @@ class Model(object):
         self.data.Framework.generator.dist_z = self.data.runParameterDict['dist_z']['value']
         self.data.Framework.generator.sig_x = self.data.runParameterDict['sig_x']['value']
         self.data.Framework.generator.sig_y = self.data.runParameterDict['sig_y']['value']
-        self.data.Framework.generator.sig_z = self.data.runParameterDict['sig_z']['value']
+        # self.data.Framework.generator.sig_z = self.data.runParameterDict['sig_z']['value']
         if scan==True and type is not None:
             for key, value in self.data.runParameterDict.items():
                 if type == 'quadrupole':

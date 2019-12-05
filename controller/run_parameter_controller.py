@@ -59,9 +59,9 @@ class RunParameterController(QObject):
                         'type'] == 'cavity':
                         if str(self.strip_text_after(widget.objectName(), ':')) == 'AMP':
                             self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))].update(
-                                {'field_amplitude': float(str(widget.placeholderText()))})
+                                {'field_amplitude': 1e6*float(str(widget.placeholderText()))})
                         elif str(self.strip_text_after(widget.objectName(), ':')) == 'PHASE':
-                            sself.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))].update(
+                            self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))].update(
                                 {'phase': float(str(widget.placeholderText()))})
                     elif self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))][
                         'type'] == 'solenoid':
@@ -79,8 +79,9 @@ class RunParameterController(QObject):
                         'type'] == 'cavity':
                         if str(self.strip_text_after(widget.objectName(), ':')) == 'AMP':
                             self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))].update(
-                                {'field_amplitude': float(str(widget.text()))})
+                                {'field_amplitude': 1e6*float(str(widget.text()))})
                         elif str(self.strip_text_after(widget.objectName(), ':')) == 'PHASE':
+                            print('widget.text() = ', widget.text())
                             self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))].update(
                                 {'phase': float(str(widget.text()))})
                     elif self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))][
@@ -140,7 +141,7 @@ class RunParameterController(QObject):
                     # if not checkBox.isChecked():
                     #     self.model.data.runParameterDict[str(checkBox.objectName())] = 'F'
         return self.model.data.runParameterDict
-        
+
     def initialize_parameter_scan_data(self):
         parameterScanDict = dict()
         parameterScanLayout = self.view.parameter_scan_layout
@@ -174,7 +175,7 @@ class RunParameterController(QObject):
 
     def get_scannable_parameters_dict(self):
         scannableParameterDict = dict()
-        unscannableParameters = ['macro_particle', 'injector_space_charge', 
+        unscannableParameters = ['macro_particle', 'injector_space_charge',
                                  'rest_of_line_space_charge', 'end_of_line']
         for key, value in self.model.data.runParameterDict.items():
             if key not in unscannableParameters:
@@ -190,7 +191,7 @@ class RunParameterController(QObject):
         scanParameterComboBox = self.view.parameter
         for (parameter, parameterDisplayStr) in self.model.data.scannableParametersDict.items():
             scanParameterComboBox.addItem(parameter)
-    
+
     def set_line_edit_text_for_run_parameters(self):
         runParameterLayouts = [self.view.non_magnet_arguments_layout,
                                self.view.magnet_quad_strength_layout]
@@ -217,7 +218,7 @@ class RunParameterController(QObject):
                         widget.setChecked(True)
                     if value == 'F':
                         widiget.setChecked(False)
-                  
+
     def set_line_edit_text_for_scan_parameters(self):
         parameterScanLayout = self.view.parameter_scan_layout
         childCount = parameterScanLayout.count()
@@ -242,7 +243,7 @@ class RunParameterController(QObject):
             if type(widget) is QComboBox:
                 itemIndex = widget.findText(self.model.data.parameterScanDict[str(widget.objectName())])
                 widget.setCurrentIndex(itemIndex)
-                
+
     def set_line_edit_text_for_directory(self):
         directoryLayout = self.view.directory_form_layout
         childCount = directoryLayout.count()
@@ -257,7 +258,7 @@ class RunParameterController(QObject):
         dialog = QFileDialog()
         filename = QFileDialog.getOpenFileName(dialog, caption='Open file',
                                                      directory='c:\\',
-                                                     filter="YAML files (*.YAML *.YML *.yaml *.yml)")  
+                                                     filter="YAML files (*.YAML *.YML *.yaml *.yml)")
         if not filename.isEmpty():
             loaded_parameter_dict = yaml_parser.parse_parameter_input_file(filename)
             for (parameter, value) in loaded_parameter_dict.items():
@@ -294,7 +295,7 @@ class RunParameterController(QObject):
                         self.view.progressBar.setValue(progress)
                         extraParams = None
                         self.get_parameter_to_scan(runData, parameterToScan, currentScanValue)
-                        runData[parameterToScan] = currentScanValue 
+                        runData[parameterToScan] = currentScanValue
                         filename = os.path.join(str(directory), self.model.data.parameterScanDict['parameter'] + '_' + str(currentScanValue).replace('.','_') + '.YAML')
                         data_dicts = [runData, self.model.data.directoryDict]
                         for dictionary in data_dicts:
@@ -332,7 +333,7 @@ class RunParameterController(QObject):
             run_dict[self.strip_text_before(parameter_to_scan, ':')]['field_amplitude'] = current_scan_value
         elif self.strip_text_after(parameter_to_scan, ':') == "PHASE":
             run_dict[self.strip_text_before(parameter_to_scan, ':')]['phase'] = current_scan_value
-    
+
     def toggle_scan_parameters_state(self):
         performScanCheckbox = self.sender()
         if performScanCheckbox.isChecked():
@@ -437,7 +438,3 @@ class RunParameterController(QObject):
     # @pyqtSlot()
     # def handle_existent_file(self):
         # print('Directory '+self.model.data.self.model.data.runParameterDict['directory_line_edit'] + 'already exists')
-
-
-
-
