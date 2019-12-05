@@ -2,3 +2,4 @@
 *.autosave
 .idea/*
 sh.exe.stackdump
+Main_App.py
