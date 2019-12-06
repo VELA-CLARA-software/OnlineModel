@@ -13,4 +13,4 @@ view/*.autosave
 *.autosave
 .idea/*
 sh.exe.stackdump
-
+directory_summary_line_edit/

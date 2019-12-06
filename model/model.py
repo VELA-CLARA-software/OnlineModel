@@ -128,6 +128,8 @@ class Model(object):
                 # path_command = '' + self.pathscript+'script/./run_2BA1 '
         else:
             self.modify_framework(scan=False)
+        # print(self.data.runParameterDict['CLA-S02-MAG-QUAD-01']['k1l'])
+        # exit()
         self.data.Framework.track(startfile="S02", endfile='BA1_dipole')
 
     ##### Find Starting Filename based on z-position ####

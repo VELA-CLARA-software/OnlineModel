@@ -35,6 +35,13 @@ class RunParameterController(QObject):
         self.app = app
         self.model = model
         self.view = view
+        self.runParameterLayouts = [self.view.simulation_parameter_groupbox,
+                               self.view.injector_parameter_groupbox,
+                               self.view.s02_parameter_groupbox,
+                               self.view.c2v_parameter_groupbox,
+                               self.view.vela_parameter_groupbox,
+                               self.view.ba1_parameter_groupbox,
+                               ]
         #self.model.data.self.model.data.runParameterDict = self.initialize_run_parameter_data()
         self.initialize_run_parameter_data()
         self.model.data.scannableParametersDict = self.get_scannable_parameters_dict()
@@ -48,98 +55,99 @@ class RunParameterController(QObject):
     def update_value_in_run_parameter_data(self):
         widget = self.sender()
         if type(widget) is QLineEdit:
-            #self.model.data.self.model.data.runParameterDict.update({str(widget.objectName()) : str(widget.text())})
-            if str(self.strip_text_before(widget.objectName(), ':')) in self.model.data.runParameterDict.keys():
+            # print widget.objectName(), widget.accessibleName(), widget.text()
+            #self.model.data.self.model.data.runParameterDict.update({str(widget.accessibleName()) : str(widget.text())})
+            if str(self.strip_text_before(widget.accessibleName(), ':')) in self.model.data.runParameterDict.keys():
                 if str(widget.text()) == '':
-                    if self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))][
+                    if self.model.data.runParameterDict[str(self.strip_text_before(widget.accessibleName(), ':'))][
                         'type'] == 'quadrupole':
-                        self.model.data.runParameterDict[str(widget.objectName())].update(
+                        self.model.data.runParameterDict[str(widget.accessibleName())].update(
                             {'k1l': float(str(widget.placeholderText()))})
-                    elif self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))][
+                    elif self.model.data.runParameterDict[str(self.strip_text_before(widget.accessibleName(), ':'))][
                         'type'] == 'cavity':
-                        if str(self.strip_text_after(widget.objectName(), ':')) == 'AMP':
-                            self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))].update(
+                        if str(self.strip_text_after(widget.accessibleName(), ':')) == 'AMP':
+                            self.model.data.runParameterDict[str(self.strip_text_before(widget.accessibleName(), ':'))].update(
                                 {'field_amplitude': 1e6*float(str(widget.placeholderText()))})
-                        elif str(self.strip_text_after(widget.objectName(), ':')) == 'PHASE':
-                            self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))].update(
+                        elif str(self.strip_text_after(widget.accessibleName(), ':')) == 'PHASE':
+                            self.model.data.runParameterDict[str(self.strip_text_before(widget.accessibleName(), ':'))].update(
                                 {'phase': float(str(widget.placeholderText()))})
-                    elif self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))][
+                    elif self.model.data.runParameterDict[str(self.strip_text_before(widget.accessibleName(), ':'))][
                         'type'] == 'solenoid':
-                        self.model.data.runParameterDict[str(widget.objectName())].update(
+                        self.model.data.runParameterDict[str(widget.accessibleName())].update(
                             {'field_amplitude': float(str(widget.placeholderText()))})
-                    elif self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))][
+                    elif self.model.data.runParameterDict[str(self.strip_text_before(widget.accessibleName(), ':'))][
                         'type'] == 'generator':
-                        self.model.data.runParameterDict[str(widget.objectName())].update(
-                            {str(widget.objectName()): str(widget.placeholderText())})
+                        self.model.data.runParameterDict[str(widget.accessibleName())].update(
+                            {str(widget.accessibleName()): str(widget.placeholderText())})
                 else:
-                    if self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))][
+                    if self.model.data.runParameterDict[str(self.strip_text_before(widget.accessibleName(), ':'))][
                         'type'] == 'quadrupole':
-                        self.model.data.runParameterDict[str(widget.objectName())].update({'k1l': float(str(widget.text()))})
-                    elif self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))][
+                        self.model.data.runParameterDict[str(widget.accessibleName())].update({'k1l': float(str(widget.text()))})
+                    elif self.model.data.runParameterDict[str(self.strip_text_before(widget.accessibleName(), ':'))][
                         'type'] == 'cavity':
-                        if str(self.strip_text_after(widget.objectName(), ':')) == 'AMP':
-                            self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))].update(
+                        if str(self.strip_text_after(widget.accessibleName(), ':')) == 'AMP':
+                            self.model.data.runParameterDict[str(self.strip_text_before(widget.accessibleName(), ':'))].update(
                                 {'field_amplitude': 1e6*float(str(widget.text()))})
-                        elif str(self.strip_text_after(widget.objectName(), ':')) == 'PHASE':
+                        elif str(self.strip_text_after(widget.accessibleName(), ':')) == 'PHASE':
                             print('widget.text() = ', widget.text())
-                            self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))].update(
+                            self.model.data.runParameterDict[str(self.strip_text_before(widget.accessibleName(), ':'))].update(
                                 {'phase': float(str(widget.text()))})
-                    elif self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))][
+                    elif self.model.data.runParameterDict[str(self.strip_text_before(widget.accessibleName(), ':'))][
                         'type'] == 'solenoid':
-                        self.model.data.runParameterDict[str(widget.objectName())].update(
+                        self.model.data.runParameterDict[str(widget.accessibleName())].update(
                             {'field_amplitude': float(str(widget.text()))})
-                    elif self.model.data.runParameterDict[str(self.strip_text_before(widget.objectName(), ':'))][
+                    elif self.model.data.runParameterDict[str(self.strip_text_before(widget.accessibleName(), ':'))][
                         'type'] == 'generator':
-                        self.model.data.runParameterDict[str(widget.objectName())].update({'value': str(widget.text())})
-            elif str(widget.objectName()) in self.model.data.scan_parameter:
+                        self.model.data.runParameterDict[str(widget.accessibleName())].update({'value': str(widget.text())})
+            elif str(widget.accessibleName()) in self.model.data.scan_parameter:
                 if str(widget.text()) == '':
-                    self.model.data.scan_parameter.update({str(widget.objectName()): str(widget.placeholderText())})
+                    self.model.data.scan_parameter.update({str(widget.accessibleName()): str(widget.placeholderText())})
                 else:
-                    self.model.data.scan_parameter.update({str(widget.objectName()): str(widget.text())})
+                    self.model.data.scan_parameter.update({str(widget.accessibleName()): str(widget.text())})
 
         if type(widget) is QCheckBox:
-            if str(widget.objectName()) in self.model.data.runParameterDict:
+            if str(widget.accessibleName()) in self.model.data.runParameterDict:
                 if widget.isChecked():
-                    self.model.data.runParameterDict[str(widget.objectName())].update({'value': True})
+                    self.model.data.runParameterDict[str(widget.accessibleName())].update({'value': True})
                 else:
-                    self.model.data.runParameterDict[str(widget.objectName())].update({'value': False})
+                    self.model.data.runParameterDict[str(widget.accessibleName())].update({'value': False})
 
     @pyqtSlot()
     def update_value_in_parameter_scan_data(self):
         widget = self.sender()
         if type(widget) is QLineEdit:
-            self.model.data.parameterScanDict.update({str(widget.objectName()) : str(widget.text())})
+            self.model.data.parameterScanDict.update({str(widget.accessibleName()) : str(widget.text())})
         if type(widget) is QCheckBox:
-            self.model.data.parameterScanDict.update({str(widget.objectName()) : widget.isChecked()})
+            self.model.data.parameterScanDict.update({str(widget.accessibleName()) : widget.isChecked()})
         if type(widget) is QComboBox:
             runParameter = str(widget.itemText(widget.currentIndex()))
-            self.model.data.parameterScanDict.update({str(widget.objectName()) : runParameter})
+            self.model.data.parameterScanDict.update({str(widget.accessibleName()) : runParameter})
     @pyqtSlot()
     def update_value_in_directory_data(self):
         widget = self.sender()
         if type(widget) is QLineEdit:
-            self.model.data.directoryDict.update({str(widget.objectName()) : str(widget.text())})
+            self.model.data.directoryDict.update({str(widget.accessibleName()) : str(widget.text())})
 
     def initialize_run_parameter_data(self):
-        runParameterLayouts = [self.view.non_magnet_arguments_layout,
-                               self.view.magnet_quad_strength_layout]
-        formLayoutList = [formLayout for layout in runParameterLayouts for formLayout in layout.findChildren(QFormLayout)]
+        formLayoutList = [formLayout for layout in self.runParameterLayouts for formLayout in layout.findChildren(QFormLayout)]
         #self.model.data.runParameterDict = dict()
         #self.model.data.runParameterDict = self.model.data.runParameterDict
+        # print formLayoutList
+        # exit()
         for layout in formLayoutList:
             childCount = layout.count()
             for child in range(0,childCount):
                 if type(layout.itemAt(child).widget()) is QLineEdit:
                     lineEdit = layout.itemAt(child).widget()
                     lineEdit.textChanged.connect(self.update_value_in_run_parameter_data)
-                    #self.model.data.runParameterDict[str(lineEdit.objectName())] = str(lineEdit.placeholderText())
+                    #self.model.data.runParameterDict[str(lineEdit.accessibleName())] = str(lineEdit.placeholderText())
                 if type(layout.itemAt(child).widget()) is QCheckBox:
                     checkBox = layout.itemAt(child).widget()
                     checkBox.stateChanged.connect(self.update_value_in_run_parameter_data)
                     # if checkBox.isChecked():
-                    #     self.model.data.runParameterDict[str(checkBox.objectName())] = 'T'
+                    #     self.model.data.runParameterDict[str(checkBox.accessibleName())] = 'T'
                     # if not checkBox.isChecked():
-                    #     self.model.data.runParameterDict[str(checkBox.objectName())] = 'F'
+                    #     self.model.data.runParameterDict[str(checkBox.accessibleName())] = 'F'
         return self.model.data.runParameterDict
 
     def initialize_parameter_scan_data(self):
@@ -149,17 +157,17 @@ class RunParameterController(QObject):
         for child in range(0, childCount):
             widget = parameterScanLayout.itemAt(child).widget()
             if type(widget) is QLineEdit:
-                parameterScanDict[str(widget.objectName())] = str(widget.placeholderText())
+                parameterScanDict[str(widget.accessibleName())] = str(widget.placeholderText())
                 widget.textChanged.connect(self.update_value_in_parameter_scan_data)
             if type(widget) is QComboBox:
-                parameterScanDict[str(widget.objectName())] = str(widget.currentText())
+                parameterScanDict[str(widget.accessibleName())] = str(widget.currentText())
                 widget.currentIndexChanged.connect(self.update_value_in_parameter_scan_data)
             if type(widget) is QCheckBox:
                 widget.stateChanged.connect(self.update_value_in_parameter_scan_data)
                 if widget.isChecked():
-                    parameterScanDict[str(widget.objectName())] = True
+                    parameterScanDict[str(widget.accessibleName())] = True
                 if not widget.isChecked():
-                    parameterScanDict[str(widget.objectName())] = False
+                    parameterScanDict[str(widget.accessibleName())] = False
         return parameterScanDict
 
     def initialize_directory_data(self):
@@ -169,7 +177,7 @@ class RunParameterController(QObject):
         for child in range(0, childCount):
             widget = directoryLayout.itemAt(child).widget()
             if type(widget) is QLineEdit:
-                directoryDict[str(widget.objectName())] = str(widget.placeholderText())
+                directoryDict[str(widget.accessibleName())] = str(widget.placeholderText())
                 widget.textChanged.connect(self.update_value_in_directory_data)
         return directoryDict
 
@@ -193,27 +201,23 @@ class RunParameterController(QObject):
             scanParameterComboBox.addItem(parameter)
 
     def set_line_edit_text_for_run_parameters(self):
-        runParameterLayouts = [self.view.non_magnet_arguments_layout,
-                               self.view.magnet_quad_strength_layout]
-        formLayoutList = [formLayout for layout in runParameterLayouts for formLayout in layout.findChildren(QFormLayout)]
+        formLayoutList = [formLayout for layout in self.runParameterLayouts for formLayout in layout.findChildren(QFormLayout)]
         for layout in formLayoutList:
             childCount = layout.count()
             for childIndex in range(0, childCount):
                 widget = layout.itemAt(childIndex).widget()
                 if type(widget) == QLineEdit:
-                    value = str(self.model.data.runParameterDict[str(widget.objectName())])
+                    value = str(self.model.data.runParameterDict[str(widget.accessibleName())])
                     widget.setText(value)
 
     def set_check_box_states_for_run_parameters(self):
-        runParameterLayouts = [self.view.non_magnet_arguments_layout,
-                               self.view.magnet_quad_strength_layout]
-        formLayoutList = [formLayout for layout in runParameterLayouts for formLayout in layout.findChildren(QFormLayout)]
+        formLayoutList = [formLayout for layout in self.runParameterLayouts for formLayout in layout.findChildren(QFormLayout)]
         for layout in formLayoutList:
             childCount = layout.count()
             for childIndex in range(0, childCount):
                 widget = layout.itemAt(childIndex).widget()
                 if type(widget) == QCheckBox:
-                    value = self.model.data.runParameterDict[str(widget.objectName())]
+                    value = self.model.data.runParameterDict[str(widget.accessibleName())]
                     if value == 'T':
                         widget.setChecked(True)
                     if value == 'F':
@@ -225,7 +229,7 @@ class RunParameterController(QObject):
         for child in range(0, childCount):
             widget = parameterScanLayout.itemAt(child).widget()
             if type(widget) is QLineEdit:
-                widget.setText(str(self.model.data.parameterScanDict[str(widget.objectName())]))
+                widget.setText(str(self.model.data.parameterScanDict[str(widget.accessibleName())]))
 
     def set_check_box_states_for_scan_parameters(self):
         parameterScanLayout = self.view.parameter_scan_layout
@@ -233,7 +237,7 @@ class RunParameterController(QObject):
         for child in range(0, childCount):
             widget = parameterScanLayout.itemAt(child).widget()
             if type(widget) is QCheckBox:
-                widget.setChecked(self.model.data.parameterScanDict[str(widget.objectName())])
+                widget.setChecked(self.model.data.parameterScanDict[str(widget.accessibleName())])
 
     def set_combo_box_text_for_scan_parameters(self):
         parameterScanLayout = self.view.parameter_scan_layout
@@ -241,7 +245,7 @@ class RunParameterController(QObject):
         for child in range(0, childCount):
             widget = parameterScanLayout.itemAt(child).widget()
             if type(widget) is QComboBox:
-                itemIndex = widget.findText(self.model.data.parameterScanDict[str(widget.objectName())])
+                itemIndex = widget.findText(self.model.data.parameterScanDict[str(widget.accessibleName())])
                 widget.setCurrentIndex(itemIndex)
 
     def set_line_edit_text_for_directory(self):
@@ -250,7 +254,7 @@ class RunParameterController(QObject):
         for child in range(0, childCount):
             widget = directoryLayout.itemAt(child).widget()
             if type(widget) is QLineEdit:
-                widget.setText(str(self.model.data.directoryDict[str(widget.objectName())]))
+                widget.setText(str(self.model.data.directoryDict[str(widget.accessibleName())]))
 
     ## Need to port this to the unified controller
     @pyqtSlot()
@@ -379,29 +383,29 @@ class RunParameterController(QObject):
 
     # def widget_names_in_layout(self, widget):
         # if isinstance(widget, QLineEdit):
-            # if str(widget.objectName()) in self.model.data.self.model.data.runParameterDict.keys():
+            # if str(widget.accessibleName()) in self.model.data.self.model.data.runParameterDict.keys():
                 # if str(widget.text()) == '':
-                    # self.model.data.self.model.data.runParameterDict.update({str(widget.objectName()): str(widget.placeholderText())})
+                    # self.model.data.self.model.data.runParameterDict.update({str(widget.accessibleName()): str(widget.placeholderText())})
                 # else:
-                    # self.model.data.self.model.data.runParameterDict.update({str(widget.objectName()): str(widget.text())})
-            # elif str(widget.objectName()) in self.model.data.scan_parameter:
+                    # self.model.data.self.model.data.runParameterDict.update({str(widget.accessibleName()): str(widget.text())})
+            # elif str(widget.accessibleName()) in self.model.data.scan_parameter:
                 # if str(widget.text()) == '':
-                    # self.model.data.scan_parameter.update({str(widget.objectName()): str(widget.placeholderText())})
+                    # self.model.data.scan_parameter.update({str(widget.accessibleName()): str(widget.placeholderText())})
                 # else:
-                    # self.model.data.scan_parameter.update({str(widget.objectName()): str(widget.text())})
+                    # self.model.data.scan_parameter.update({str(widget.accessibleName()): str(widget.text())})
         # elif isinstance(widget, QCheckBox):
-            # if str(widget.objectName()) in self.model.data.self.model.data.runParameterDict:
+            # if str(widget.accessibleName()) in self.model.data.self.model.data.runParameterDict:
                 # if widget.isChecked():
-                    # self.model.data.self.model.data.runParameterDict.update({str(widget.objectName()): 'T'})
+                    # self.model.data.self.model.data.runParameterDict.update({str(widget.accessibleName()): 'T'})
                 # else:
-                    # self.model.data.self.model.data.runParameterDict.update({str(widget.objectName()): 'F'})
-            # elif str(widget.objectName()) in self.model.data.scan_parameter:
+                    # self.model.data.self.model.data.runParameterDict.update({str(widget.accessibleName()): 'F'})
+            # elif str(widget.accessibleName()) in self.model.data.scan_parameter:
                 # if widget.isChecked():
-                   # self.model.data.scan_parameter.update({str(widget.objectName()) : True})
+                   # self.model.data.scan_parameter.update({str(widget.accessibleName()) : True})
                 # else:
-                   # self.model.data.scan_parameter.update({str(widget.objectName()) : False})
+                   # self.model.data.scan_parameter.update({str(widget.accessibleName()) : False})
         # elif isinstance(widget, QComboBox):
-            # self.model.data.scan_parameter.update({str(widget.objectName()) : str(widget.currentText())})
+            # self.model.data.scan_parameter.update({str(widget.accessibleName()) : str(widget.currentText())})
         # return
 
     def disable_run_button(self):
