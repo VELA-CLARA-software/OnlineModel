@@ -4,6 +4,8 @@ from copy import copy,deepcopy
 from decimal import Decimal
 import run_parameters_parser as yaml_parser
 import sys, os
+import collections
+
 class GenericThread(QThread):
     signal = pyqtSignal()
 
@@ -36,23 +38,27 @@ class RunParameterController(QObject):
         self.model = model
         self.view = view
         self.runParameterLayouts = [
-                               self.view.simulation_parameter_groupbox,
-                               self.view.injector_parameter_groupbox,
                                self.view.s02_parameter_groupbox,
                                self.view.c2v_parameter_groupbox,
                                self.view.vela_parameter_groupbox,
                                self.view.ba1_parameter_groupbox,
-                               self.view.scan_groupBox, self.view.directory_groupBox
+                               self.view.injector_parameter_groupbox,
+                               self.view.simulation_parameter_groupbox,
+                               self.view.scan_groupBox,
+                               self.view.directory_groupBox,
                                ]
         #self.model.data.self.model.data.runParameterDict = self.initialize_run_parameter_data()
         self.initialize_run_parameter_data()
         self.model.data.scannableParametersDict = self.get_scannable_parameters_dict()
         self.populate_scan_combo_box()
-        # self.model.data.scanDict = self.initialize_scan_data()
-        # print(self.model.data.scanDict)
-        # self.model.data.simulationDict = self.initialize_simulation_data()
         self.view.parameter_scan.stateChanged.connect(self.toggle_scan_parameters_state)
         self.view.runButton.clicked.connect(self.run_astra)
+        self.update_macro_particle_combo()
+
+    def update_macro_particle_combo(self):
+        combo = self.view.macro_particle
+        for i in range(2,7):
+            combo.addItem(str(2**(3*i)), i)
 
     @pyqtSlot()
     def update_value_in_dict(self):
@@ -73,7 +79,9 @@ class RunParameterController(QObject):
         elif type(widget) is QCheckBox:
             value = True if widget.isChecked() else False
         elif type(widget) is QComboBox:
-            value = str(widget.currentText())
+            value = str(widget.itemData(widget.currentIndex()).toString())
+            if value is '':
+                value = str(widget.currentText())
         if param is None:
             self.model.data.parameterDict[dictname].update({pv: value})
         else:
@@ -83,6 +91,7 @@ class RunParameterController(QObject):
     def initialize_run_parameter_data(self):
         formLayoutList = [formLayout for layout in self.runParameterLayouts for
                           formLayout in layout.findChildren((QFormLayout,QGridLayout))]
+        self.scannableParameters = []
         for layout in formLayoutList:
             childCount = layout.count()
             for child in range(0,childCount):
@@ -93,6 +102,7 @@ class RunParameterController(QObject):
                 if type(widget) is QDoubleSpinBox:
                     widget.valueChanged.connect(self.update_value_in_dict)
                     widget.valueChanged.emit(widget.value())
+                    self.scannableParameters.append(str(widget.accessibleName()))
                 if type(widget) is QCheckBox:
                     value = True if widget.isChecked() else False
                     widget.stateChanged.connect(self.update_value_in_dict)
@@ -103,23 +113,19 @@ class RunParameterController(QObject):
         # return self.model.data.latticeDict
 
     def get_scannable_parameters_dict(self):
-        scannableParameterDict = dict()
+        scannableParameterDict = collections.OrderedDict()
         unscannableParameters = ['macro_particle', 'injector_space_charge',
                                  'rest_of_line_space_charge', 'end_of_line']
-        for key, value in self.model.data.latticeDict.items():
+        for key in self.scannableParameters:
             if key not in unscannableParameters:
-                if value['type'] == 'cavity':
-                    scannableParameterDict[key+'_AMP'] = key
-                    scannableParameterDict[key+'_PHASE'] = key
-                #parameterDisplayStr = parameter.replace('_', ' ')
-                else:
-                    scannableParameterDict[key] = key
+                if ':' in key:
+                    scannableParameterDict[' - '.join(list(key.split(':'))[1:])] = key
         return scannableParameterDict
 
     def populate_scan_combo_box(self):
         scanParameterComboBox = self.view.parameter
-        for (parameter, parameterDisplayStr) in self.model.data.scannableParametersDict.items():
-            scanParameterComboBox.addItem(parameter)
+        for (parameterDisplayStr, parameter) in self.model.data.scannableParametersDict.items():
+            scanParameterComboBox.addItem(parameterDisplayStr, parameter)
 
     def set_line_edit_text_for_run_parameters(self):
         formLayoutList = [formLayout for layout in self.runParameterLayouts for formLayout in layout.findChildren(QFormLayout)]

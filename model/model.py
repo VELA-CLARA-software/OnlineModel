@@ -75,60 +75,31 @@ class Model(object):
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
         if self.data.scanDict['parameter_scan']:
             try:
-                current_scan_value = float(self.data.scanDict['parameter_scan_from_value'])
+                scan_start = float(self.data.scanDict['parameter_scan_from_value'])
                 scan_end = float(self.data.scanDict['parameter_scan_to_value'])
                 scan_step_size = float(self.data.scanDict['parameter_scan_step_size'])
             except ValueError:
                 print("Enter a numerical value to conduct a scan")
-            while current_scan_value <= scan_end:
-                # path_command = 'cd ' + self.data.data_values['directory_line_edit'] + '; '
-                # path_command = path_command + self.pathscript + 'script/./run_2BA1 '
-                for key, value in self.data.latticeDict.items():
-                    par = self.data.scanDict['parameter']# + '_line_edit'
-                    if key == par:
-                        if self.strip_text_before(key, ':') in self.generator_params:
-                            self.modify_framework(scan=True, type=self.strip_text_before(key, ':'),
-                                                  modify=current_scan_value,
-                                                  generator_param=self.strip_text_after(key, ':'))
-                        elif not self.strip_text_before(key, ':') in self.generator_params:
-                            if self.data.runParameterDict[self.strip_text_before(key, ':')]['type'] == 'cavity':
-                                self.modify_framework(scan=True, type=self.strip_text_before(key, ':'),
-                                                      modify=current_scan_value,
-                                                      cavity_params=self.strip_text_after(key, ':'))
-                            else:
-                                self.modify_framework(scan=True, type=self.strip_text_before(key, ':'),
-                                                      modify=current_scan_value)
-                        # path_command += str(current_scan_value) + ' '
-                        subdir = par + '-' + str(current_scan_value)
-                        current_scan_value += scan_step_size
-                        self.data.Framework.setSubDirectory(subdir)
-                        self.data.Framework.track(startfile='generator', endfile='S02')
-                    else:
-                        continue
+            for current_scan_value in np.arange(scan_start, scan_end + scan_step_size, scan_step_size):
+                par = self.data.scanDict['parameter']
+                print('parameter to scan = ', par, current_scan_value)
+                if len((par.split(':'))) == 3:
+                    dictname, pv, param = map(str, par.split(':'))
+                else:
+                    param = None
+                    dictname, pv = map(str, par.split(':'))
+                self.data.parameterDict[dictname][pv].update({param: current_scan_value})
+                self.modify_framework(scan=False)
+                subdir = str(self.data.parameterDict['simulation']['directory']) + '/scan/' + pv + '_' + str(current_scan_value)
+                current_scan_value += scan_step_size
+                self.data.Framework.setSubDirectory(subdir)
+                print self.data.Framework.subdirectory
+                self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
 
-                        # path_command = path_command + str(value) + ' '
-                #path_command = self.path_command_ensemble('script/run_2BA1 ', self.data.data_values)
-                #self.path_run_command(path_command, self.data.data_values['directory_line_edit'])
-                # print 'Running with command: ' + path_command
-                # path_command = self.path_command_ensemble()
-                # stdin, stdout, stderr = self.client.exec_command(path_command)
-                # print(stderr.readlines())
-                '''
-                  ASTRA RUN NUMBER NO LONGER INCLUDED, NEEDS TO BE ADDED IMPLICITLY HERE
-                '''
-                #if int(self.data.data_values['astra_run_number_line_edit']) < 100:
-                #    self.data.data_values['astra_run_number_line_edit'] = '00' + str(
-                #        int(self.data.data_values['astra_run_number_line_edit']) + 1)
-                #else:
-                #    self.data.data_values['astra_run_number_line_edit'] = str(
-                #        int(self.data.data_values['astra_run_number_line_edit']) + 1)
-
-                # print 'Running with command: ' + path_command
-                # path_command = '' + self.pathscript+'script/./run_2BA1 '
         else:
+            self.data.Framework.setSubDirectory(str(self.data.parameterDict['simulation']['directory']))
             self.modify_framework(scan=False)
-        self.data.Framework.setSubDirectory(self.data.parameterDict['simulation']['directory'])
-        self.data.Framework.track(startfile="generator", endfile='BA1_dipole')
+            self.data.Framework.track(startfile="generator", endfile='BA1_dipole')
 
     ##### Find Starting Filename based on z-position ####
     def find_starting_lattice(self, z):
@@ -139,23 +110,28 @@ class Model(object):
                         return l
         return 'generator'
 
-    def modify_framework(self, scan=False, type=None, modify=None, cavity_params=None, generator_param=None):
-        for key, value in self.data.latticeDict.items():
-            if self.data.latticeDict[key]['type'] == 'quadrupole':
+    def update_framework_elements(self, dict):
+        for key, value in dict.items():
+            if dict[key]['type'] == 'quadrupole':
                 self.data.Framework.modifyElement(key, 'k1l', value['k1l'])
-            elif self.data.latticeDict[key]['type'] == 'cavity':
+            elif dict[key]['type'] == 'cavity':
                 self.data.Framework.modifyElement(key, 'field_amplitude', 1e6*value['field_amplitude'])
                 self.data.Framework.modifyElement(key, 'phase', value['phase'])
-            elif self.data.latticeDict[key]['type'] == 'solenoid':
-                tempcav = self.data.latticeDict[key]['cavity']
-                # print(self.data.runParameterDict[tempcav]['sub_elements'][key])
+            elif dict[key]['type'] == 'solenoid':
+                tempcav = dict[key]['cavity']
                 self.data.Framework.modifyElement(key, 'field_amplitude', value['field_amplitude'])
-            # elif self.data.runParameterDict[self.strip_text_before(key, ':')]['type'] == 'generator':
-            #     self.data.Framework.modifyElement(key,key,value)
-        self.data.Framework.generator.number_of_particles = int(self.data.generatorDict['number_of_particles']['value'])
+
+    def modify_framework(self, scan=False, type=None, modify=None, cavity_params=None, generator_param=None):
+        if not os.name == 'nt':
+            self.data.Framework.defineASTRACommand(scaling=int(self.data.generatorDict['number_of_particles']['value']))
+            self.data.Framework.defineCSRTrackCommand(scaling=int(self.data.generatorDict['number_of_particles']['value']))
+            self.data.Framework.define_gpt_command(scaling=int(self.data.generatorDict['number_of_particles']['value']))
+
+        self.update_framework_elements(self.data.latticeDict)
+        if scan==True and type is not None:
+            print self.data.parameterDict[dictname][pv]
+        self.data.Framework.generator.number_of_particles = int(2**(3*int(self.data.generatorDict['number_of_particles']['value'])))
         self.data.Framework.generator.charge = 1e-9*float(self.data.generatorDict['charge']['value'])
-        print(float(self.data.generatorDict['sig_clock']['value']))
-        print(float(self.data.generatorDict['sig_clock']['value']) / (2354.82))
         self.data.Framework.generator.sig_clock = float(self.data.generatorDict['sig_clock']['value']) / (2354.82)
         # self.data.Framework.generator.dist_x = self.data.generatorDict['dist_x']['value']
         # self.data.Framework.generator.dist_y = self.data.generatorDict['dist_y']['value']
@@ -163,36 +139,35 @@ class Model(object):
         self.data.Framework.generator.sig_x = self.data.generatorDict['spot_size']
         self.data.Framework.generator.sig_y = self.data.generatorDict['spot_size']
         # self.data.Framework.generator.sig_z = self.data.runParameterDict['sig_z']['value']
-        if scan==True and type is not None:
-            for key, value in self.data.latticeDict.items():
-                if type == 'quadrupole':
-                    self.data.Framework.modifyElement(key, 'k1l', modify)
-                elif type == 'cavity':
-                    if cavity_params == "AMP":
-                        self.data.Framework.modifyElement(key, 1e6*'field_amplitude', modify)
-                    elif cavity_params == "PHASE":
-                        self.data.Framework.modifyElement(key, 'phase', modify)
-                elif type == 'solenoid':
-                    tempcav = self.data.latticeDict[key]['cavity']
-                    # print(self.data.runParameterDict[tempcav]['sub_elements'][key])
-                    self.data.Framework.modifyElement(key, 'field_amplitude', modify)
-                # elif self.data.runParameterDict[self.strip_text_before(key, ':')]['type'] == 'generator':
-                #     self.data.Framework.modifyElement(key,key,value)
-        elif scan==True and generator_param in self.generator_params:
-            if generator_param == 'number_of_particles':
-                self.data.Framework.generator.number_of_particles = modify
-            elif generator_param == 'dist_x':
-                self.data.Framework.generator.dist_x = modify
-            elif generator_param == 'dist_y':
-                self.data.Framework.generator.dist_y = modify
-            elif generator_param == 'dist_z':
-                self.data.Framework.generator.dist_z = modify
-            elif generator_param == 'sig_x':
-                self.data.Framework.generator.sig_x = modify
-            elif generator_param == 'sig_y':
-                self.data.Framework.generator.sig_y = modify
-            elif generator_param == 'sig_z':
-                self.data.Framework.generator.sig_z = modify
+        #     for key, value in self.data.latticeDict.items():
+        #         if type == 'quadrupole':
+        #             self.data.Framework.modifyElement(key, 'k1l', modify)
+        #         elif type == 'cavity':
+        #             if cavity_params == "AMP":
+        #                 self.data.Framework.modifyElement(key, 1e6*'field_amplitude', modify)
+        #             elif cavity_params == "PHASE":
+        #                 self.data.Framework.modifyElement(key, 'phase', modify)
+        #         elif type == 'solenoid':
+        #             tempcav = self.data.latticeDict[key]['cavity']
+        #             # print(self.data.runParameterDict[tempcav]['sub_elements'][key])
+        #             self.data.Framework.modifyElement(key, 'field_amplitude', modify)
+        #         # elif self.data.runParameterDict[self.strip_text_before(key, ':')]['type'] == 'generator':
+        #         #     self.data.Framework.modifyElement(key,key,value)
+        # elif scan==True and generator_param in self.generator_params:
+        #     if generator_param == 'number_of_particles':
+        #         self.data.Framework.generator.number_of_particles = modify
+        #     elif generator_param == 'dist_x':
+        #         self.data.Framework.generator.dist_x = modify
+        #     elif generator_param == 'dist_y':
+        #         self.data.Framework.generator.dist_y = modify
+        #     elif generator_param == 'dist_z':
+        #         self.data.Framework.generator.dist_z = modify
+        #     elif generator_param == 'sig_x':
+        #         self.data.Framework.generator.sig_x = modify
+        #     elif generator_param == 'sig_y':
+        #         self.data.Framework.generator.sig_y = modify
+        #     elif generator_param == 'sig_z':
+        #         self.data.Framework.generator.sig_z = modify
 
     def strip_text_before(self, string, condition):
         sep = condition
