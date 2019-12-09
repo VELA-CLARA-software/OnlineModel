@@ -4,7 +4,6 @@ import numpy as np
 import ruamel.yaml
 # sys.path.append('\\\\apclara1\\ControlRoomApps\\OnlineModel')
 # sys.path.append('\\\\apclara1\\ControlRoomApps\\OnlineModel\\MasterLattice')
-sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/SimulationFramework/'))
 sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
 import SimulationFramework.Framework as Fw
 import view as view

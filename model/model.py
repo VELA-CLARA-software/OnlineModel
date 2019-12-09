@@ -154,8 +154,8 @@ class Model(object):
             #     self.data.Framework.modifyElement(key,key,value)
         self.data.Framework.generator.number_of_particles = int(self.data.generatorDict['number_of_particles']['value'])
         self.data.Framework.generator.charge = 1e-9*float(self.data.generatorDict['charge']['value'])
-        print float(self.data.generatorDict['sig_clock']['value'])
-        print float(self.data.generatorDict['sig_clock']['value']) / (2354.82)
+        print(float(self.data.generatorDict['sig_clock']['value']))
+        print(float(self.data.generatorDict['sig_clock']['value']) / (2354.82))
         self.data.Framework.generator.sig_clock = float(self.data.generatorDict['sig_clock']['value']) / (2354.82)
         # self.data.Framework.generator.dist_x = self.data.generatorDict['dist_x']['value']
         # self.data.Framework.generator.dist_y = self.data.generatorDict['dist_y']['value']
