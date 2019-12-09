@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1233</width>
-    <height>697</height>
+    <width>1123</width>
+    <height>754</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,6 +23,13 @@
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Post-processing&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
+      <property name="styleSheet">
+       <string notr="true">QGroupBox
+{
+    font-size: 16px;
+    font-weight: bold;
+}</string>
+      </property>
       <property name="tabShape">
        <enum>QTabWidget::Rounded</enum>
       </property>
@@ -34,286 +41,6 @@
         <string>Scan</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="2">
-         <widget class="QGroupBox" name="vela_parameter_groupbox">
-          <property name="title">
-           <string>VELA</string>
-          </property>
-          <layout class="QFormLayout" name="formLayout_6">
-           <property name="sizeConstraint">
-            <enum>QLayout::SetDefaultConstraint</enum>
-           </property>
-           <item row="0" column="0">
-            <widget class="QLabel" name="vela_quad1_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD1 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="vela_quad1_strength">
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>EBT-INJ-MAG-QUAD-07</string>
-             </property>
-             <property name="placeholderText">
-              <string>20.743</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="vela_quad2_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD2 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="vela_quad2_strength">
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>EBT-INJ-MAG-QUAD-08</string>
-             </property>
-             <property name="placeholderText">
-              <string>-18.492</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="vela_quad3_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD3 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="vela_quad3_strength">
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>EBT-INJ-MAG-QUAD-09</string>
-             </property>
-             <property name="placeholderText">
-              <string>5.267</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="vela_quad4_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD4 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="vela_quad4_strength">
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>EBT-INJ-MAG-QUAD-10</string>
-             </property>
-             <property name="placeholderText">
-              <string>-5.527</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="vela_quad5_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD5 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLineEdit" name="vela_quad5_strength">
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>EBT-INJ-MAG-QUAD-11</string>
-             </property>
-             <property name="placeholderText">
-              <string>6.721</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="vela_quad6_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD6 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1">
-            <widget class="QLineEdit" name="vela_quad6_strength">
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>EBT-INJ-MAG-QUAD-15</string>
-             </property>
-             <property name="placeholderText">
-              <string>8.891</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0" colspan="2">
-            <spacer name="verticalSpacer_5">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <layout class="QGridLayout" name="parameter_scan_layout">
-          <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
-          </property>
-          <item row="2" column="2">
-           <widget class="QLabel" name="parameter_scan_to_value_label">
-            <property name="text">
-             <string>Scan To:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="parameter_scan_label">
-            <property name="text">
-             <string>Parameter:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="3">
-           <widget class="QLineEdit" name="parameter_scan_to_value">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="accessibleName">
-             <string>parameter_scan_to_value</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="4">
-           <widget class="QLabel" name="parameter_scan_step_size_label">
-            <property name="text">
-             <string>Step Size:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="parameter_scan_from_value_label">
-            <property name="text">
-             <string>Scan From:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="parameter_scan_from_value">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="accessibleName">
-             <string>parameter_scan_from_value</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="5">
-           <widget class="QLineEdit" name="parameter_scan_step_size">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="accessibleName">
-             <string>parameter_scan_step_size</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1" colspan="5">
-           <widget class="QComboBox" name="parameter">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="accessibleName">
-             <string>parameter</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QCheckBox" name="parameter_scan">
-            <property name="accessibleName">
-             <string>parameter_scan</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0" colspan="3">
-           <widget class="QLabel" name="parameter_scan_section_label">
-            <property name="font">
-             <font>
-              <pointsize>11</pointsize>
-              <weight>75</weight>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>Scan Parameters</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
         <item row="0" column="0">
          <widget class="QGroupBox" name="simulation_parameter_groupbox">
           <property name="title">
@@ -322,10 +49,67 @@
           <property name="flat">
            <bool>false</bool>
           </property>
-          <layout class="QFormLayout" name="formLayout_2">
-           <property name="fieldGrowthPolicy">
-            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-           </property>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="1" column="2">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+             <property name="accessibleName">
+              <string>generator:laser_pulse_length</string>
+             </property>
+             <property name="suffix">
+              <string> ps</string>
+             </property>
+             <property name="maximum">
+              <double>10.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>3.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="2">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+             <property name="accessibleName">
+              <string>generator:spot_size</string>
+             </property>
+             <property name="suffix">
+              <string> mm</string>
+             </property>
+             <property name="maximum">
+              <double>1.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.010000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.250000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="2">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+             <property name="accessibleName">
+              <string>generator:charge</string>
+             </property>
+             <property name="suffix">
+              <string> pC</string>
+             </property>
+             <property name="minimum">
+              <double>0.010000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>0.250000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.005000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.250000000000000</double>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="macro_particle_label">
              <property name="minimumSize">
@@ -339,49 +123,34 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="macro_particle">
-             <property name="whatsThis">
-              <string/>
-             </property>
+           <item row="0" column="2">
+            <widget class="QComboBox" name="macro_particle">
              <property name="accessibleName">
-              <string>macro_particle</string>
+              <string>generator:number_of_particles</string>
              </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
+             <property name="currentIndex">
+              <number>1</number>
              </property>
-             <property name="placeholderText">
-              <string>32</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="laser_pulse_length_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Laser Pulse Length (ps)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="laser_pulse_length">
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>laser_pulse_length</string>
-             </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
-             </property>
-             <property name="placeholderText">
-              <string>3</string>
-             </property>
+             <item>
+              <property name="text">
+               <string>64</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>512</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>4096</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>32768</string>
+              </property>
+             </item>
             </widget>
            </item>
            <item row="2" column="0">
@@ -394,22 +163,6 @@
              </property>
              <property name="text">
               <string>Spot Size (sig in mm)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="spot_size">
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>spot_size</string>
-             </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
-             </property>
-             <property name="placeholderText">
-              <string>0.25</string>
              </property>
             </widget>
            </item>
@@ -426,19 +179,16 @@
              </property>
             </widget>
            </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="charge">
-             <property name="whatsThis">
-              <string/>
+           <item row="1" column="0">
+            <widget class="QLabel" name="laser_pulse_length_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
              </property>
-             <property name="accessibleName">
-              <string>charge</string>
-             </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
-             </property>
-             <property name="placeholderText">
-              <string>0.25</string>
+             <property name="text">
+              <string>Laser Pulse Length (ps)</string>
              </property>
             </widget>
            </item>
@@ -449,7 +199,83 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
+           <item row="5" column="2">
+            <widget class="QCheckBox" name="injector_space_charge">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="accessibleName">
+              <string>simulation:injector_space_charge</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="injector_space_charge_switch_label">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Injector Space Charge (On/Off)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="rest_of_line_space_charge_switch_label">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Rest of Line Space Charge (On/Off)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="2">
+            <widget class="QCheckBox" name="rest_of_line_space_charge">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="accessibleName">
+              <string>simulation:rest_of_line_space_charge</string>
+             </property>
+             <property name="text">
+              <string/>
+             </property>
+             <property name="checked">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="2">
             <widget class="QWidget" name="widget" native="true">
              <layout class="QHBoxLayout" name="horizontalLayout_2">
               <property name="spacing">
@@ -460,6 +286,9 @@
               </property>
               <item>
                <widget class="QComboBox" name="starting_lattice">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -479,7 +308,7 @@
                  </size>
                 </property>
                 <property name="accessibleName">
-                 <string>starting_lattice</string>
+                 <string>simulation:starting_lattice</string>
                 </property>
                 <item>
                  <property name="text">
@@ -536,6 +365,9 @@
               </item>
               <item>
                <widget class="QComboBox" name="final_lattice">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -555,7 +387,7 @@
                  </size>
                 </property>
                 <property name="accessibleName">
-                 <string>final_lattice</string>
+                 <string>simulation:final_lattice</string>
                 </property>
                 <property name="currentIndex">
                  <number>6</number>
@@ -603,215 +435,8 @@
              </layout>
             </widget>
            </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="injector_space_charge_switch_label">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Injector Space Charge (On/Off)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1">
-            <widget class="QCheckBox" name="injector_space_charge">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="accessibleName">
-              <string>injector_space_charge</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="rest_of_line_space_charge_switch_label">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Rest of Line Space Charge (On/Off)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QCheckBox" name="rest_of_line_space_charge">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="accessibleName">
-              <string>rest_of_line_space_charge</string>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QGroupBox" name="s02_parameter_groupbox">
-          <property name="title">
-           <string>S02</string>
-          </property>
-          <layout class="QFormLayout" name="formLayout_4">
-           <property name="sizeConstraint">
-            <enum>QLayout::SetDefaultConstraint</enum>
-           </property>
-           <item row="0" column="0">
-            <widget class="QLabel" name="s02_quad1_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD1 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="s02_quad1_strength">
-             <property name="contextMenuPolicy">
-              <enum>Qt::DefaultContextMenu</enum>
-             </property>
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>CLA-S02-MAG-QUAD-01</string>
-             </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
-             </property>
-             <property name="placeholderText">
-              <string>3.012</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="s02_quad2_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD2 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="s02_quad2_strength">
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>CLA-S02-MAG-QUAD-02</string>
-             </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
-             </property>
-             <property name="placeholderText">
-              <string>-4.719</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="s02_quad3_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD3 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="s02_quad3_strength">
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>CLA-S02-MAG-QUAD-03</string>
-             </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
-             </property>
-             <property name="placeholderText">
-              <string>-4.07</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="s02_quad4_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD4 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="s02_quad4_strength">
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>CLA-S02-MAG-QUAD-04</string>
-             </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
-             </property>
-             <property name="placeholderText">
-              <string>13.316</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <spacer name="verticalSpacer_4">
+           <item row="7" column="0">
+            <spacer name="verticalSpacer">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
@@ -832,9 +457,6 @@
            <string>C2V</string>
           </property>
           <layout class="QFormLayout" name="formLayout_3">
-           <property name="sizeConstraint">
-            <enum>QLayout::SetNoConstraint</enum>
-           </property>
            <item row="0" column="0">
             <widget class="QLabel" name="c2v_quad1_strength_label">
              <property name="minimumSize">
@@ -849,15 +471,27 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="c2v_quad1_strength">
-             <property name="whatsThis">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
+             <property name="accessibleName">
+              <string>lattice:CLA-C2V-MAG-QUAD-01:k1l</string>
+             </property>
+             <property name="suffix">
               <string/>
              </property>
-             <property name="accessibleName">
-              <string>CLA-C2V-MAG-QUAD-01</string>
+             <property name="decimals">
+              <number>3</number>
              </property>
-             <property name="placeholderText">
-              <string>54.756</string>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>5.757000000000000</double>
              </property>
             </widget>
            </item>
@@ -875,15 +509,27 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="c2v_quad2_strength">
-             <property name="whatsThis">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_10">
+             <property name="accessibleName">
+              <string>lattice:CLA-C2V-MAG-QUAD-02:k1l</string>
+             </property>
+             <property name="suffix">
               <string/>
              </property>
-             <property name="accessibleName">
-              <string>CLA-C2V-MAG-QUAD-02</string>
+             <property name="decimals">
+              <number>3</number>
              </property>
-             <property name="placeholderText">
-              <string>-46.099</string>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>-4.734000000000000</double>
              </property>
             </widget>
            </item>
@@ -901,15 +547,27 @@
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QLineEdit" name="c2v_quad3_strength">
-             <property name="whatsThis">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_11">
+             <property name="accessibleName">
+              <string>lattice:CLA-C2V-MAG-QUAD-03:k1l</string>
+             </property>
+             <property name="suffix">
               <string/>
              </property>
-             <property name="accessibleName">
-              <string>CLA-C2V-MAG-QUAD-03</string>
+             <property name="decimals">
+              <number>3</number>
              </property>
-             <property name="placeholderText">
-              <string>55.974</string>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>5.757000000000000</double>
              </property>
             </widget>
            </item>
@@ -929,413 +587,106 @@
           </layout>
          </widget>
         </item>
-        <item row="1" column="2">
-         <widget class="QGroupBox" name="ba1_parameter_groupbox">
-          <property name="title">
-           <string>BA1</string>
-          </property>
-          <layout class="QFormLayout" name="formLayout_5">
-           <property name="sizeConstraint">
-            <enum>QLayout::SetDefaultConstraint</enum>
-           </property>
-           <item row="0" column="0">
-            <widget class="QLabel" name="ba1_quad1_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD1 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="ba1_quad1_strength">
-             <property name="whatsThis">
-              <string>EBT-BA1-MAG-QUAD-01</string>
-             </property>
-             <property name="placeholderText">
-              <string>-3.8</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="ba1_quad2_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD2 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QLineEdit" name="ba1_quad2_strength">
-             <property name="whatsThis">
-              <string>EBT-BA1-MAG-QUAD-02</string>
-             </property>
-             <property name="placeholderText">
-              <string>9.9</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="ba1_quad3_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD3 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="ba1_quad3_strength">
-             <property name="whatsThis">
-              <string>EBT-BA1-MAG-QUAD-03</string>
-             </property>
-             <property name="placeholderText">
-              <string>-11.5</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="ba1_quad4_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD4 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="ba1_quad4_strength">
-             <property name="whatsThis">
-              <string>EBT-BA1-MAG-QUAD-04</string>
-             </property>
-             <property name="placeholderText">
-              <string>5.0</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="0">
-            <widget class="QLabel" name="ba1_quad5_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD5 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="4" column="1">
-            <widget class="QLineEdit" name="ba1_quad5_strength">
-             <property name="whatsThis">
-              <string>EBT-BA1-MAG-QUAD-05</string>
-             </property>
-             <property name="placeholderText">
-              <string>-3.5</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="0">
-            <widget class="QLabel" name="ba1_quad6_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD6 Strength (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="5" column="1">
-            <widget class="QLineEdit" name="ba1_quad6_strength">
-             <property name="whatsThis">
-              <string>EBT-BA1-MAG-QUAD-06</string>
-             </property>
-             <property name="placeholderText">
-              <string>-3.5</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="0">
-            <widget class="QLabel" name="ba1_quad7_strength_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>QUAD7 Strength in Dipole (k)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="6" column="1">
-            <widget class="QLineEdit" name="ba1_quad7_strength">
-             <property name="whatsThis">
-              <string>EBT-BA1-MAG-QUAD-07</string>
-             </property>
-             <property name="placeholderText">
-              <string>2.5</string>
-             </property>
-            </widget>
-           </item>
-           <item row="7" column="0" colspan="2">
-            <spacer name="verticalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="2" column="1" colspan="2">
-         <layout class="QGridLayout" name="directory_and_run_button_grid_layout">
-          <property name="sizeConstraint">
-           <enum>QLayout::SetDefaultConstraint</enum>
-          </property>
-          <item row="0" column="0">
-           <layout class="QFormLayout" name="directory_form_layout">
-            <property name="sizeConstraint">
-             <enum>QLayout::SetDefaultConstraint</enum>
-            </property>
-            <property name="fieldGrowthPolicy">
-             <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-            </property>
-            <item row="0" column="0">
-             <widget class="QLabel" name="directory_label">
-              <property name="text">
-               <string>Directory</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="directory">
-              <property name="accessibleName">
-               <string>directory</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="runButton">
-            <property name="accessibleName">
-             <string>runButton</string>
-            </property>
-            <property name="text">
-             <string>Run ASTRA</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="2">
-           <widget class="QProgressBar" name="progressBar">
-            <property name="accessibleName">
-             <string>progressBar</string>
-            </property>
-            <property name="value">
-             <number>0</number>
-            </property>
-            <property name="textVisible">
-             <bool>true</bool>
-            </property>
-            <property name="format">
-             <string>%p%</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
         <item row="1" column="0">
          <widget class="QGroupBox" name="injector_parameter_groupbox">
           <property name="title">
            <string>Injector Parameters</string>
           </property>
-          <layout class="QFormLayout" name="formLayout">
-           <property name="fieldGrowthPolicy">
-            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-           </property>
-           <item row="0" column="0">
-            <widget class="QLabel" name="gun_gradient_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Gun Gradient (MV/m)</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QLineEdit" name="gun_gradient">
-             <property name="whatsThis">
-              <string/>
-             </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="4" column="1">
+            <widget class="QDoubleSpinBox" name="bucking_coil_and_sol_strength_2">
              <property name="accessibleName">
-              <string>CLA-LRG1-GUN-CAV:field_amplitude</string>
+              <string>lattice:CLA-LRG1-GUN-SOL:field_amplitude</string>
              </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
+             <property name="suffix">
+              <string> T</string>
              </property>
-             <property name="placeholderText">
-              <string>71.5</string>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>0.250000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>0.500000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.001000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.345000000000000</double>
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QLabel" name="gun_phase_label">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
+           <item row="5" column="1">
+            <widget class="QDoubleSpinBox" name="linac1_sol1_strength_2">
+             <property name="accessibleName">
+              <string>lattice:CLA-L01-CAV-SOL-01:field_amplitude</string>
              </property>
-             <property name="text">
-              <string>Gun Phase (deg.)</string>
+             <property name="suffix">
+              <string> T</string>
+             </property>
+             <property name="minimum">
+              <double>-0.500000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>0.500000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.010000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.050000000000000</double>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="gun_phase">
-             <property name="whatsThis">
-              <string/>
-             </property>
+            <widget class="QDoubleSpinBox" name="gun_phase">
              <property name="accessibleName">
-              <string>CLA-LRG1-GUN-CAV:phase</string>
+              <string>lattice:CLA-LRG1-GUN-CAV:phase</string>
              </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
+             <property name="suffix">
+              <string>°</string>
              </property>
-             <property name="placeholderText">
-              <string>-9</string>
+             <property name="decimals">
+              <number>0</number>
              </property>
-            </widget>
-           </item>
-           <item row="2" column="0">
-            <widget class="QLabel" name="linac1_gradient_label">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+             <property name="minimum">
+              <double>-180.000000000000000</double>
              </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
+             <property name="maximum">
+              <double>180.000000000000000</double>
              </property>
-             <property name="text">
-              <string>Linac 1 Gradient (MV/m)</string>
+             <property name="value">
+              <double>-9.000000000000000</double>
              </property>
             </widget>
            </item>
-           <item row="2" column="1">
-            <widget class="QLineEdit" name="linac_1_gradient">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="whatsThis">
-              <string/>
-             </property>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox">
              <property name="accessibleName">
-              <string>CLA-L01-CAV:field_amplitude</string>
+              <string>lattice:CLA-LRG1-GUN-CAV:field_amplitude</string>
              </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
+             <property name="buttonSymbols">
+              <enum>QAbstractSpinBox::PlusMinus</enum>
              </property>
-             <property name="text">
-              <string/>
+             <property name="suffix">
+              <string> MV/m</string>
              </property>
-             <property name="placeholderText">
-              <string>21</string>
+             <property name="decimals">
+              <number>1</number>
              </property>
-            </widget>
-           </item>
-           <item row="3" column="0">
-            <widget class="QLabel" name="linac1_phase_label">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+             <property name="minimum">
+              <double>0.000000000000000</double>
              </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>25</height>
-              </size>
+             <property name="maximum">
+              <double>100.000000000000000</double>
              </property>
-             <property name="text">
-              <string>Linac 1 Phase (deg.)</string>
+             <property name="singleStep">
+              <double>0.500000000000000</double>
              </property>
-            </widget>
-           </item>
-           <item row="3" column="1">
-            <widget class="QLineEdit" name="linac1_phase">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>CLA-L01-CAV:phase</string>
-             </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
-             </property>
-             <property name="text">
-              <string/>
-             </property>
-             <property name="placeholderText">
-              <string>-16</string>
+             <property name="value">
+              <double>71.500000000000000</double>
              </property>
             </widget>
            </item>
@@ -1358,31 +709,16 @@
              </property>
             </widget>
            </item>
-           <item row="4" column="1">
-            <widget class="QLineEdit" name="bucking_coil_and_sol_strength">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="gun_gradient_label">
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>0</height>
+               <height>25</height>
               </size>
              </property>
-             <property name="whatsThis">
-              <string/>
-             </property>
-             <property name="accessibleName">
-              <string>CLA-LRG1-GUN-SOL</string>
-             </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
-             </property>
-             <property name="placeholderText">
-              <string>0.345</string>
+             <property name="text">
+              <string>Gun Gradient (MV/m)</string>
              </property>
             </widget>
            </item>
@@ -1405,8 +741,21 @@
              </property>
             </widget>
            </item>
-           <item row="5" column="1">
-            <widget class="QLineEdit" name="linac1_sol1_strength">
+           <item row="1" column="0">
+            <widget class="QLabel" name="gun_phase_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Gun Phase (deg.)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="linac1_gradient_label">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
@@ -1416,20 +765,30 @@
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>0</height>
+               <height>25</height>
               </size>
              </property>
-             <property name="whatsThis">
-              <string/>
+             <property name="text">
+              <string>Linac 1 Gradient (MV/m)</string>
              </property>
-             <property name="accessibleName">
-              <string>CLA-L01-CAV-SOL-01</string>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="linac1_phase_label">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
              </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
              </property>
-             <property name="placeholderText">
-              <string>0.05</string>
+             <property name="text">
+              <string>Linac 1 Phase (deg.)</string>
              </property>
             </widget>
            </item>
@@ -1452,32 +811,958 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="1">
-            <widget class="QLineEdit" name="linac1_sol2_strength">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
+           <item row="2" column="1">
+            <widget class="QDoubleSpinBox" name="linac_1_gradient_2">
+             <property name="accessibleName">
+              <string>lattice:CLA-L01-CAV:field_amplitude</string>
              </property>
+             <property name="suffix">
+              <string> MV/m</string>
+             </property>
+             <property name="decimals">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <double>25.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.500000000000000</double>
+             </property>
+             <property name="value">
+              <double>21.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QDoubleSpinBox" name="linac1_sol2_strength_2">
+             <property name="accessibleName">
+              <string>lattice:CLA-L01-CAV-SOL-02:field_amplitude</string>
+             </property>
+             <property name="suffix">
+              <string> T</string>
+             </property>
+             <property name="minimum">
+              <double>-0.500000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>0.500000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.010000000000000</double>
+             </property>
+             <property name="value">
+              <double>-0.050000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QDoubleSpinBox" name="linac1_phase_2">
+             <property name="accessibleName">
+              <string>lattice:CLA-L01-CAV:phase</string>
+             </property>
+             <property name="suffix">
+              <string>°</string>
+             </property>
+             <property name="decimals">
+              <number>0</number>
+             </property>
+             <property name="minimum">
+              <double>-180.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>180.000000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="7" column="1">
+            <spacer name="verticalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QGroupBox" name="s02_parameter_groupbox">
+          <property name="title">
+           <string>S02</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout_2">
+           <item row="0" column="0">
+            <widget class="QLabel" name="s02_quad1_strength_label">
              <property name="minimumSize">
               <size>
                <width>0</width>
-               <height>0</height>
+               <height>25</height>
               </size>
              </property>
-             <property name="whatsThis">
+             <property name="text">
+              <string>QUAD1 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
+             <property name="accessibleName">
+              <string>lattice:CLA-S02-MAG-QUAD-01:k1l</string>
+             </property>
+             <property name="suffix">
               <string/>
              </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.790000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="s02_quad2_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD2 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_8">
              <property name="accessibleName">
-              <string>CLA-L01-CAV-SOL-02</string>
+              <string>lattice:CLA-S02-MAG-QUAD-02:k1l</string>
              </property>
-             <property name="inputMethodHints">
-              <set>Qt::ImhDigitsOnly</set>
+             <property name="suffix">
+              <string/>
              </property>
-             <property name="placeholderText">
-              <string>-0.05</string>
+             <property name="decimals">
+              <number>3</number>
              </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>-1.651000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="s02_quad3_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD3 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
+             <property name="accessibleName">
+              <string>lattice:CLA-S02-MAG-QUAD-03:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>2.304000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="s02_quad4_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD4 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
+             <property name="accessibleName">
+              <string>lattice:CLA-S02-MAG-QUAD-04:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>-1.386000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QGroupBox" name="vela_parameter_groupbox">
+          <property name="title">
+           <string>VELA</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout">
+           <property name="fieldGrowthPolicy">
+            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="vela_quad1_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD1 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_13">
+             <property name="accessibleName">
+              <string>lattice:EBT-INJ-MAG-QUAD-07:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.724000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="vela_quad2_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD2 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_12">
+             <property name="accessibleName">
+              <string>lattice:EBT-INJ-MAG-QUAD-08:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>-1.587000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="vela_quad3_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD3 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_15">
+             <property name="accessibleName">
+              <string>lattice:EBT-INJ-MAG-QUAD-09:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.376000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="vela_quad4_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD4 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_14">
+             <property name="accessibleName">
+              <string>lattice:EBT-INJ-MAG-QUAD-10:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>-0.390000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="vela_quad5_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD5 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_17">
+             <property name="accessibleName">
+              <string>lattice:EBT-INJ-MAG-QUAD-11:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.171000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="0">
+            <widget class="QLabel" name="vela_quad6_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD6 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="5" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_16">
+             <property name="accessibleName">
+              <string>lattice:EBT-INJ-MAG-QUAD-15:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.123000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <spacer name="verticalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QGroupBox" name="ba1_parameter_groupbox">
+          <property name="title">
+           <string>BA1</string>
+          </property>
+          <layout class="QFormLayout" name="formLayout_4">
+           <item row="0" column="0">
+            <widget class="QLabel" name="ba1_quad1_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD1 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="ba1_quad2_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD2 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="0">
+            <widget class="QLabel" name="ba1_quad3_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD3 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="ba1_quad4_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD4 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="0">
+            <widget class="QLabel" name="ba1_quad5_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD5 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="0">
+            <widget class="QLabel" name="ba1_quad6_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD6 Strength (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="12" column="0">
+            <widget class="QLabel" name="ba1_quad7_strength_label">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>25</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>QUAD7 Strength in Dipole (k)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="14" column="1">
+            <spacer name="verticalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_18">
+             <property name="accessibleName">
+              <string>lattice:EBT-BA1-MAG-QUAD-01:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>-0.264000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_24">
+             <property name="accessibleName">
+              <string>lattice:EBT-BA1-MAG-QUAD-02:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>-0.959000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_19">
+             <property name="accessibleName">
+              <string>lattice:EBT-BA1-MAG-QUAD-03:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.225000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_20">
+             <property name="accessibleName">
+              <string>lattice:EBT-BA1-MAG-QUAD-04:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.150000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="8" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_21">
+             <property name="accessibleName">
+              <string>lattice:EBT-BA1-MAG-QUAD-05:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.039000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="10" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_22">
+             <property name="accessibleName">
+              <string>lattice:EBT-BA1-MAG-QUAD-06:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>-1.334000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="12" column="1">
+            <widget class="QDoubleSpinBox" name="doubleSpinBox_23">
+             <property name="accessibleName">
+              <string>lattice:EBT-BA1-MAG-QUAD-07:k1l</string>
+             </property>
+             <property name="suffix">
+              <string/>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>-70.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>70.000000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.100000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.361000000000000</double>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="3">
+         <widget class="QWidget" name="widget_2" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <property name="margin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QGroupBox" name="scan_groupBox">
+             <property name="title">
+              <string>Scan Parameters</string>
+             </property>
+             <layout class="QGridLayout" name="parameter_scan_layout">
+              <item row="2" column="0" colspan="2">
+               <widget class="QLabel" name="parameter_scan_from_value_label_2">
+                <property name="text">
+                 <string>Scan From:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QLabel" name="parameter_scan_label_2">
+                <property name="text">
+                 <string>Scan Parameter:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="4">
+               <widget class="QLineEdit" name="parameter_scan_to_value">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="accessibleName">
+                 <string>scan:parameter_scan_to_value</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="3">
+               <widget class="QLabel" name="parameter_scan_to_value_label_2">
+                <property name="text">
+                 <string>Scan To:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="2" colspan="5">
+               <widget class="QComboBox" name="parameter">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="accessibleName">
+                 <string>scan:parameter</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="5">
+               <widget class="QLabel" name="parameter_scan_step_size_label_2">
+                <property name="text">
+                 <string>Step Size:</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QLineEdit" name="parameter_scan_from_value">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="accessibleName">
+                 <string>scan:parameter_scan_from_value</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="6">
+               <widget class="QLineEdit" name="parameter_scan_step_size">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="accessibleName">
+                 <string>scan:parameter_scan_step_size</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QCheckBox" name="parameter_scan">
+                <property name="accessibleName">
+                 <string>scan:parameter_scan</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="directory_groupBox">
+             <property name="title">
+              <string>Run ASTRA</string>
+             </property>
+             <layout class="QGridLayout" name="directory_form_layout">
+              <item row="0" column="0">
+               <widget class="QLabel" name="directory_label">
+                <property name="text">
+                 <string>Directory</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QLineEdit" name="directory">
+                <property name="accessibleName">
+                 <string>simulation:directory</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="2">
+               <widget class="QPushButton" name="runButton">
+                <property name="accessibleName">
+                 <string>runButton</string>
+                </property>
+                <property name="text">
+                 <string>Run ASTRA</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0" colspan="3">
+               <widget class="QProgressBar" name="progressBar">
+                <property name="accessibleName">
+                 <string>progressBar</string>
+                </property>
+                <property name="value">
+                 <number>0</number>
+                </property>
+                <property name="textVisible">
+                 <bool>true</bool>
+                </property>
+                <property name="format">
+                 <string>%p%</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </item>
           </layout>
@@ -1945,7 +2230,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1233</width>
+     <width>1123</width>
      <height>21</height>
     </rect>
    </property>

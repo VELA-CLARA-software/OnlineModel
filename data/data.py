@@ -41,9 +41,15 @@ class Data(object):
     def __init__(self):
         object.__init__(self)
         self.my_name = "data"
-        self.runParameterDict = collections.OrderedDict()
-        self.parameterScanDict = collections.OrderedDict()
-        self.directoryDict = collections.OrderedDict()
+        self.parameterDict = collections.OrderedDict()
+        self.parameterDict['lattice'] = collections.OrderedDict()
+        self.latticeDict = self.parameterDict['lattice']
+        self.parameterDict['scan'] = collections.OrderedDict()
+        self.scanDict = self.parameterDict['scan']
+        self.parameterDict['simulation'] = collections.OrderedDict()
+        self.simulationDict = self.parameterDict['simulation']
+        self.parameterDict['generator'] = collections.OrderedDict()
+        self.generatorDict = self.parameterDict['generator']
         self.scannableParametersDict = collections.OrderedDict()
         self.Framework = Fw.Framework(directory=directory_summary, clean=False, verbose=False)
         self.Framework.loadSettings('Lattices/CLA10-BA1_OM.def')
@@ -56,15 +62,15 @@ class Data(object):
 
     def initialise_data(self):
         # [self.runParameterDict.update({key: value}) for key, value in zip(data_keys, data_v)]
-        [self.runParameterDict.update({key: value}) for key, value in self.quad_values.items()]
-        [self.runParameterDict.update({key: value}) for key, value in self.gun_values.items()]
-        [self.runParameterDict.update({key: value}) for key, value in self.l01_values.items()]
-        [self.runParameterDict.update({key: value}) for key, value in self.laser_values.items()]
-        [self.runParameterDict.update({key: value}) for key, value in self.charge_values.items()]
-        [self.runParameterDict.update({key: value}) for key, value in self.number_of_particles.items()]
-        [self.runParameterDict.update({key: value}) for key, value in self.cathode.items()]
-        [self.runParameterDict.update({key: value}) for key, value in self.space_charge.items()]
-        [self.runParameterDict.update({key: value}) for key, value in self.astra_run_number.items()]
+        [self.latticeDict.update({key: value}) for key, value in self.quad_values.items()]
+        [self.latticeDict.update({key: value}) for key, value in self.gun_values.items()]
+        [self.latticeDict.update({key: value}) for key, value in self.l01_values.items()]
+        [self.generatorDict.update({key: value}) for key, value in self.laser_values.items()]
+        [self.generatorDict.update({key: value}) for key, value in self.charge_values.items()]
+        [self.generatorDict.update({key: value}) for key, value in self.number_of_particles.items()]
+        [self.generatorDict.update({key: value}) for key, value in self.cathode.items()]
+        [self.simulationDict.update({key: value}) for key, value in self.space_charge.items()]
+        [self.simulationDict.update({key: value}) for key, value in self.astra_run_number.items()]
 
     def initialise_scan(self):
         [self.scan_values.update({key: value}) for key, value in zip(scan_parameter_keys, scan_parameter_v)]
@@ -177,20 +183,3 @@ class Data(object):
         # self.laser_values.update({'sig_z': collections.OrderedDict()})
         # self.laser_values['sig_z'].update({'type': 'generator'})
         # self.laser_values['sig_z'].update({'value': self.Framework.generator.parameters['sig_z']})
-
-    # def initialise_data_post(self):
-        # [self.runParameterDict_post.update({key: value}) for key, value in zip(data_keys_post, data_v_post)]
-        # [self.data_plot_parameters.update({key: value}) for key, value in zip(post_scan_plot_keys, post_scan_plot_v)]
-        # self.runParameterDict_post['directory_post_line_edit'] = self.runParameterDict['directory_line_edit']
-
-    # def initialise_data_summary_post(self):
-        # [self.data_summary_plot_parameters.update({key:value}) for key, value in zip(data_keys_post_summary, data_v_summary)]
-    # #def initialise_data(self):
-    # #    for key_dict, d_key, d_val in zip(['runParameterDict', 'scan_values', 'scan_parameter', 'runParameterDict_post'],
-    # #                                      ['data_v', 'scan_parameter_v', 'scan_v', 'data_v_post'],
-    # #                                      ['data_keys', 'scan_parameter_keys', 'scan_keys', 'data_keys_post']):  # type: (str, str, str)
-    # #        for key, value in zip(d_key, d_val):
-    # #            getattr(self, key_dict).update({key: value})
-
-    # def hello(self):
-        # print(self.my_name + ' says hello')

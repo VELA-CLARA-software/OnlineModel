@@ -37,21 +37,7 @@ class DynamicPlotController(QObject):
         self.app = app
         self.model = model
         self.view = view
-        print('Hello from the DynamicPlotController!')
-        # del self.view.post_tab
-        # self.view.remove
         self.view.main_tab_widget.removeTab(2)
         self.astraPlot = astraPlotWidget('./directory_summary_line_edit/')
         self.view.post_tab = self.astraPlot
         self.view.main_tab_widget.addTab(self.astraPlot, "Plots")
-        # self.view.post_tab.show()
-        print(self.view.post_tab)
-        # exit()
-        # #self.model.data.self.model.data.runParameterDict = self.initialize_run_parameter_data()
-        # self.initialize_run_parameter_data()
-        # self.model.data.scannableParametersDict = self.get_scannable_parameters_dict()
-        # self.populate_scan_combo_box()
-        # self.model.data.parameterScanDict = self.initialize_parameter_scan_data()
-        # self.model.data.directoryDict = self.initialize_directory_data()
-        # self.view.parameter_scan.stateChanged.connect(self.toggle_scan_parameters_state)
-        # self.view.runButton.clicked.connect(self.run_astra)
