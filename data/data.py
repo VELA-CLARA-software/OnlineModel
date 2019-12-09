@@ -51,7 +51,7 @@ class Data(object):
         self.parameterDict['generator'] = collections.OrderedDict()
         self.generatorDict = self.parameterDict['generator']
         self.scannableParametersDict = collections.OrderedDict()
-        self.Framework = Fw.Framework(directory=directory_summary, clean=False, verbose=False)
+        self.Framework = Fw.Framework(directory=directory_summary, clean=False, verbose=True)
         self.Framework.loadSettings('Lattices/CLA10-BA1_OM.def')
         self.my_name = "data"
         self.get_data()
@@ -180,6 +180,6 @@ class Data(object):
         self.laser_values.update({'sig_y': collections.OrderedDict()})
         self.laser_values['sig_y'].update({'type': 'generator'})
         self.laser_values['sig_y'].update({'value': self.Framework.generator.parameters['sig_y']})
-        # self.laser_values.update({'sig_z': collections.OrderedDict()})
-        # self.laser_values['sig_z'].update({'type': 'generator'})
-        # self.laser_values['sig_z'].update({'value': self.Framework.generator.parameters['sig_z']})
+        self.laser_values.update({'sig_clock': collections.OrderedDict()})
+        self.laser_values['sig_clock'].update({'type': 'generator'})
+        self.laser_values['sig_clock'].update({'value': self.Framework.generator.parameters['sig_clock']})

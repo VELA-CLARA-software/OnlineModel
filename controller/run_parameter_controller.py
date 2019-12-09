@@ -57,12 +57,12 @@ class RunParameterController(QObject):
     @pyqtSlot()
     def update_value_in_dict(self):
         widget = self.sender()
-        dict = (widget.accessibleName().split(':'))[0]
-        if dict == 'lattice':
-            dict, pv, param = map(str, widget.accessibleName().split(':'))
+        dictname = (widget.accessibleName().split(':'))[0]
+        if len((widget.accessibleName().split(':'))) == 3:
+            dictname, pv, param = map(str, widget.accessibleName().split(':'))
         else:
             param = None
-            dict, pv = map(str, widget.accessibleName().split(':'))
+            dictname, pv = map(str, widget.accessibleName().split(':'))
         if type(widget) is QLineEdit:
             try:
                 value = float(widget.text())
@@ -75,9 +75,9 @@ class RunParameterController(QObject):
         elif type(widget) is QComboBox:
             value = str(widget.currentText())
         if param is None:
-            self.model.data.parameterDict[dict].update({pv: value})
+            self.model.data.parameterDict[dictname].update({pv: value})
         else:
-            self.model.data.parameterDict[dict][pv].update({param: value})
+            self.model.data.parameterDict[dictname][pv].update({param: value})
         # print self.model.data.parameterDict[dict]
 
     def initialize_run_parameter_data(self):
@@ -201,7 +201,7 @@ class RunParameterController(QObject):
             self.set_line_edit_text_for_directory()
         else:
             print('Failed to import, please provide a filename')
-            
+
     @pyqtSlot()
     def export_parameter_values_to_yaml_file(self):
             export_dict = dict()
