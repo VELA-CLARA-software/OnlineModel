@@ -389,6 +389,9 @@
                 <property name="accessibleName">
                  <string>simulation:directory</string>
                 </property>
+                <property name="text">
+                 <string>./</string>
+                </property>
                </widget>
               </item>
               <item row="0" column="2">

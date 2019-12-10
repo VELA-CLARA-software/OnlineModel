@@ -1001,6 +1001,7 @@ class Ui_MainWindow(object):
         self.directory_groupBox.setTitle(_translate("MainWindow", "Run ASTRA", None))
         self.directory_label.setText(_translate("MainWindow", "Directory", None))
         self.directory.setAccessibleName(_translate("MainWindow", "simulation:directory", None))
+        self.directory.setText(_translate("MainWindow", "./", None))
         self.runButton.setAccessibleName(_translate("MainWindow", "runButton", None))
         self.runButton.setText(_translate("MainWindow", "Run ASTRA", None))
         self.progressBar.setAccessibleName(_translate("MainWindow", "progressBar", None))

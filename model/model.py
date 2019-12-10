@@ -80,7 +80,9 @@ class Model(object):
                 scan_step_size = float(self.data.scanDict['parameter_scan_step_size'])
             except ValueError:
                 print("Enter a numerical value to conduct a scan")
-            for current_scan_value in np.arange(scan_start, scan_end + scan_step_size, scan_step_size):
+            scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
+            for i, current_scan_value in enumerate(scan_range):
+                self.scan_progress = float(i)/scan_range
                 par = self.data.scanDict['parameter']
                 print('parameter to scan = ', par, current_scan_value)
                 if len((par.split(':'))) == 3:
@@ -93,12 +95,13 @@ class Model(object):
                 subdir = str(self.data.parameterDict['simulation']['directory']) + '/scan/' + pv + '_' + str(current_scan_value)
                 current_scan_value += scan_step_size
                 self.data.Framework.setSubDirectory(subdir)
-                print self.data.Framework.subdirectory
+                self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
                 self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
 
         else:
             self.data.Framework.setSubDirectory(str(self.data.parameterDict['simulation']['directory']))
             self.modify_framework(scan=False)
+            self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
             self.data.Framework.track(startfile="generator", endfile='BA1_dipole')
 
     ##### Find Starting Filename based on z-position ####
