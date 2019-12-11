@@ -366,6 +366,9 @@
                 <property name="text">
                  <string/>
                 </property>
+                <property name="checked">
+                 <bool>false</bool>
+                </property>
                </widget>
               </item>
              </layout>
@@ -377,27 +380,20 @@
               <string>Run ASTRA</string>
              </property>
              <layout class="QGridLayout" name="directory_form_layout">
-              <item row="0" column="0">
-               <widget class="QLabel" name="directory_label">
-                <property name="text">
-                 <string>Directory</string>
-                </property>
-               </widget>
-              </item>
               <item row="0" column="1">
                <widget class="QLineEdit" name="directory">
                 <property name="accessibleName">
                  <string>simulation:directory</string>
                 </property>
+                <property name="text">
+                 <string>./test/</string>
+                </property>
                </widget>
               </item>
-              <item row="0" column="2">
-               <widget class="QPushButton" name="runButton">
-                <property name="accessibleName">
-                 <string>runButton</string>
-                </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="directory_label">
                 <property name="text">
-                 <string>Run ASTRA</string>
+                 <string>Directory</string>
                 </property>
                </widget>
               </item>
@@ -414,6 +410,32 @@
                 </property>
                 <property name="format">
                  <string>%p%</string>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="3">
+               <widget class="QCheckBox" name="checkBox">
+                <property name="accessibleName">
+                 <string>simulation:track</string>
+                </property>
+                <property name="accessibleDescription">
+                 <string/>
+                </property>
+                <property name="text">
+                 <string>Track?</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="3">
+               <widget class="QPushButton" name="runButton">
+                <property name="accessibleName">
+                 <string>runButton</string>
+                </property>
+                <property name="text">
+                 <string>Run ASTRA</string>
                 </property>
                </widget>
               </item>

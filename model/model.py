@@ -24,6 +24,7 @@ class Model(object):
         self.data = data.Data()
         self.client = SSHClient()
         self.generator_params = ['number_of_particles', 'dist_x', 'dist_y', 'dist_z', 'sig_x', 'sig_y', 'sig_z']
+        self.scan_progress = -1
 
     def ssh_to_server(self):
         try:
@@ -80,7 +81,9 @@ class Model(object):
                 scan_step_size = float(self.data.scanDict['parameter_scan_step_size'])
             except ValueError:
                 print("Enter a numerical value to conduct a scan")
-            for current_scan_value in np.arange(scan_start, scan_end + scan_step_size, scan_step_size):
+            scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
+            for i, current_scan_value in enumerate(scan_range):
+                self.scan_progress = float(i)/scan_range
                 par = self.data.scanDict['parameter']
                 print('parameter to scan = ', par, current_scan_value)
                 if len((par.split(':'))) == 3:
@@ -93,13 +96,16 @@ class Model(object):
                 subdir = str(self.data.parameterDict['simulation']['directory']) + '/scan/' + pv + '_' + str(current_scan_value)
                 current_scan_value += scan_step_size
                 self.data.Framework.setSubDirectory(subdir)
-                print self.data.Framework.subdirectory
-                self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
+                self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
+                if self.data.simulationDict['track']:
+                    self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
 
         else:
             self.data.Framework.setSubDirectory(str(self.data.parameterDict['simulation']['directory']))
             self.modify_framework(scan=False)
-            self.data.Framework.track(startfile="generator", endfile='BA1_dipole')
+            self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
+            if self.data.simulationDict['track']:
+                self.data.Framework.track(startfile="generator", endfile='BA1_dipole')
 
     ##### Find Starting Filename based on z-position ####
     def find_starting_lattice(self, z):
@@ -129,7 +135,7 @@ class Model(object):
 
         self.update_framework_elements(self.data.latticeDict)
         if scan==True and type is not None:
-            print self.data.parameterDict[dictname][pv]
+            print( self.data.parameterDict[dictname][pv])
         self.data.Framework.generator.number_of_particles = int(2**(3*int(self.data.generatorDict['number_of_particles']['value'])))
         self.data.Framework.generator.charge = 1e-9*float(self.data.generatorDict['charge']['value'])
         self.data.Framework.generator.sig_clock = float(self.data.generatorDict['sig_clock']['value']) / (2354.82)
