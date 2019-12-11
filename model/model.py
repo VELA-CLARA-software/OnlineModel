@@ -135,7 +135,7 @@ class Model(object):
 
         self.update_framework_elements(self.data.latticeDict)
         if scan==True and type is not None:
-            print self.data.parameterDict[dictname][pv]
+            print( self.data.parameterDict[dictname][pv])
         self.data.Framework.generator.number_of_particles = int(2**(3*int(self.data.generatorDict['number_of_particles']['value'])))
         self.data.Framework.generator.charge = 1e-9*float(self.data.generatorDict['charge']['value'])
         self.data.Framework.generator.sig_clock = float(self.data.generatorDict['sig_clock']['value']) / (2354.82)

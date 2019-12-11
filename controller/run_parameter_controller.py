@@ -79,11 +79,14 @@ class RunParameterController(QObject):
             except:
                 value = str(widget.text())
         elif type(widget) is QDoubleSpinBox:
-            value = float(widget.value())
+            value = round(float(widget.value()), widget.decimals())
         elif type(widget) is QCheckBox:
             value = True if widget.isChecked() else False
         elif type(widget) is QComboBox:
-            value = str(widget.itemData(widget.currentIndex()).toString())
+            value = widget.itemData(widget.currentIndex())
+            if isinstance(value, QVariant):
+                value = value.toString()
+            value = str(value)
             if value is '':
                 value = str(widget.currentText())
         if param is None:
@@ -182,7 +185,7 @@ class RunParameterController(QObject):
         filename = QFileDialog.getOpenFileName(dialog, caption='Open file',
                                                      directory=self.model.data.parameterDict['simulation']['directory'],
                                                      filter="YAML files (*.YAML *.YML *.yaml *.yml)")
-        if not filename.isEmpty():
+        if not filename == '':
             loaded_parameter_dict = yaml_parser.parse_parameter_input_file(filename)
             for (parameter, value) in loaded_parameter_dict.items():
                     self.update_widgets_with_values(parameter, value)
@@ -201,7 +204,7 @@ class RunParameterController(QObject):
                 edict.update({key:subdict})
             else:
                 if not key == 'sub_elements':
-                    value = self.model.data.Framework.convert_numpy_types(value)
+                    # value = self.model.data.Framework.convert_numpy_types(value)
                     edict.update({key:value})
         return export_dict
 
