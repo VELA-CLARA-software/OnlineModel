@@ -93,7 +93,7 @@ class Model(object):
                 subdir = str(self.data.parameterDict['simulation']['directory']) + '/scan/' + pv + '_' + str(current_scan_value)
                 current_scan_value += scan_step_size
                 self.data.Framework.setSubDirectory(subdir)
-                print self.data.Framework.subdirectory
+                print(self.data.Framework.subdirectory)
                 self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
 
         else:
@@ -129,15 +129,15 @@ class Model(object):
 
         self.update_framework_elements(self.data.latticeDict)
         if scan==True and type is not None:
-            print self.data.parameterDict[dictname][pv]
+            print(self.data.parameterDict[dictname][pv])
         self.data.Framework.generator.number_of_particles = int(2**(3*int(self.data.generatorDict['number_of_particles']['value'])))
         self.data.Framework.generator.charge = 1e-9*float(self.data.generatorDict['charge']['value'])
         self.data.Framework.generator.sig_clock = float(self.data.generatorDict['sig_clock']['value']) / (2354.82)
         # self.data.Framework.generator.dist_x = self.data.generatorDict['dist_x']['value']
         # self.data.Framework.generator.dist_y = self.data.generatorDict['dist_y']['value']
         # self.data.Framework.generator.dist_z = self.data.generatorDict['dist_z']['value']
-        self.data.Framework.generator.sig_x = self.data.generatorDict['spot_size']
-        self.data.Framework.generator.sig_y = self.data.generatorDict['spot_size']
+        self.data.Framework.generator.sig_x = self.data.generatorDict['sig_x']['value']
+        self.data.Framework.generator.sig_y = self.data.generatorDict['sig_y']['value']
         # self.data.Framework.generator.sig_z = self.data.runParameterDict['sig_z']['value']
         #     for key, value in self.data.latticeDict.items():
         #         if type == 'quadrupole':

@@ -2,9 +2,7 @@ import collections
 import os, sys
 import numpy as np
 import ruamel.yaml
-# sys.path.append('\\\\apclara1\\ControlRoomApps\\OnlineModel')
-# sys.path.append('\\\\apclara1\\ControlRoomApps\\OnlineModel\\MasterLattice')
-sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
+sys.path.append(os.path.abspath(__file__+'/../../../../VELA-CLARA-software/OnlineModel/'))
 import SimulationFramework.Framework as Fw
 import view as view
 # Post-processing dictionary
@@ -18,24 +16,7 @@ directory_summary = 'directory_summary_line_edit'
 summary_save_plot = 'summary_save_plot_check_box'
 summary_output_file = 'summary_output_file_line_edit'
 
-
-# data_keys_post = [directory_post, directory_run_post_1, directory_run_post_2,directory_run_post_3,directory_run_post_4]
-# data_keys_post_summary = [directory_summary, summary_save_plot, summary_output_file]
-
-# post_scan_plot_keys = ['emittance (x)', 'emittance (y)', 'emittance (z)', 'rms (x)', 'rms (y)', 'rms (z)',
-                       # 'Average (x)', 'Average (y)', 'Energy spread', 'Kinetic Energy']
-# post_scan_plot_v = ['emitt', 'emitt', 'emitt', 'bs', 'bs', 'bl', 'av', 'av', 'rmsespread', 'ke']
-
-
-
 class Data(object):
-
-    # scan_values = collections.OrderedDict()
-    # scan_parameter = collections.OrderedDict()
-    # scan_parameter_list = scannable_data_list
-    # runParameterDict_post = collections.OrderedDict()
-    # data_plot_parameters = collections.OrderedDict()
-    # data_summary_plot_parameters = collections.OrderedDict()
 
     def __init__(self):
         object.__init__(self)
@@ -77,8 +58,10 @@ class Data(object):
     def initialise_scan_parameters(self):
         [self.scan_parameter.update({key: value}) for key, value in zip(scan_keys, scan_v)]
 
-    def hello(self):
-        print(self.my_name + ' says hello')
+    def get_element_length(self, dict, key):
+        length = self.Framework.getElement(key)['position_end'][2] - self.Framework.getElement(key)['position_start'][2]
+        dict[key].update({'length': length})
+        print(dict[key]['length'])
 
     def get_data(self):
         self.scan_values = collections.OrderedDict()
@@ -107,6 +90,7 @@ class Data(object):
                 self.gun_values.update({'CLA-LRG1-GUN-CAV': collections.OrderedDict()})
                 self.gun_values['CLA-LRG1-GUN-CAV'].update({'type': 'cavity'})
                 self.gun_values['CLA-LRG1-GUN-CAV'].update({'phase': cavity['phase']})
+                self.get_element_length(self.gun_values, 'CLA-LRG1-GUN-CAV')
                 # self.gun_values.update({'CLA-LRG1-GUN-CAV:PHASE': cavity['field_amplitude']})
                 self.gun_values['CLA-LRG1-GUN-CAV'].update({'field_amplitude': cavity['field_amplitude']})
                 # self.gun_values.update({'CLA-LRG1-GUN-CAV:AMP': cavity['field_amplitude']})
@@ -129,6 +113,7 @@ class Data(object):
                 self.l01_values['CLA-L01-CAV'].update({'type': 'cavity'})
                 self.l01_values['CLA-L01-CAV'].update({'phase': cavity['phase']})
                 self.l01_values['CLA-L01-CAV'].update({'field_amplitude': cavity['phase']})
+                self.get_element_length(self.l01_values, 'CLA-L01-CAV')
                 self.l01_values.update({'CLA-L01-CAV-SOL-01': collections.OrderedDict()})
                 self.l01_values['CLA-L01-CAV-SOL-01'].update({'type': 'solenoid'})
                 self.l01_values['CLA-L01-CAV-SOL-01'].update({'cavity': cavity['objectname']})
