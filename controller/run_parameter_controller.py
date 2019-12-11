@@ -50,13 +50,13 @@ class RunParameterController(QObject):
         self.formLayoutList = [formLayout for layout in self.runParameterLayouts for
                           formLayout in layout.findChildren((QFormLayout,QGridLayout))]
         #self.model.data.self.model.data.runParameterDict = self.initialize_run_parameter_data()
+        self.update_macro_particle_combo()
         self.initialize_run_parameter_data()
         self.model.data.scannableParametersDict = self.get_scannable_parameters_dict()
         self.populate_scan_combo_box()
         self.view.parameter_scan.stateChanged.connect(lambda: self.toggle_scan_parameters_state(self.view.parameter_scan))
         self.view.runButton.clicked.connect(self.run_astra)
         self.view.runButton.clicked.connect(lambda: self.export_parameter_values_to_yaml_file(auto=True))
-        self.update_macro_particle_combo()
 
     def update_macro_particle_combo(self):
         combo = self.view.macro_particle
@@ -84,11 +84,11 @@ class RunParameterController(QObject):
             value = True if widget.isChecked() else False
         elif type(widget) is QComboBox:
             value = widget.itemData(widget.currentIndex())
+            if value == '' or value is None:
+                value = str(widget.currentText())
             if isinstance(value, QVariant):
                 value = value.toString()
             value = str(value)
-            if value is '':
-                value = str(widget.currentText())
         if param is None:
             self.model.data.parameterDict[dictname].update({pv: value})
         else:
@@ -112,7 +112,7 @@ class RunParameterController(QObject):
                     widget.stateChanged.connect(self.update_value_in_dict)
                     widget.stateChanged.emit(widget.isChecked())
                 if type(widget) is QComboBox:
-                    widget.currentIndexChanged[str].connect(self.update_value_in_dict)
+                    widget.currentIndexChanged.connect(self.update_value_in_dict)
                     widget.currentIndexChanged.emit(widget.currentIndex())
         # return self.model.data.latticeDict
 

@@ -71,6 +71,7 @@ class Data(object):
         [self.generatorDict.update({key: value}) for key, value in self.cathode.items()]
         [self.simulationDict.update({key: value}) for key, value in self.space_charge.items()]
         [self.simulationDict.update({key: value}) for key, value in self.astra_run_number.items()]
+        [self.simulationDict.update({key: value}) for key, value in self.tracking_code.items()]
 
     def initialise_scan(self):
         [self.scan_values.update({key: value}) for key, value in zip(scan_parameter_keys, scan_parameter_v)]
@@ -97,6 +98,7 @@ class Data(object):
         self.cathode = collections.OrderedDict()
         self.space_charge = collections.OrderedDict()
         self.astra_run_number = collections.OrderedDict()
+        self.tracking_code = collections.OrderedDict()
         # quad_values.update({key: value}) for key, value in zip(data_keys, data_v)
 
         for quad in self.Framework.getElementType('quadrupole'):
@@ -183,3 +185,4 @@ class Data(object):
         self.laser_values.update({'sig_clock': collections.OrderedDict()})
         self.laser_values['sig_clock'].update({'type': 'generator'})
         self.laser_values['sig_clock'].update({'value': self.Framework.generator.parameters['sig_clock']})
+        self.tracking_code.update({'tracking_code':  collections.OrderedDict()})

@@ -72,8 +72,13 @@ class Model(object):
     def close_connection(self):
         return self.client.close()
 
+    def update_tracking_codes(self):
+        for l, c in self.data.simulationDict['tracking_code'].items():
+            self.data.Framework.change_Lattice_Code(l, c)
+
     def run_script(self):
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
+        self.update_tracking_codes()
         if self.data.scanDict['parameter_scan']:
             try:
                 scan_start = float(self.data.scanDict['parameter_scan_from_value'])
@@ -105,7 +110,7 @@ class Model(object):
             self.modify_framework(scan=False)
             self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
             if self.data.simulationDict['track']:
-                self.data.Framework.track(startfile="generator", endfile='BA1_dipole')
+                self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
 
     ##### Find Starting Filename based on z-position ####
     def find_starting_lattice(self, z):
