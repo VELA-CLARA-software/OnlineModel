@@ -97,13 +97,15 @@ class Model(object):
                 current_scan_value += scan_step_size
                 self.data.Framework.setSubDirectory(subdir)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
-                self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
+                if self.data.simulationDict['track']:
+                    self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
 
         else:
             self.data.Framework.setSubDirectory(str(self.data.parameterDict['simulation']['directory']))
             self.modify_framework(scan=False)
             self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
-            self.data.Framework.track(startfile="generator", endfile='BA1_dipole')
+            if self.data.simulationDict['track']:
+                self.data.Framework.track(startfile="generator", endfile='BA1_dipole')
 
     ##### Find Starting Filename based on z-position ####
     def find_starting_lattice(self, z):
