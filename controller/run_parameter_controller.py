@@ -45,7 +45,7 @@ class RunParameterController(QObject):
                                self.view.injector_parameter_groupbox,
                                self.view.simulation_parameter_groupbox,
                                self.view.scan_groupBox,
-                               self.view.directory_groupBox,
+                               self.view.directory_groupBox
                                ]
         #self.model.data.self.model.data.runParameterDict = self.initialize_run_parameter_data()
         self.initialize_run_parameter_data()
@@ -183,6 +183,16 @@ class RunParameterController(QObject):
             if type(widget) is QLineEdit:
                 widget.setText(str(self.model.data.directoryDict[str(widget.accessibleName())]))
 
+    def set_spinbox_text_by_name(self, name, value):
+        formLayoutList = [formLayout for layout in self.runParameterLayouts for formLayout in layout.findChildren(QFormLayout)]
+        for layout in formLayoutList:
+            childCount = layout.count()
+            for childIndex in range(0, childCount):
+                widget = layout.itemAt(childIndex).widget()
+                if type(widget) == QDoubleSpinBox and name == widget.accessibleName():
+                    print(widget.accessibleName())
+                    widget.setValue(value)
+
     ## Need to port this to the unified controller
     @pyqtSlot()
     def import_parameter_values_from_yaml_file(self):
@@ -301,15 +311,19 @@ class RunParameterController(QObject):
         linac_pulse_length = 1
         fudge = 0
         gun_energy_gain = self.get_energy_from_rf(gun_klystron_power, gun_phase, gun_pulse_length)
-        self.model.data.parameterDict['lattice']['CLA-LRG1-GUN-CAV'].update({'field_amplitude': gun_energy_gain / gun_cavity_length})
+        self.model.data.parameterDict['lattice']['CLA-LRG1-GUN-CAV']['field_amplitude'] = gun_energy_gain / gun_cavity_length
         self.model.data.parameterDict['lattice']['CLA-LRG1-GUN-CAV'].update({'energy_gain': gun_energy_gain})
         self.model.data.parameterDict['lattice']['CLA-LRG1-GUN-CAV']['phase'] = gun_phase
         self.model.data.parameterDict['lattice']['CLA-LRG1-GUN-CAV'].update({'pulse_length': gun_pulse_length})
+        self.set_spinbox_text_by_name("lattice:"+"CLA-LRG1-GUN-CAV"+":field_amplitude", gun_energy_gain / gun_cavity_length)
+        self.set_spinbox_text_by_name("lattice:"+"CLA-LRG1-GUN-CAV"+":phase", gun_phase)
         linac_energy_gain = self.get_energy_from_rf(linac_klystron_power, linac_phase, linac_pulse_length)
-        self.model.data.parameterDict['lattice']['CLA-L01-CAV'].update({'field_amplitude': linac_energy_gain / l01_cavity_length})
+        self.model.data.parameterDict['lattice']['CLA-L01-CAV']['field_amplitude'] = linac_energy_gain / l01_cavity_length
         self.model.data.parameterDict['lattice']['CLA-L01-CAV'].update({'energy_gain': linac_energy_gain})
         self.model.data.parameterDict['lattice']['CLA-L01-CAV']['phase'] = linac_phase
         self.model.data.parameterDict['lattice']['CLA-L01-CAV'].update({'pulse_length': linac_pulse_length})
+        self.set_spinbox_text_by_name("lattice:" + 'CLA-L01-CAV' + ":field_amplitude", linac_energy_gain / l01_cavity_length)
+        self.set_spinbox_text_by_name("lattice:" + 'CLA-L01-CAV' + ":phase", linac_phase)
         total_energy_gain = gun_energy_gain + linac_energy_gain + fudge
         speed_of_light = scipy.constants.speed_of_light / 1e6
         for key, value in self.model.data.parameterDict['lattice'].items():
@@ -318,17 +332,18 @@ class RunParameterController(QObject):
                 coeffs = numpy.append(value['field_integral_coefficients'][:-1], value['field_integral_coefficients'][-1])
                 int_strength = numpy.polyval(coeffs, current)
                 effect = speed_of_light * int_strength / total_energy_gain
-                value['k1l'] = effect / value['magnetic_length']
+                self.set_spinbox_text_by_name("lattice:"+key+":k1l", effect / value['magnetic_length'])
+                # value['k1l'] = effect / value['magnetic_length']
             elif value['type'] == 'solenoid':
                 current = 1 #epics.caget(name+"SETI")
                 sign = numpy.copysign(1, current)
                 coeffs = numpy.append(value['field_integral_coefficients'][-4:-1] * int(sign), value['field_integral_coefficients'][-1])
                 int_strength = numpy.polyval(coeffs, current)
                 effect = int_strength / value['magnetic_length']
-                value['field_amplitude'] = effect / value['magnetic_length']
-        self.model.data.parameterDict['generator']['sig_x']['value'] = 1
-        self.model.data.parameterDict['generator']['sig_y']['value'] = 1
-        self.model.data.parameterDict['generator']['charge']['value'] = 1
+                self.set_spinbox_text_by_name("lattice:"+key+":field_amplitude", effect / value['magnetic_length'])
+                # value['field_amplitude'] = effect / value['magnetic_length']
+        self.set_spinbox_text_by_name("generator:"+"spot_size"+":value", 1)
+        self.set_spinbox_text_by_name("generator:"+"charge"+":value", 1)
 
     def get_energy_from_rf(self, klystron_power, phase, pulse_length):
         bestcase = 0.407615 + 1.94185 * (((1 - math.exp((-1.54427 * 10 ** 6 * pulse_length * 10 ** -6))) * (0.0331869 + 6.05422 * 10 ** -7 * klystron_power * 10 ** 6)) * numpy.cos(phase)) ** 0.5
@@ -504,10 +519,10 @@ class RunParameterController(QObject):
         return
 
     def run_astra(self):
-        #self.read_values_from_epics()
-        self.disable_run_button()
-        self.app_sequence()
-        self.enable_run_button()
+        self.read_values_from_epics()
+        # self.disable_run_button()
+        # self.app_sequence()
+        # self.enable_run_button()
         #self.run_thread(self.app_sequence)
         #self.thread.start()
 
