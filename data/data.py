@@ -45,6 +45,7 @@ class Data(object):
         self.latticeDict = self.parameterDict['lattice']
         self.parameterDict['scan'] = collections.OrderedDict()
         self.scanDict = self.parameterDict['scan']
+        self.scanDict['parameter_scan'] = False
         self.parameterDict['simulation'] = collections.OrderedDict()
         self.simulationDict = self.parameterDict['simulation']
         self.parameterDict['generator'] = collections.OrderedDict()

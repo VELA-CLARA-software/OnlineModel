@@ -24,6 +24,7 @@ class Model(object):
         self.data = data.Data()
         self.client = SSHClient()
         self.generator_params = ['number_of_particles', 'dist_x', 'dist_y', 'dist_z', 'sig_x', 'sig_y', 'sig_z']
+        self.scan_progress = -1
 
     def ssh_to_server(self):
         try:
