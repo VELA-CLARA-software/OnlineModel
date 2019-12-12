@@ -115,14 +115,8 @@ class Data(object):
                 # self.gun_values.update({'CLA-LRG1-GUN-CAV:AMP': cavity['field_amplitude']})
                 self.gun_values.update({'CLA-LRG1-MAG-SOL-01': collections.OrderedDict()})
                 self.gun_values['CLA-LRG1-MAG-SOL-01'].update({'type': 'solenoid'})
-                self.gun_values['CLA-LRG1-MAG-SOL-01'].update({'cavity': cavity['objectname']})
                 self.gun_values['CLA-LRG1-MAG-SOL-01'].update(
                     {'field_amplitude': cavity['sub_elements']['CLA-LRG1-MAG-SOL-01']['field_amplitude']})
-                self.gun_values['CLA-LRG1-GUN-CAV'].update({'sub_elements': collections.OrderedDict()})
-                self.gun_values['CLA-LRG1-GUN-CAV']['sub_elements'].update(
-                    {'CLA-LRG1-MAG-SOL-01': collections.OrderedDict()})
-                self.gun_values['CLA-LRG1-GUN-CAV']['sub_elements']['CLA-LRG1-MAG-SOL-01'].update(
-                    {'field_amplitude': self.gun_values['CLA-LRG1-MAG-SOL-01']['field_amplitude']})
             # self.gun_values['CLA-LRG1-GUN-CAV'].update({'sub_elements': collections.OrderedDict()})
             # self.gun_values['CLA-LRG1-GUN-CAV']['sub_elements'].update({'CLA-LRG-GUN-SOL': cavity['sub_elements']['CLA-LRG1-GUN-SOL']['field_amplitude']})
             # self.gun_values.update({'CLA-LRG1-GUN-CAV:AMP': cavity['field_amplitude']})

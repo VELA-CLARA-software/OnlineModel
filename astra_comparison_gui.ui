@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1026</width>
-    <height>750</height>
+    <height>776</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -894,11 +894,11 @@
               </size>
              </property>
              <property name="text">
-              <string>Bucking Coil and Sol Strength</string>
+              <string>Main Solenoid Strength</string>
              </property>
             </widget>
            </item>
-           <item row="6" column="2">
+           <item row="7" column="2">
             <widget class="QDoubleSpinBox" name="linac1_sol1_strength_2">
              <property name="maximumSize">
               <size>
@@ -954,7 +954,7 @@
              </property>
             </widget>
            </item>
-           <item row="6" column="0">
+           <item row="7" column="0">
             <widget class="QLabel" name="linac1_sol1_strength_label">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -993,7 +993,7 @@
             </widget>
            </item>
            <item row="5" column="2">
-            <widget class="QDoubleSpinBox" name="bucking_coil_and_sol_strength_2">
+            <widget class="QDoubleSpinBox" name="sol_strength">
              <property name="maximumSize">
               <size>
                <width>150</width>
@@ -1010,7 +1010,7 @@
               <number>3</number>
              </property>
              <property name="minimum">
-              <double>0.250000000000000</double>
+              <double>0.000000000000000</double>
              </property>
              <property name="maximum">
               <double>0.500000000000000</double>
@@ -1048,7 +1048,7 @@
              </property>
             </widget>
            </item>
-           <item row="8" column="2">
+           <item row="9" column="2">
             <spacer name="verticalSpacer_2">
              <property name="orientation">
               <enum>Qt::Vertical</enum>
@@ -1061,7 +1061,7 @@
              </property>
             </spacer>
            </item>
-           <item row="7" column="0">
+           <item row="8" column="0">
             <widget class="QLabel" name="linac1_sol2_strength_label">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -1080,7 +1080,7 @@
              </property>
             </widget>
            </item>
-           <item row="7" column="2">
+           <item row="8" column="2">
             <widget class="QDoubleSpinBox" name="linac1_sol2_strength_2">
              <property name="maximumSize">
               <size>
@@ -1105,6 +1105,38 @@
              </property>
              <property name="value">
               <double>-0.050000000000000</double>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="0">
+            <widget class="QLabel" name="label_7">
+             <property name="text">
+              <string>Bucking Solenoid Strength</string>
+             </property>
+            </widget>
+           </item>
+           <item row="6" column="2">
+            <widget class="QDoubleSpinBox" name="buckingsol_strength">
+             <property name="accessibleName">
+              <string>lattice:CLA-LRG1-MAG-BSOL-01:field_amplitude</string>
+             </property>
+             <property name="suffix">
+              <string> T</string>
+             </property>
+             <property name="decimals">
+              <number>3</number>
+             </property>
+             <property name="minimum">
+              <double>0.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>0.500000000000000</double>
+             </property>
+             <property name="singleStep">
+              <double>0.005000000000000</double>
+             </property>
+             <property name="value">
+              <double>0.311000000000000</double>
              </property>
             </widget>
            </item>
