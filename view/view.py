@@ -1098,7 +1098,7 @@ class Ui_MainWindow(object):
         self.gun_phase.setSuffix(_translate("MainWindow", "°", None))
         self.linac1_sol1_strength_label.setText(_translate("MainWindow", "Linac 1 Solenoid 1 Strength", None))
         self.linac1_gradient_label.setText(_translate("MainWindow", "Linac 1 Gradient", None))
-        self.bucking_coil_and_sol_strength_2.setAccessibleName(_translate("MainWindow", "lattice:CLA-LRG1-GUN-SOL:field_amplitude", None))
+        self.bucking_coil_and_sol_strength_2.setAccessibleName(_translate("MainWindow", "lattice:CLA-LRG1-MAG-SOL-01:field_amplitude", None))
         self.bucking_coil_and_sol_strength_2.setSuffix(_translate("MainWindow", " T", None))
         self.linac1_phase_2.setAccessibleName(_translate("MainWindow", "lattice:CLA-L01-CAV:phase", None))
         self.linac1_phase_2.setSuffix(_translate("MainWindow", "°", None))

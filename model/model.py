@@ -1,6 +1,7 @@
 from paramiko import *
 import os
 import sys
+import time
 import stat
 import numpy as np
 from copy import deepcopy
@@ -88,9 +89,9 @@ class Model(object):
                 print("Enter a numerical value to conduct a scan")
             scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
             for i, current_scan_value in enumerate(scan_range):
-                self.scan_progress = float(i)/scan_range
+                self.scan_progress = i+1
                 par = self.data.scanDict['parameter']
-                print('parameter to scan = ', par, current_scan_value)
+                print('Scanning['+str(i)+']: Setting ', par, ' to ', current_scan_value)
                 if len((par.split(':'))) == 3:
                     dictname, pv, param = map(str, par.split(':'))
                 else:
@@ -104,6 +105,8 @@ class Model(object):
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
                 if self.data.simulationDict['track']:
                     self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
+                else:
+                    time.sleep(0.1)
 
         else:
             self.data.Framework.setSubDirectory(str(self.data.parameterDict['simulation']['directory']))

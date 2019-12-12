@@ -1001,7 +1001,7 @@
               </size>
              </property>
              <property name="accessibleName">
-              <string>lattice:CLA-LRG1-GUN-SOL:field_amplitude</string>
+              <string>lattice:CLA-LRG1-MAG-SOL-01:field_amplitude</string>
              </property>
              <property name="suffix">
               <string> T</string>
