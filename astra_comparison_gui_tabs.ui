@@ -154,7 +154,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-S02-MAG-QUAD-01:k1l</string>
+                  <string>S02:CLA-S02-MAG-QUAD-01:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -185,7 +185,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-S02-MAG-QUAD-02:k1l</string>
+                  <string>S02:CLA-S02-MAG-QUAD-02:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -216,7 +216,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-S02-MAG-QUAD-03:k1l</string>
+                  <string>S02:CLA-S02-MAG-QUAD-03:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -247,7 +247,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-S02-MAG-QUAD-04:k1l</string>
+                  <string>S02:CLA-S02-MAG-QUAD-04:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -601,7 +601,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-C2V-MAG-QUAD-01:k1l</string>
+                  <string>C2V:CLA-C2V-MAG-QUAD-01:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -645,7 +645,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-C2V-MAG-QUAD-02:k1l</string>
+                  <string>C2V:CLA-C2V-MAG-QUAD-02:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -689,7 +689,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-C2V-MAG-QUAD-03:k1l</string>
+                  <string>C2V:CLA-C2V-MAG-QUAD-03:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -875,7 +875,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-LRG1-GUN-CAV:field_amplitude</string>
+                  <string>INJ:CLA-LRG1-GUN-CAV:field_amplitude</string>
                  </property>
                  <property name="buttonSymbols">
                   <enum>QAbstractSpinBox::PlusMinus</enum>
@@ -922,7 +922,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-LRG1-GUN-CAV:phase</string>
+                  <string>INJ:CLA-LRG1-GUN-CAV:phase</string>
                  </property>
                  <property name="suffix">
                   <string>°</string>
@@ -969,7 +969,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-L01-CAV:field_amplitude</string>
+                  <string>INJ:CLA-L01-CAV:field_amplitude</string>
                  </property>
                  <property name="suffix">
                   <string> MV/m</string>
@@ -1016,7 +1016,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-L01-CAV:phase</string>
+                  <string>INJ:CLA-L01-CAV:phase</string>
                  </property>
                  <property name="suffix">
                   <string>°</string>
@@ -1060,7 +1060,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-LRG1-MAG-SOL-01:field_amplitude</string>
+                  <string>INJ:CLA-LRG1-MAG-SOL-01:field_amplitude</string>
                  </property>
                  <property name="suffix">
                   <string> T</string>
@@ -1117,7 +1117,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-L01-CAV-SOL-01:field_amplitude</string>
+                  <string>INJ:CLA-L01-CAV-SOL-01:field_amplitude</string>
                  </property>
                  <property name="suffix">
                   <string> T</string>
@@ -1164,7 +1164,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-L01-CAV-SOL-02:field_amplitude</string>
+                  <string>INJ:CLA-L01-CAV-SOL-02:field_amplitude</string>
                  </property>
                  <property name="suffix">
                   <string> T</string>
@@ -1192,7 +1192,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:CLA-LRG1-MAG-BSOL-01:field_amplitude</string>
+                  <string>INJ:CLA-LRG1-MAG-BSOL-01:field_amplitude</string>
                  </property>
                  <property name="suffix">
                   <string> T</string>
@@ -1294,7 +1294,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:EBT-BA1-MAG-QUAD-01:k1l</string>
+                  <string>BA1:EBT-BA1-MAG-QUAD-01:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -1338,7 +1338,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:EBT-BA1-MAG-QUAD-02:k1l</string>
+                  <string>BA1:EBT-BA1-MAG-QUAD-02:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -1382,7 +1382,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:EBT-BA1-MAG-QUAD-03:k1l</string>
+                  <string>BA1:EBT-BA1-MAG-QUAD-03:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -1426,7 +1426,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:EBT-BA1-MAG-QUAD-04:k1l</string>
+                  <string>BA1:EBT-BA1-MAG-QUAD-04:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -1470,7 +1470,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:EBT-BA1-MAG-QUAD-05:k1l</string>
+                  <string>BA1:EBT-BA1-MAG-QUAD-05:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -1514,7 +1514,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:EBT-BA1-MAG-QUAD-06:k1l</string>
+                  <string>BA1:EBT-BA1-MAG-QUAD-06:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -1558,7 +1558,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:EBT-BA1-MAG-QUAD-07:k1l</string>
+                  <string>BA1:EBT-BA1-MAG-QUAD-07:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -2152,7 +2152,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:EBT-INJ-MAG-QUAD-07:k1l</string>
+                  <string>VELA:EBT-INJ-MAG-QUAD-07:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -2209,7 +2209,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:EBT-INJ-MAG-QUAD-08:k1l</string>
+                  <string>VELA:EBT-INJ-MAG-QUAD-08:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -2240,7 +2240,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:EBT-INJ-MAG-QUAD-09:k1l</string>
+                  <string>VELA:EBT-INJ-MAG-QUAD-09:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -2284,7 +2284,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:EBT-INJ-MAG-QUAD-10:k1l</string>
+                  <string>VELA:EBT-INJ-MAG-QUAD-10:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -2328,7 +2328,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:EBT-INJ-MAG-QUAD-11:k1l</string>
+                  <string>VELA:EBT-INJ-MAG-QUAD-11:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -2372,7 +2372,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>lattice:EBT-INJ-MAG-QUAD-15:k1l</string>
+                  <string>VELA:EBT-INJ-MAG-QUAD-15:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
