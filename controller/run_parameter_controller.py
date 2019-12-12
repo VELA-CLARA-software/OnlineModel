@@ -109,6 +109,8 @@ class RunParameterController(QObject):
                 value = str(widget.text())
         elif type(widget) is QDoubleSpinBox:
             value = round(float(widget.value()), widget.decimals())
+        elif type(widget) is QSpinBox:
+            value = int(widget.value())
         elif type(widget) is QCheckBox:
             value = True if widget.isChecked() else False
         elif type(widget) is QComboBox:
@@ -121,7 +123,10 @@ class RunParameterController(QObject):
         if param is None:
             self.model.data.parameterDict[dictname].update({pv: value})
         else:
-            self.model.data.parameterDict[dictname][pv].update({param: value})
+            try:
+                self.model.data.parameterDict[dictname][pv].update({param: value})
+            except:
+                print('Error ', dictname, pv, param, value)
 
     def initialize_run_parameter_data(self):
         self.scannableParameters = []
@@ -132,7 +137,7 @@ class RunParameterController(QObject):
                 if type(widget) is QLineEdit:
                     widget.textChanged.connect(self.update_value_in_dict)
                     widget.textChanged.emit(widget.placeholderText())
-                if type(widget) is QDoubleSpinBox:
+                if type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
                     widget.valueChanged.connect(self.update_value_in_dict)
                     widget.valueChanged.emit(widget.value())
                     self.scannableParameters.append(str(widget.accessibleName()))
@@ -194,7 +199,7 @@ class RunParameterController(QObject):
             if widget is not None:
                 if type(widget) is QLineEdit:
                     widget.setText(str(value))
-                if type(widget) is QDoubleSpinBox:
+                if type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
                     widget.setValue(value)
                 if type(widget) is QCheckBox:
                     if value is True:
@@ -240,7 +245,7 @@ class RunParameterController(QObject):
     @pyqtSlot()
     def export_parameter_values_to_yaml_file(self, auto=False):
         export_dict = dict()
-        data_dicts = ['generator', 'lattice', 'simulation']
+        data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'BA1', 'simulation']
         if self.model.data.scanDict['parameter_scan']:
             if not auto:
                 dialog = QFileDialog()

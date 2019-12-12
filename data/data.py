@@ -42,8 +42,9 @@ class Data(object):
         object.__init__(self)
         self.my_name = "data"
         self.parameterDict = collections.OrderedDict()
-        self.parameterDict['lattice'] = collections.OrderedDict()
-        self.latticeDict = self.parameterDict['lattice']
+        self.lattices = ['INJ', 'S02', 'C2V', 'EBT', 'BA1']
+        [self.parameterDict.update({l:collections.OrderedDict()}) for l in self.lattices]
+        # self.latticeDict = self.parameterDict['lattice']
         self.parameterDict['scan'] = collections.OrderedDict()
         self.scanDict = self.parameterDict['scan']
         self.scanDict['parameter_scan'] = False
@@ -63,9 +64,9 @@ class Data(object):
 
     def initialise_data(self):
         # [self.runParameterDict.update({key: value}) for key, value in zip(data_keys, data_v)]
-        [self.latticeDict.update({key: value}) for key, value in self.quad_values.items()]
-        [self.latticeDict.update({key: value}) for key, value in self.gun_values.items()]
-        [self.latticeDict.update({key: value}) for key, value in self.l01_values.items()]
+        [[self.parameterDict[l].update({key: value}) for key, value in self.quad_values.items() if l in key] for l in self.lattices]
+        [self.parameterDict['INJ'].update({key: value}) for key, value in self.gun_values.items()]
+        [self.parameterDict['INJ'].update({key: value}) for key, value in self.l01_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.laser_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.charge_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.number_of_particles.items()]
@@ -118,6 +119,10 @@ class Data(object):
                 self.gun_values['CLA-LRG1-MAG-SOL-01'].update({'type': 'solenoid'})
                 self.gun_values['CLA-LRG1-MAG-SOL-01'].update(
                     {'field_amplitude': cavity['sub_elements']['CLA-LRG1-MAG-SOL-01']['field_amplitude']})
+                self.gun_values.update({'CLA-LRG1-MAG-BSOL-01': collections.OrderedDict()})
+                self.gun_values['CLA-LRG1-MAG-BSOL-01'].update({'type': 'solenoid'})
+                self.gun_values['CLA-LRG1-MAG-BSOL-01'].update(
+                    {'field_amplitude': cavity['sub_elements']['CLA-LRG1-MAG-BSOL-01']['field_amplitude']})
             # self.gun_values['CLA-LRG1-GUN-CAV'].update({'sub_elements': collections.OrderedDict()})
             # self.gun_values['CLA-LRG1-GUN-CAV']['sub_elements'].update({'CLA-LRG-GUN-SOL': cavity['sub_elements']['CLA-LRG1-GUN-SOL']['field_amplitude']})
             # self.gun_values.update({'CLA-LRG1-GUN-CAV:AMP': cavity['field_amplitude']})
@@ -180,4 +185,4 @@ class Data(object):
         self.laser_values.update({'sig_clock': collections.OrderedDict()})
         self.laser_values['sig_clock'].update({'type': 'generator'})
         self.laser_values['sig_clock'].update({'value': self.Framework.generator.parameters['sig_clock']})
-        self.tracking_code.update({'tracking_code':  collections.OrderedDict()})
+        self.tracking_code.update({'tracking_code':  collections.OrderedDict(), 'csr':  collections.OrderedDict(), 'csr_bins':  collections.OrderedDict()})

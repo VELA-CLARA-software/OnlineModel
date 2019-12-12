@@ -760,6 +760,9 @@
                </item>
                <item row="1" column="1">
                 <widget class="QCheckBox" name="checkBox_2">
+                 <property name="accessibleName">
+                  <string>simulation:csr:C2V</string>
+                 </property>
                  <property name="text">
                   <string/>
                  </property>
@@ -767,6 +770,9 @@
                </item>
                <item row="2" column="1">
                 <widget class="QSpinBox" name="spinBox">
+                 <property name="accessibleName">
+                  <string>simulation:csr_bins:C2V</string>
+                 </property>
                  <property name="minimum">
                   <number>10</number>
                  </property>
@@ -937,7 +943,7 @@
                   <double>180.000000000000000</double>
                  </property>
                  <property name="value">
-                  <double>-9.000000000000000</double>
+                  <double>5.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -1201,16 +1207,16 @@
                   <number>3</number>
                  </property>
                  <property name="minimum">
-                  <double>0.000000000000000</double>
+                  <double>-0.500000000000000</double>
                  </property>
                  <property name="maximum">
-                  <double>0.500000000000000</double>
+                  <double>0.000000000000000</double>
                  </property>
                  <property name="singleStep">
                   <double>0.005000000000000</double>
                  </property>
                  <property name="value">
-                  <double>0.000000000000000</double>
+                  <double>-0.311000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -1920,7 +1926,7 @@
               <item row="0" column="2">
                <widget class="QComboBox" name="starting_lattice">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -1975,7 +1981,7 @@
                 </item>
                 <item>
                  <property name="text">
-                  <string>BA1 Spectrometer</string>
+                  <string>BA1_dipole</string>
                  </property>
                 </item>
                </widget>
@@ -1999,7 +2005,7 @@
               <item row="0" column="4">
                <widget class="QComboBox" name="final_lattice">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -2060,7 +2066,7 @@
                 </item>
                 <item>
                  <property name="text">
-                  <string>BA1 Spectrometer</string>
+                  <string>BA1_dipole</string>
                  </property>
                 </item>
                </widget>
@@ -2152,7 +2158,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>VELA:EBT-INJ-MAG-QUAD-07:k1l</string>
+                  <string>EBT:EBT-INJ-MAG-QUAD-07:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -2209,7 +2215,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>VELA:EBT-INJ-MAG-QUAD-08:k1l</string>
+                  <string>EBT:EBT-INJ-MAG-QUAD-08:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -2240,7 +2246,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>VELA:EBT-INJ-MAG-QUAD-09:k1l</string>
+                  <string>EBT:EBT-INJ-MAG-QUAD-09:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -2284,7 +2290,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>VELA:EBT-INJ-MAG-QUAD-10:k1l</string>
+                  <string>EBT:EBT-INJ-MAG-QUAD-10:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -2328,7 +2334,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>VELA:EBT-INJ-MAG-QUAD-11:k1l</string>
+                  <string>EBT:EBT-INJ-MAG-QUAD-11:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>
@@ -2372,7 +2378,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>VELA:EBT-INJ-MAG-QUAD-15:k1l</string>
+                  <string>EBT:EBT-INJ-MAG-QUAD-15:k1l</string>
                  </property>
                  <property name="suffix">
                   <string/>

@@ -80,6 +80,8 @@ class Model(object):
     def run_script(self):
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
         self.update_tracking_codes()
+        startlattice = self.data.simulationDict['starting_lattice']
+        endLattice = self.data.simulationDict['final_lattice']
         if self.data.scanDict['parameter_scan']:
             try:
                 scan_start = float(self.data.scanDict['parameter_scan_from_value'])
@@ -104,16 +106,15 @@ class Model(object):
                 self.data.Framework.setSubDirectory(subdir)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
                 if self.data.simulationDict['track']:
-                    self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
+                    self.data.Framework.track(startfile=startlattice, endfile=endLattice)
                 else:
                     time.sleep(0.1)
-
         else:
             self.data.Framework.setSubDirectory(str(self.data.parameterDict['simulation']['directory']))
             self.modify_framework(scan=False)
             self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
             if self.data.simulationDict['track']:
-                self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
+                self.data.Framework.track(startfile=startlattice, endfile=endLattice)
 
     ##### Find Starting Filename based on z-position ####
     def find_starting_lattice(self, z):
@@ -124,16 +125,19 @@ class Model(object):
                         return l
         return 'generator'
 
-    def update_framework_elements(self, dict):
-        for key, value in dict.items():
-            if dict[key]['type'] == 'quadrupole':
-                self.data.Framework.modifyElement(key, 'k1l', value['k1l'])
-            elif dict[key]['type'] == 'cavity':
-                self.data.Framework.modifyElement(key, 'field_amplitude', 1e6*value['field_amplitude'])
-                self.data.Framework.modifyElement(key, 'phase', value['phase'])
-            elif dict[key]['type'] == 'solenoid':
-                tempcav = dict[key]['cavity']
-                self.data.Framework.modifyElement(key, 'field_amplitude', value['field_amplitude'])
+    def update_framework_elements(self, inputdict):
+        for key, value in inputdict.items():
+            if isinstance(value, dict):
+                if inputdict[key]['type'] == 'quadrupole':
+                    self.data.Framework.modifyElement(key, 'k1l', value['k1l'])
+                elif inputdict[key]['type'] == 'cavity':
+                    self.data.Framework.modifyElement(key, 'field_amplitude', 1e6*value['field_amplitude'])
+                    self.data.Framework.modifyElement(key, 'phase', value['phase'])
+                elif inputdict[key]['type'] == 'solenoid':
+                    if 'BSOL' in key:
+                        self.data.Framework.modifyElement(key, 'field_amplitude', 0.3462 * value['field_amplitude'])
+                    else:
+                        self.data.Framework.modifyElement(key, 'field_amplitude', value['field_amplitude'])
 
     def modify_framework(self, scan=False, type=None, modify=None, cavity_params=None, generator_param=None):
         if not os.name == 'nt':
@@ -141,7 +145,7 @@ class Model(object):
             self.data.Framework.defineCSRTrackCommand(scaling=int(self.data.generatorDict['number_of_particles']['value']))
             self.data.Framework.define_gpt_command(scaling=int(self.data.generatorDict['number_of_particles']['value']))
 
-        self.update_framework_elements(self.data.latticeDict)
+        [self.update_framework_elements(self.data.parameterDict[l]) for l in self.data.lattices]
         if scan==True and type is not None:
             print( self.data.parameterDict[dictname][pv])
         self.data.Framework.generator.number_of_particles = int(2**(3*int(self.data.generatorDict['number_of_particles']['value'])))
