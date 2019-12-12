@@ -138,9 +138,6 @@ class Model(object):
         self.data.Framework.generator.number_of_particles = int(2**(3*int(self.data.generatorDict['number_of_particles']['value'])))
         self.data.Framework.generator.charge = 1e-9*float(self.data.generatorDict['charge']['value'])
         self.data.Framework.generator.sig_clock = float(self.data.generatorDict['sig_clock']['value']) / (2354.82)
-        # self.data.Framework.generator.dist_x = self.data.generatorDict['dist_x']['value']
-        # self.data.Framework.generator.dist_y = self.data.generatorDict['dist_y']['value']
-        # self.data.Framework.generator.dist_z = self.data.generatorDict['dist_z']['value']
         self.data.Framework.generator.sig_x = self.data.generatorDict['sig_x']['value']
         self.data.Framework.generator.sig_y = self.data.generatorDict['sig_y']['value']
         # self.data.Framework.generator.sig_z = self.data.runParameterDict['sig_z']['value']
