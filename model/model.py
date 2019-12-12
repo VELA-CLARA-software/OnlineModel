@@ -1,6 +1,7 @@
 from paramiko import *
 import os
 import sys
+import time
 import stat
 import numpy as np
 from copy import deepcopy
@@ -72,8 +73,13 @@ class Model(object):
     def close_connection(self):
         return self.client.close()
 
+    def update_tracking_codes(self):
+        for l, c in self.data.simulationDict['tracking_code'].items():
+            self.data.Framework.change_Lattice_Code(l, c)
+
     def run_script(self):
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
+        self.update_tracking_codes()
         if self.data.scanDict['parameter_scan']:
             try:
                 scan_start = float(self.data.scanDict['parameter_scan_from_value'])
@@ -83,9 +89,9 @@ class Model(object):
                 print("Enter a numerical value to conduct a scan")
             scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
             for i, current_scan_value in enumerate(scan_range):
-                self.scan_progress = float(i)/scan_range
+                self.scan_progress = i+1
                 par = self.data.scanDict['parameter']
-                print('parameter to scan = ', par, current_scan_value)
+                print('Scanning['+str(i)+']: Setting ', par, ' to ', current_scan_value)
                 if len((par.split(':'))) == 3:
                     dictname, pv, param = map(str, par.split(':'))
                 else:
@@ -99,13 +105,15 @@ class Model(object):
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
                 if self.data.simulationDict['track']:
                     self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
+                else:
+                    time.sleep(0.1)
 
         else:
             self.data.Framework.setSubDirectory(str(self.data.parameterDict['simulation']['directory']))
             self.modify_framework(scan=False)
             self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
             if self.data.simulationDict['track']:
-                self.data.Framework.track(startfile="generator", endfile='BA1_dipole')
+                self.data.Framework.track(startfile='generator', endfile='BA1_dipole')
 
     ##### Find Starting Filename based on z-position ####
     def find_starting_lattice(self, z):

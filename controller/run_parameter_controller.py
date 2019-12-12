@@ -3,8 +3,9 @@ from PyQt4.QtGui import *
 from copy import copy,deepcopy
 from decimal import Decimal
 import run_parameters_parser as yaml_parser
-import sys, os
+import sys, os, time
 import collections
+import numpy as np
 
 class GenericThread(QThread):
     signal = pyqtSignal()
@@ -28,6 +29,31 @@ class GenericThread(QThread):
         if not self._stopped:
             self.object = self.function(*self.args, **self.kwargs)
 
+class signalling_monitor(QObject):
+
+    valueChanged = pyqtSignal(int)
+
+    def __init__(self, ref, parameter, interval=200):
+        super(signalling_monitor, self).__init__()
+        self.timer = QTimer(self)
+        self.timer.setInterval(interval)
+        self.timer.timeout.connect(self.emitValue)
+        self.ref = ref
+        self.parameter = parameter
+
+    def stop(self):
+        self.timer.stop()
+
+    def start(self, interval=None):
+        self.setInterval(interval)
+        self.timer.start()
+
+    def setInterval(self, interval):
+        if interval is not None:
+            self.timer.setInterval(interval)
+
+    def emitValue(self):
+        self.valueChanged.emit(getattr(self.ref, self.parameter))
 
 class RunParameterController(QObject):
 
@@ -50,13 +76,16 @@ class RunParameterController(QObject):
         self.formLayoutList = [formLayout for layout in self.runParameterLayouts for
                           formLayout in layout.findChildren((QFormLayout,QGridLayout))]
         #self.model.data.self.model.data.runParameterDict = self.initialize_run_parameter_data()
+        self.update_macro_particle_combo()
         self.initialize_run_parameter_data()
         self.model.data.scannableParametersDict = self.get_scannable_parameters_dict()
         self.populate_scan_combo_box()
         self.view.parameter_scan.stateChanged.connect(lambda: self.toggle_scan_parameters_state(self.view.parameter_scan))
         self.view.runButton.clicked.connect(self.run_astra)
         self.view.runButton.clicked.connect(lambda: self.export_parameter_values_to_yaml_file(auto=True))
-        self.update_macro_particle_combo()
+        self.value_to_be_checked = 0
+        self.sm = signalling_monitor(self.model, 'scan_progress')
+        self.sm.valueChanged.connect(self.view.progressBar.setValue)
 
     def update_macro_particle_combo(self):
         combo = self.view.macro_particle
@@ -84,11 +113,11 @@ class RunParameterController(QObject):
             value = True if widget.isChecked() else False
         elif type(widget) is QComboBox:
             value = widget.itemData(widget.currentIndex())
+            if value == '' or value is None:
+                value = str(widget.currentText())
             if isinstance(value, QVariant):
                 value = value.toString()
             value = str(value)
-            if value is '':
-                value = str(widget.currentText())
         if param is None:
             self.model.data.parameterDict[dictname].update({pv: value})
         else:
@@ -112,7 +141,7 @@ class RunParameterController(QObject):
                     widget.stateChanged.connect(self.update_value_in_dict)
                     widget.stateChanged.emit(widget.isChecked())
                 if type(widget) is QComboBox:
-                    widget.currentIndexChanged[str].connect(self.update_value_in_dict)
+                    widget.currentIndexChanged.connect(self.update_value_in_dict)
                     widget.currentIndexChanged.emit(widget.currentIndex())
         # return self.model.data.latticeDict
 
@@ -252,10 +281,6 @@ class RunParameterController(QObject):
             self.view.parameter_scan_to_value.setEnabled(False)
             self.view.parameter_scan_step_size.setEnabled(False)
 
-    # def run_thread(self, func):
-        # self.thread = GenericThread(func)
-        # self.thread.finished.connect(self.enable_run_button)
-
     def disable_run_button(self):
         self.view.runButton.setEnabled(False)
         return
@@ -265,26 +290,31 @@ class RunParameterController(QObject):
         return
 
     def app_sequence(self):
-        #self.collect_parameters()
-        #self.collect_scan_parameters()
-        # self.model.ssh_to_server()
-        # self.model.create_subdirectory()
-        # if self.model.path_exists:
-            # self.thread.stop()
-            # self.thread.finished.connect(self.enable_run_button())
-            # self.thread.signal.connect(self.handle_existent_file)
-
-        # else:
-            # self.thread._stopped = False
         self.model.run_script()
         return
 
+    def reset_progress_bar_timer(self):
+        self.timer = QTimer()
+        self.timer.setInterval(1000)
+        self.timer.setSingleShot(True)
+        self.timer.timeout.connect(self.view.progressBar.reset)
+        self.timer.start()
+
     def run_astra(self):
+        if self.model.data.scanDict['parameter_scan']:
+            scan_start = float(self.model.data.scanDict['parameter_scan_from_value'])
+            scan_end = float(self.model.data.scanDict['parameter_scan_to_value'])
+            scan_step_size = float(self.model.data.scanDict['parameter_scan_step_size'])
+            scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
+            self.view.progressBar.setRange(0,len(scan_range))
         self.disable_run_button()
-        self.app_sequence()
-        self.enable_run_button()
-        #self.run_thread(self.app_sequence)
-        #self.thread.start()
+        self.sm.start()
+        self.thread = GenericThread(self.app_sequence)
+        self.thread.finished.connect(self.enable_run_button)
+        self.thread.finished.connect(self.sm.stop)
+        self.thread.finished.connect(self.reset_progress_bar_timer)
+        self.thread.start()
+
 
 
     # @pyqtSlot()

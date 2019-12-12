@@ -5,6 +5,7 @@ import ruamel.yaml
 # sys.path.append('\\\\apclara1\\ControlRoomApps\\OnlineModel')
 # sys.path.append('\\\\apclara1\\ControlRoomApps\\OnlineModel\\MasterLattice')
 sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
+sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
 import SimulationFramework.Framework as Fw
 import view as view
 # Post-processing dictionary
@@ -71,6 +72,7 @@ class Data(object):
         [self.generatorDict.update({key: value}) for key, value in self.cathode.items()]
         [self.simulationDict.update({key: value}) for key, value in self.space_charge.items()]
         [self.simulationDict.update({key: value}) for key, value in self.astra_run_number.items()]
+        [self.simulationDict.update({key: value}) for key, value in self.tracking_code.items()]
 
     def initialise_scan(self):
         [self.scan_values.update({key: value}) for key, value in zip(scan_parameter_keys, scan_parameter_v)]
@@ -97,6 +99,7 @@ class Data(object):
         self.cathode = collections.OrderedDict()
         self.space_charge = collections.OrderedDict()
         self.astra_run_number = collections.OrderedDict()
+        self.tracking_code = collections.OrderedDict()
         # quad_values.update({key: value}) for key, value in zip(data_keys, data_v)
 
         for quad in self.Framework.getElementType('quadrupole'):
@@ -111,16 +114,16 @@ class Data(object):
                 # self.gun_values.update({'CLA-LRG1-GUN-CAV:PHASE': cavity['field_amplitude']})
                 self.gun_values['CLA-LRG1-GUN-CAV'].update({'field_amplitude': cavity['field_amplitude']})
                 # self.gun_values.update({'CLA-LRG1-GUN-CAV:AMP': cavity['field_amplitude']})
-                self.gun_values.update({'CLA-LRG1-GUN-SOL': collections.OrderedDict()})
-                self.gun_values['CLA-LRG1-GUN-SOL'].update({'type': 'solenoid'})
-                self.gun_values['CLA-LRG1-GUN-SOL'].update({'cavity': cavity['objectname']})
-                self.gun_values['CLA-LRG1-GUN-SOL'].update(
-                    {'field_amplitude': cavity['sub_elements']['CLA-LRG1-GUN-SOL']['field_amplitude']})
+                self.gun_values.update({'CLA-LRG1-MAG-SOL-01': collections.OrderedDict()})
+                self.gun_values['CLA-LRG1-MAG-SOL-01'].update({'type': 'solenoid'})
+                self.gun_values['CLA-LRG1-MAG-SOL-01'].update({'cavity': cavity['objectname']})
+                self.gun_values['CLA-LRG1-MAG-SOL-01'].update(
+                    {'field_amplitude': cavity['sub_elements']['CLA-LRG1-MAG-SOL-01']['field_amplitude']})
                 self.gun_values['CLA-LRG1-GUN-CAV'].update({'sub_elements': collections.OrderedDict()})
                 self.gun_values['CLA-LRG1-GUN-CAV']['sub_elements'].update(
-                    {'CLA-LRG1-GUN-SOL': collections.OrderedDict()})
-                self.gun_values['CLA-LRG1-GUN-CAV']['sub_elements']['CLA-LRG1-GUN-SOL'].update(
-                    {'field_amplitude': self.gun_values['CLA-LRG1-GUN-SOL']['field_amplitude']})
+                    {'CLA-LRG1-MAG-SOL-01': collections.OrderedDict()})
+                self.gun_values['CLA-LRG1-GUN-CAV']['sub_elements']['CLA-LRG1-MAG-SOL-01'].update(
+                    {'field_amplitude': self.gun_values['CLA-LRG1-MAG-SOL-01']['field_amplitude']})
             # self.gun_values['CLA-LRG1-GUN-CAV'].update({'sub_elements': collections.OrderedDict()})
             # self.gun_values['CLA-LRG1-GUN-CAV']['sub_elements'].update({'CLA-LRG-GUN-SOL': cavity['sub_elements']['CLA-LRG1-GUN-SOL']['field_amplitude']})
             # self.gun_values.update({'CLA-LRG1-GUN-CAV:AMP': cavity['field_amplitude']})
@@ -183,3 +186,4 @@ class Data(object):
         self.laser_values.update({'sig_clock': collections.OrderedDict()})
         self.laser_values['sig_clock'].update({'type': 'generator'})
         self.laser_values['sig_clock'].update({'value': self.Framework.generator.parameters['sig_clock']})
+        self.tracking_code.update({'tracking_code':  collections.OrderedDict()})
