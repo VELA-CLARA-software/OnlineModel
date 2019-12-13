@@ -3,6 +3,8 @@ import os, sys
 import numpy as np
 import ruamel.yaml
 sys.path.append(os.path.abspath(__file__+'/../../../../VELA-CLARA-software/OnlineModel/'))
+sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
+sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
 import SimulationFramework.Framework as Fw
 import view as view
 import requests, json, scipy.constants, datetime, math, numpy
@@ -52,6 +54,7 @@ class Data(object):
         [self.generatorDict.update({key: value}) for key, value in self.cathode.items()]
         [self.simulationDict.update({key: value}) for key, value in self.space_charge.items()]
         [self.simulationDict.update({key: value}) for key, value in self.astra_run_number.items()]
+        [self.simulationDict.update({key: value}) for key, value in self.tracking_code.items()]
         self.update_mag_field_coefficients()
 
     def initialise_scan(self):
@@ -79,7 +82,9 @@ class Data(object):
         self.cathode = collections.OrderedDict()
         self.space_charge = collections.OrderedDict()
         self.astra_run_number = collections.OrderedDict()
-        # quad_values.update({key: value}) for key, value in zip(data_keys, data_v)
+        self.tracking_code = collections.OrderedDict()
+
+        self.tracking_code.update({'tracking_code': collections.OrderedDict()})
 
         for quad in self.Framework.getElementType('quadrupole'):
             self.quad_values.update({quad['objectname']: collections.OrderedDict()})
@@ -190,12 +195,12 @@ class Data(object):
                         pulse_length = 2.5
                         gun_energy_gain = self.get_energy_from_rf(forward_power, phase, pulse_length) / cavity_length
                         value.update({'energy_gain': float(gun_energy_gain)})
-                        value['field_amplitude'] = gun_energy_gain
+                        value['field_amplitude'] = float(gun_energy_gain)
                     elif value['controller_name'] == "L01":
                         pulse_length = 0.75
                         l01_energy_gain = self.get_energy_from_rf(forward_power, phase, pulse_length) / cavity_length
                         value.update({'energy_gain': float(l01_energy_gain)})
-                        value['field_amplitude'] = l01_energy_gain
+                        value['field_amplitude'] = float(l01_energy_gain)
                     value['phase'] = phase
                     value['pulse_length'] = pulse_length
             fudge = 0
@@ -225,7 +230,7 @@ class Data(object):
                                       value['field_integral_coefficients'][-1])
                 int_strength = numpy.polyval(coeffs, current)
                 effect = int_strength / value['magnetic_length']
-                value['field_amplitude'] = effect / value['magnetic_length']
+                value['field_amplitude'] = float(effect / value['magnetic_length'])
             elif value['type'] == 'generator':
                 if key == 'charge':
                     charge_pv_alias = value['pv_root_alias'] + ":" + value['pv_suffix_alias']

@@ -5,6 +5,8 @@ from decimal import Decimal
 import run_parameters_parser as yaml_parser
 import sys, os
 sys.path.append(os.path.abspath(__file__+'/../../../../VELA-CLARA-software/OnlineModel/'))
+sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
+sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
 from SimulationFramework.Modules.online_model_plotter import astraPlotWidget
 
 class GenericThread(QThread):
