@@ -1088,14 +1088,14 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="0">
+               <item row="6" column="0">
                 <widget class="QLabel" name="label_7">
                  <property name="text">
                   <string>Bucking Solenoid Strength</string>
                  </property>
                 </widget>
                </item>
-               <item row="6" column="0">
+               <item row="7" column="0">
                 <widget class="QLabel" name="linac1_sol1_strength_label">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -1114,7 +1114,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="6" column="1">
+               <item row="7" column="1">
                 <widget class="QDoubleSpinBox" name="linac1_sol1_strength_2">
                  <property name="maximumSize">
                   <size>
@@ -1142,7 +1142,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="7" column="0">
+               <item row="8" column="0">
                 <widget class="QLabel" name="linac1_sol2_strength_label">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -1161,7 +1161,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="7" column="1">
+               <item row="8" column="1">
                 <widget class="QDoubleSpinBox" name="linac1_sol2_strength_2">
                  <property name="maximumSize">
                   <size>
@@ -1189,35 +1189,84 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="1">
-                <widget class="QDoubleSpinBox" name="buckingsol_strength">
-                 <property name="maximumSize">
-                  <size>
-                   <width>150</width>
-                   <height>16777215</height>
-                  </size>
-                 </property>
-                 <property name="accessibleName">
-                  <string>INJ:CLA-LRG1-MAG-BSOL-01:field_amplitude</string>
-                 </property>
-                 <property name="suffix">
-                  <string> T</string>
-                 </property>
-                 <property name="decimals">
-                  <number>3</number>
-                 </property>
-                 <property name="minimum">
-                  <double>-0.500000000000000</double>
-                 </property>
-                 <property name="maximum">
-                  <double>0.000000000000000</double>
-                 </property>
-                 <property name="singleStep">
-                  <double>0.005000000000000</double>
-                 </property>
-                 <property name="value">
-                  <double>-0.311000000000000</double>
-                 </property>
+               <item row="6" column="1">
+                <widget class="QWidget" name="widget_3" native="true">
+                 <layout class="QFormLayout" name="formLayout_10">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>4</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QDoubleSpinBox" name="buckingsol_strength">
+                    <property name="minimumSize">
+                     <size>
+                      <width>130</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>150</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="accessibleName">
+                     <string>INJ:CLA-LRG1-MAG-BSOL-01:field_amplitude</string>
+                    </property>
+                    <property name="suffix">
+                     <string> T</string>
+                    </property>
+                    <property name="decimals">
+                     <number>3</number>
+                    </property>
+                    <property name="minimum">
+                     <double>-0.500000000000000</double>
+                    </property>
+                    <property name="maximum">
+                     <double>0.000000000000000</double>
+                    </property>
+                    <property name="singleStep">
+                     <double>0.005000000000000</double>
+                    </property>
+                    <property name="value">
+                     <double>-0.311000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QCheckBox" name="bsol_track_checkBox">
+                    <property name="maximumSize">
+                     <size>
+                      <width>20</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="toolTip">
+                     <string>Track Main Solenoid Field</string>
+                    </property>
+                    <property name="whatsThis">
+                     <string>Track Main Solenoid Field</string>
+                    </property>
+                    <property name="accessibleName">
+                     <string>simulation:bsol_tracking</string>
+                    </property>
+                    <property name="layoutDirection">
+                     <enum>Qt::RightToLeft</enum>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
               </layout>
@@ -2955,6 +3004,85 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>main_tab_widget</tabstop>
+  <tabstop>macro_particle</tabstop>
+  <tabstop>doubleSpinBox_2</tabstop>
+  <tabstop>doubleSpinBox_3</tabstop>
+  <tabstop>doubleSpinBox_4</tabstop>
+  <tabstop>starting_lattice</tabstop>
+  <tabstop>final_lattice</tabstop>
+  <tabstop>injector_space_charge</tabstop>
+  <tabstop>rest_of_line_space_charge</tabstop>
+  <tabstop>doubleSpinBox</tabstop>
+  <tabstop>gun_phase</tabstop>
+  <tabstop>linac_1_gradient_2</tabstop>
+  <tabstop>linac1_phase_2</tabstop>
+  <tabstop>sol_strength</tabstop>
+  <tabstop>buckingsol_strength</tabstop>
+  <tabstop>bsol_track_checkBox</tabstop>
+  <tabstop>linac1_sol1_strength_2</tabstop>
+  <tabstop>linac1_sol2_strength_2</tabstop>
+  <tabstop>doubleSpinBox_5</tabstop>
+  <tabstop>doubleSpinBox_8</tabstop>
+  <tabstop>doubleSpinBox_6</tabstop>
+  <tabstop>doubleSpinBox_7</tabstop>
+  <tabstop>doubleSpinBox_9</tabstop>
+  <tabstop>doubleSpinBox_10</tabstop>
+  <tabstop>doubleSpinBox_11</tabstop>
+  <tabstop>doubleSpinBox_13</tabstop>
+  <tabstop>doubleSpinBox_12</tabstop>
+  <tabstop>doubleSpinBox_15</tabstop>
+  <tabstop>doubleSpinBox_14</tabstop>
+  <tabstop>doubleSpinBox_17</tabstop>
+  <tabstop>doubleSpinBox_16</tabstop>
+  <tabstop>doubleSpinBox_18</tabstop>
+  <tabstop>doubleSpinBox_24</tabstop>
+  <tabstop>doubleSpinBox_19</tabstop>
+  <tabstop>doubleSpinBox_20</tabstop>
+  <tabstop>doubleSpinBox_21</tabstop>
+  <tabstop>doubleSpinBox_22</tabstop>
+  <tabstop>doubleSpinBox_23</tabstop>
+  <tabstop>parameter_scan</tabstop>
+  <tabstop>parameter</tabstop>
+  <tabstop>parameter_scan_from_value</tabstop>
+  <tabstop>parameter_scan_to_value</tabstop>
+  <tabstop>parameter_scan_step_size</tabstop>
+  <tabstop>directory</tabstop>
+  <tabstop>checkBox</tabstop>
+  <tabstop>runButton</tabstop>
+  <tabstop>graphics_post_graphics_view_1</tabstop>
+  <tabstop>graphics_post_graphics_view_2</tabstop>
+  <tabstop>directory_post_combo_box</tabstop>
+  <tabstop>directory_post_combo_box_2</tabstop>
+  <tabstop>directory_post_combo_box_4</tabstop>
+  <tabstop>directory_post_combo_box_3</tabstop>
+  <tabstop>runButton_post</tabstop>
+  <tabstop>variables_dyn_plot_combo_box_1</tabstop>
+  <tabstop>variables_dyn_plot_combo_box_2</tabstop>
+  <tabstop>directory_dyn_plot_line_edit</tabstop>
+  <tabstop>runButton_dyn_plot</tabstop>
+  <tabstop>save_plot_dyn_plot_check_box</tabstop>
+  <tabstop>import_dist_dyn_plot_check_box</tabstop>
+  <tabstop>output_file_dyn_plot_line_edit</tabstop>
+  <tabstop>directory_summary_line_edit</tabstop>
+  <tabstop>summary_save_plot_check_box</tabstop>
+  <tabstop>summary_output_file_line_edit</tabstop>
+  <tabstop>runButton_summary</tabstop>
+  <tabstop>comboBox_4</tabstop>
+  <tabstop>directory_post_line_edit</tabstop>
+  <tabstop>comboBox_3</tabstop>
+  <tabstop>comboBox</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>comboBox_2</tabstop>
+  <tabstop>checkBox_2</tabstop>
+  <tabstop>spinBox</tabstop>
+  <tabstop>tabWidget_2</tabstop>
+  <tabstop>tabWidget_3</tabstop>
+  <tabstop>tabWidget_4</tabstop>
+  <tabstop>tabWidget_5</tabstop>
+  <tabstop>directory_post_label</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

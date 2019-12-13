@@ -80,41 +80,15 @@ class Model(object):
     def run_script(self):
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
         self.update_tracking_codes()
-        startlattice = self.data.simulationDict['starting_lattice']
+        startLattice = self.data.simulationDict['starting_lattice']
         endLattice = self.data.simulationDict['final_lattice']
-        if self.data.scanDict['parameter_scan']:
-            try:
-                scan_start = float(self.data.scanDict['parameter_scan_from_value'])
-                scan_end = float(self.data.scanDict['parameter_scan_to_value'])
-                scan_step_size = float(self.data.scanDict['parameter_scan_step_size'])
-            except ValueError:
-                print("Enter a numerical value to conduct a scan")
-            scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
-            for i, current_scan_value in enumerate(scan_range):
-                self.scan_progress = i+1
-                par = self.data.scanDict['parameter']
-                print('Scanning['+str(i)+']: Setting ', par, ' to ', current_scan_value)
-                if len((par.split(':'))) == 3:
-                    dictname, pv, param = map(str, par.split(':'))
-                else:
-                    param = None
-                    dictname, pv = map(str, par.split(':'))
-                self.data.parameterDict[dictname][pv].update({param: current_scan_value})
-                self.modify_framework(scan=False)
-                subdir = str(self.data.parameterDict['simulation']['directory']) + '/scan/' + pv + '_' + str(current_scan_value)
-                current_scan_value += scan_step_size
-                self.data.Framework.setSubDirectory(subdir)
-                self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
-                if self.data.simulationDict['track']:
-                    self.data.Framework.track(startfile=startlattice, endfile=endLattice)
-                else:
-                    time.sleep(0.1)
+        self.data.Framework.setSubDirectory(str(self.data.parameterDict['simulation']['directory']))
+        self.modify_framework(scan=False)
+        self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
+        if self.data.simulationDict['track']:
+            self.data.Framework.track(startfile=startLattice, endfile=endLattice)
         else:
-            self.data.Framework.setSubDirectory(str(self.data.parameterDict['simulation']['directory']))
-            self.modify_framework(scan=False)
-            self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
-            if self.data.simulationDict['track']:
-                self.data.Framework.track(startfile=startlattice, endfile=endLattice)
+            time.sleep(0.5)
 
     ##### Find Starting Filename based on z-position ####
     def find_starting_lattice(self, z):
@@ -129,15 +103,15 @@ class Model(object):
         for key, value in inputdict.items():
             if isinstance(value, dict):
                 if inputdict[key]['type'] == 'quadrupole':
-                    self.data.Framework.modifyElement(key, 'k1l', value['k1l'])
+                    self.data.Framework.modifyElement(key, 'k1l', float(value['k1l']))
                 elif inputdict[key]['type'] == 'cavity':
-                    self.data.Framework.modifyElement(key, 'field_amplitude', 1e6*value['field_amplitude'])
+                    self.data.Framework.modifyElement(key, 'field_amplitude', 1e6*float(value['field_amplitude']))
                     self.data.Framework.modifyElement(key, 'phase', value['phase'])
                 elif inputdict[key]['type'] == 'solenoid':
                     if 'BSOL' in key:
-                        self.data.Framework.modifyElement(key, 'field_amplitude', 0.3462 * value['field_amplitude'])
+                        self.data.Framework.modifyElement(key, 'field_amplitude', 0.3462 * float(value['field_amplitude']))
                     else:
-                        self.data.Framework.modifyElement(key, 'field_amplitude', value['field_amplitude'])
+                        self.data.Framework.modifyElement(key, 'field_amplitude', float(value['field_amplitude']))
 
     def modify_framework(self, scan=False, type=None, modify=None, cavity_params=None, generator_param=None):
         if not os.name == 'nt':
@@ -146,6 +120,8 @@ class Model(object):
             self.data.Framework.define_gpt_command(scaling=int(self.data.generatorDict['number_of_particles']['value']))
 
         [self.update_framework_elements(self.data.parameterDict[l]) for l in self.data.lattices]
+        if self.data.parameterDict['simulation']['bsol_tracking']:
+            self.data.Framework.modifyElement('CLA-LRG1-MAG-BSOL-01', 'field_amplitude', 0.3462 * 0.9 * self.data.Framework['CLA-LRG1-MAG-SOL-01']['field_amplitude'])
         if scan==True and type is not None:
             print( self.data.parameterDict[dictname][pv])
         self.data.Framework.generator.number_of_particles = int(2**(3*int(self.data.generatorDict['number_of_particles']['value'])))
