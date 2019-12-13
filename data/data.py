@@ -93,11 +93,9 @@ class Data(object):
             self.rf_values[cavity['objectname']].update({'pv_root_alias': cavity['PV']})
             self.rf_values[cavity['objectname']].update({'controller_name': cavity['Controller_Name']})
             self.get_element_length(self.rf_values, cavity['objectname'])
-            # self.gun_values.update({'CLA-LRG1-GUN-CAV:PHASE': cavity['field_amplitude']})
             self.rf_values[cavity['objectname']].update({'field_amplitude': cavity['field_amplitude']})
             self.rf_values[cavity['objectname']].update({'pv_field_amplitude_alias': "ad1:ch6:power_remote_s.POWER"})
             self.rf_values[cavity['objectname']].update({'pv_phase_alias': "vm:dsp:sp_ph:phase"})
-            # self.gun_values.update({'CLA-LRG1-GUN-CAV:AMP': cavity['field_amplitude']})
             for key, value in cavity['sub_elements'].items():
                 if value['type'] == "solenoid":
                     self.rf_values.update({key: collections.OrderedDict()})
@@ -200,7 +198,6 @@ class Data(object):
                         value['field_amplitude'] = l01_energy_gain
                     value['phase'] = phase
                     value['pulse_length'] = pulse_length
-                    print(value['field_amplitude'])
             fudge = 0
             total_energy_gain = gun_energy_gain + l01_energy_gain + fudge
             return total_energy_gain
@@ -209,12 +206,6 @@ class Data(object):
 
     def read_values_from_epics(self, dict, time_from=None, time_to=None, lattice=False):
         self.total_energy_gain = self.get_energy_gain(dict, time_from, time_to, lattice)
-        # self.update_widgets_with_values("lattice:" + "CLA-LRG1-GUN-CAV" + ":field_amplitude",
-        #                                 gun_energy_gain / gun_cavity_length)
-        # self.update_widgets_with_values("lattice:" + "CLA-LRG1-GUN-CAV" + ":phase", gun_phase)
-        # self.update_widgets_with_values("lattice:" + 'CLA-L01-CAV' + ":field_amplitude",
-        #                                 l01_energy_gain / l01_cavity_length)
-        # self.update_widgets_with_values("lattice:" + 'CLA-L01-CAV' + ":phase", l01_phase)
         speed_of_light = scipy.constants.speed_of_light / 1e6
         for key, value in dict.items():
             if value['type'] == 'quadrupole':
@@ -234,8 +225,6 @@ class Data(object):
                                       value['field_integral_coefficients'][-1])
                 int_strength = numpy.polyval(coeffs, current)
                 effect = int_strength / value['magnetic_length']
-                # self.update_widgets_with_values("lattice:" + key + ":field_amplitude",
-                #                                 effect / value['magnetic_length'])
                 value['field_amplitude'] = effect / value['magnetic_length']
             elif value['type'] == 'generator':
                 if key == 'charge':

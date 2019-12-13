@@ -140,46 +140,6 @@ class Model(object):
         self.data.Framework.generator.sig_clock = float(self.data.generatorDict['sig_clock']['value']) / (2354.82)
         self.data.Framework.generator.sig_x = self.data.generatorDict['sig_x']['value']
         self.data.Framework.generator.sig_y = self.data.generatorDict['sig_y']['value']
-        # self.data.Framework.generator.sig_z = self.data.runParameterDict['sig_z']['value']
-        #     for key, value in self.data.latticeDict.items():
-        #         if type == 'quadrupole':
-        #             self.data.Framework.modifyElement(key, 'k1l', modify)
-        #         elif type == 'cavity':
-        #             if cavity_params == "AMP":
-        #                 self.data.Framework.modifyElement(key, 1e6*'field_amplitude', modify)
-        #             elif cavity_params == "PHASE":
-        #                 self.data.Framework.modifyElement(key, 'phase', modify)
-        #         elif type == 'solenoid':
-        #             tempcav = self.data.latticeDict[key]['cavity']
-        #             # print(self.data.runParameterDict[tempcav]['sub_elements'][key])
-        #             self.data.Framework.modifyElement(key, 'field_amplitude', modify)
-        #         # elif self.data.runParameterDict[self.strip_text_before(key, ':')]['type'] == 'generator':
-        #         #     self.data.Framework.modifyElement(key,key,value)
-        # elif scan==True and generator_param in self.generator_params:
-        #     if generator_param == 'number_of_particles':
-        #         self.data.Framework.generator.number_of_particles = modify
-        #     elif generator_param == 'dist_x':
-        #         self.data.Framework.generator.dist_x = modify
-        #     elif generator_param == 'dist_y':
-        #         self.data.Framework.generator.dist_y = modify
-        #     elif generator_param == 'dist_z':
-        #         self.data.Framework.generator.dist_z = modify
-        #     elif generator_param == 'sig_x':
-        #         self.data.Framework.generator.sig_x = modify
-        #     elif generator_param == 'sig_y':
-        #         self.data.Framework.generator.sig_y = modify
-        #     elif generator_param == 'sig_z':
-        #         self.data.Framework.generator.sig_z = modify
-
-    def strip_text_before(self, string, condition):
-        sep = condition
-        rest = string.split(sep, 1)[0]
-        return rest
-
-    def strip_text_after(self, string, condition):
-        sep = condition
-        rest = string.split(sep, 1)[1]
-        return rest
 
     def path_command_ensemble(self, script, dictionary):
         path_command = self.pathscript + script

@@ -254,16 +254,6 @@ class RunParameterController(QObject):
             self.view.parameter_scan_to_value.setEnabled(False)
             self.view.parameter_scan_step_size.setEnabled(False)
 
-    def strip_text_before(self, string, condition):
-        sep = condition
-        rest = string.split(sep, 1)[0]
-        return rest
-
-    def strip_text_after(self, string, condition):
-        sep = condition
-        rest = string.split(sep, 1)[1]
-        return rest
-
     def read_from_epics(self, time_from=None, time_to=None):
         self.model.data.read_values_from_epics(self.model.data.parameterDict['lattice'], lattice=True)
         self.model.data.read_values_from_epics(self.model.data.parameterDict['generator'], lattice=False)
