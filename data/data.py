@@ -2,7 +2,6 @@ import collections
 import os, sys
 import numpy as np
 import ruamel.yaml
-sys.path.append(os.path.abspath(__file__+'/../../../../VELA-CLARA-software/OnlineModel/'))
 sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
 sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
 import SimulationFramework.Framework as Fw
