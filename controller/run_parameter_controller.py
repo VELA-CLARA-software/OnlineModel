@@ -3,7 +3,8 @@ from PyQt4.QtGui import *
 from copy import copy,deepcopy
 from decimal import Decimal
 import run_parameters_parser as yaml_parser
-import sys, os, time
+import sys, os, math, epics, scipy.constants, numpy
+import json, requests, datetime, time
 import collections
 import numpy as np
 
@@ -71,7 +72,7 @@ class RunParameterController(QObject):
                                self.view.injector_parameter_groupbox,
                                self.view.simulation_parameter_groupbox,
                                self.view.scan_groupBox,
-                               self.view.directory_groupBox,
+                               self.view.directory_groupBox
                                ]
         self.formLayoutList = [formLayout for layout in self.runParameterLayouts for
                           formLayout in layout.findChildren((QFormLayout,QGridLayout))]
@@ -166,6 +167,7 @@ class RunParameterController(QObject):
             dictname, pv, param = map(str, aname.split(':'))
         else:
             param = None
+            print(aname)
             dictname, pv = map(str, aname.split(':'))
         if param is None:
             value = self.model.data.parameterDict[dictname][pv]
@@ -281,6 +283,27 @@ class RunParameterController(QObject):
             self.view.parameter_scan_to_value.setEnabled(False)
             self.view.parameter_scan_step_size.setEnabled(False)
 
+
+    def read_from_epics(self, time_from=None, time_to=None):
+        self.model.data.read_values_from_epics(self.model.data.parameterDict['lattice'], lattice=True)
+        self.model.data.read_values_from_epics(self.model.data.parameterDict['generator'], lattice=False)
+        for key, value in self.model.data.parameterDict['lattice'].items():
+            if value['type'] == "quadrupole":
+                self.update_widgets_with_values('lattice:' + key + ':k1l', value['k1l'])
+            if value['type'] == "solenoid":
+                self.update_widgets_with_values('lattice:' + key + ':field_amplitude', value['field_amplitude'])
+            if value['type'] == "cavity":
+                self.update_widgets_with_values('lattice:' + key + ':phase', value['phase'])
+                self.update_widgets_with_values('lattice:' + key + ':field_amplitude', value['field_amplitude'])
+        for key, value in self.model.data.parameterDict['generator'].items():
+            if key == "charge":
+                self.update_widgets_with_values('generator:' + key + ':value', value['value'])
+            # self.update_widget_from_dict(key)
+
+    # def run_thread(self, func):
+        # self.thread = GenericThread(func)
+        # self.thread.finished.connect(self.enable_run_button)
+
     def disable_run_button(self):
         self.view.runButton.setEnabled(False)
         return
@@ -301,6 +324,12 @@ class RunParameterController(QObject):
         self.timer.start()
 
     def run_astra(self):
+        # self.read_from_epics()
+        # self.disable_run_button()
+        # self.app_sequence()
+        # self.enable_run_button()
+        #self.run_thread(self.app_sequence)
+        #self.thread.start()
         if self.model.data.scanDict['parameter_scan']:
             scan_start = float(self.model.data.scanDict['parameter_scan_from_value'])
             scan_end = float(self.model.data.scanDict['parameter_scan_to_value'])
@@ -314,8 +343,6 @@ class RunParameterController(QObject):
         self.thread.finished.connect(self.sm.stop)
         self.thread.finished.connect(self.reset_progress_bar_timer)
         self.thread.start()
-
-
 
     # @pyqtSlot()
     # def handle_existent_file(self):
