@@ -177,7 +177,7 @@ class Data(object):
         # print(url)
         r = requests.get(url)
         data = r.json()
-        value = data[0]['data'][0]['val']
+        value = numpy.mean(data[0]['data'][0]['val'])
         # print(value)
         return value
 
@@ -238,9 +238,9 @@ class Data(object):
 
     def get_energy_from_rf(self, klystron_power, phase, pulse_length):
         bestcase = 0.407615 + 1.94185 * (((1 - math.exp((-1.54427 * 10 ** 6 * pulse_length * 10 ** -6))) * (
-                    0.0331869 + 6.05422 * 10 ** -7 * klystron_power * 10 ** 6)) * numpy.cos(phase)) ** 0.5
+                    0.0331869 + 6.05422 * 10 ** -7 * klystron_power)) * numpy.cos(phase)) ** 0.5
         worstcase = 0.377 + 1.81689 * (((1 - math.exp((-1.54427 * 10 ** 6 * pulse_length * 10 ** -6))) * (
-                    0.0331869 + 6.05422 * 10 ** -7 * klystron_power * 10 ** 6)) * numpy.cos(phase)) ** 0.5
+                    0.0331869 + 6.05422 * 10 ** -7 * klystron_power)) * numpy.cos(phase)) ** 0.5
         return numpy.mean([bestcase, worstcase])
 
     def update_mag_field_coefficients(self):
