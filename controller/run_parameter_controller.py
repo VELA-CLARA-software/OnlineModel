@@ -339,39 +339,54 @@ class RunParameterController(QObject):
         else:
             self.finished_tracking = True
 
-    def app_sequence(self):
-        if self.model.data.scanDict['parameter_scan']:
-            try:
-                scan_start = float(self.model.data.scanDict['parameter_scan_from_value'])
-                scan_end = float(self.model.data.scanDict['parameter_scan_to_value'])
-                scan_step_size = float(self.model.data.scanDict['parameter_scan_step_size'])
-            except ValueError:
-                print("Enter a numerical value to conduct a scan")
-            par = self.model.data.scanDict['parameter']
-            basedir = str(self.model.data.parameterDict['simulation']['directory'])
-            basevalue = self.get_widget_value(self.get_object_by_accessible_name(par))
-            dictname, pv, param = self.split_accessible_name(par)
+    def setup_scan(self):
+        try:
+            scan_start = float(self.model.data.scanDict['parameter_scan_from_value'])
+            scan_end = float(self.model.data.scanDict['parameter_scan_to_value'])
+            scan_step_size = float(self.model.data.scanDict['parameter_scan_step_size'])
             scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
-            scan_no = 0
-            while not self.abort_scan and scan_no < len(scan_range):
-                self.view.progressBar.setValue(scan_no+1)
-                current_scan_value = round(scan_range[scan_no], 5)
-                self.scan_progress = scan_no+1
-                print('Scanning['+str(scan_no)+']: Setting ', par, ' to ', current_scan_value)
-                self.update_widgets_with_values(par, current_scan_value)
-                subdir = (basedir + '/' + pv + '_' + str(current_scan_value)).replace('//','/')
-                self.update_widgets_with_values('simulation:directory', subdir)
-                self.run_script()
-                scan_no += 1
-                current_scan_value += scan_step_size
+            self.view.progressBar.setRange(0,len(scan_range))
+        except ValueError:
+            print("Enter a numerical value to conduct a scan")
+        self.scan_parameter = self.model.data.scanDict['parameter']
+        self.scan_basedir = str(self.model.data.parameterDict['simulation']['directory'])
+        self.scan_basevalue = self.get_widget_value(self.get_object_by_accessible_name(self.scan_parameter))
+        dictname, pv, param = self.split_accessible_name(self.scan_parameter)
+        self.scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
+        self.scan_no = 0
+        self.continue_scan()
+
+    def do_scan(self):
+        self.model.run_script()
+        self.scan_no += 1
+
+    def continue_scan(self):
+        if not self.abort_scan and self.scan_no < len(self.scan_range):
+            self.view.progressBar.setValue(self.scan_no+1)
+            self.scan_progress = self.scan_no+1
+            current_scan_value = round(self.scan_range[self.scan_no], 5)
+            print('Scanning['+str(self.scan_no)+']: Setting ', self.scan_parameter, ' to ', current_scan_value)
+            self.update_widgets_with_values(self.scan_parameter, current_scan_value)
+            dictname, pv, param = self.split_accessible_name(self.scan_parameter)
+            subdir = (self.scan_basedir + '/' + pv + '_' + str(current_scan_value)).replace('//','/')
+            self.update_widgets_with_values('simulation:directory', subdir)
+            self.thread = GenericThread(self.do_scan)
+            self.thread.finished.connect(self.continue_scan)
+            self.thread.start()
+        else:
             self.abort_scan = False
             self.enable_run_button(scan=self.model.data.scanDict['parameter_scan'])
             self.reset_progress_bar_timer()
-            self.update_widgets_with_values(par, basevalue)
-            self.update_widgets_with_values('simulation:directory', basedir)
+            self.update_widgets_with_values(self.scan_parameter, self.scan_basevalue)
+            self.update_widgets_with_values('simulation:directory', self.scan_basedir)
+
+    def app_sequence(self):
+        if self.model.data.scanDict['parameter_scan']:
+            self.setup_scan()
         else:
-            self.run_script()
-            self.enable_run_button(scan=self.model.data.scanDict['parameter_scan'])
+            self.thread = GenericThread(self.do_scan)
+            self.thread.finished.connect(self.enable_run_button)
+            self.thread.start()
         return
 
     def reset_progress_bar_timer(self):
@@ -382,25 +397,5 @@ class RunParameterController(QObject):
         self.timer.start()
 
     def run_astra(self):
-        if self.model.data.scanDict['parameter_scan']:
-            scan_start = float(self.model.data.scanDict['parameter_scan_from_value'])
-            scan_end = float(self.model.data.scanDict['parameter_scan_to_value'])
-            scan_step_size = float(self.model.data.scanDict['parameter_scan_step_size'])
-            scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
-            self.view.progressBar.setRange(0,len(scan_range))
         self.disable_run_button(scan=self.model.data.scanDict['parameter_scan'])
         self.app_sequence()
-
-    def run_script(self):
-        self.thread = GenericThread(self.model.run_script)
-        self.thread.finished.connect(self.toggle_finished_tracking)
-        self.finished_tracking = False
-        self.thread.start()
-        while not self.finished_tracking:
-            qApp.processEvents()
-            time.sleep(0.1)
-        return
-
-    # @pyqtSlot()
-    # def handle_existent_file(self):
-        # print('Directory '+self.model.data.self.model.data.runParameterDict['directory_line_edit'] + 'already exists')
