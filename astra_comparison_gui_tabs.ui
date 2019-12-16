@@ -1161,7 +1161,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>INJ:CLA-L01-CAV-SOL-01:field_amplitude</string>
+                  <string>INJ:CLA-L01-MAG-SOL-01:field_amplitude</string>
                  </property>
                  <property name="suffix">
                   <string> T</string>
@@ -1208,7 +1208,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>INJ:CLA-L01-CAV-SOL-02:field_amplitude</string>
+                  <string>INJ:CLA-L01-MAG-SOL-02:field_amplitude</string>
                  </property>
                  <property name="suffix">
                   <string> T</string>

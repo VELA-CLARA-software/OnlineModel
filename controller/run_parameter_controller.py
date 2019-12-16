@@ -358,7 +358,6 @@ class RunParameterController(QObject):
 
     def do_scan(self):
         self.model.run_script()
-        self.scan_no += 1
 
     def continue_scan(self):
         if not self.abort_scan and self.scan_no < len(self.scan_range):
@@ -373,6 +372,7 @@ class RunParameterController(QObject):
             self.thread = GenericThread(self.do_scan)
             self.thread.finished.connect(self.continue_scan)
             self.thread.start()
+            self.scan_no += 1
         else:
             self.abort_scan = False
             self.enable_run_button(scan=self.model.data.scanDict['parameter_scan'])

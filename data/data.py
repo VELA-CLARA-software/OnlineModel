@@ -132,26 +132,26 @@ class Data(object):
                 self.l01_values['CLA-L01-CAV'].update({'type': 'cavity'})
                 self.l01_values['CLA-L01-CAV'].update({'phase': cavity['phase']})
                 self.l01_values['CLA-L01-CAV'].update({'field_amplitude': cavity['phase']})
-                self.l01_values.update({'CLA-L01-CAV-SOL-01': collections.OrderedDict()})
-                self.l01_values['CLA-L01-CAV-SOL-01'].update({'type': 'solenoid'})
-                self.l01_values['CLA-L01-CAV-SOL-01'].update({'cavity': cavity['objectname']})
-                self.l01_values['CLA-L01-CAV-SOL-01'].update(
-                    {'field_amplitude': cavity['sub_elements']['CLA-L01-CAV-SOL-01']['field_amplitude']})
-                self.l01_values.update({'CLA-L01-CAV-SOL-02': collections.OrderedDict()})
-                self.l01_values['CLA-L01-CAV-SOL-02'].update({'type': 'solenoid'})
-                self.l01_values['CLA-L01-CAV-SOL-02'].update({'cavity': cavity['objectname']})
-                self.l01_values['CLA-L01-CAV-SOL-02'].update(
-                    {'field_amplitude': cavity['sub_elements']['CLA-L01-CAV-SOL-02']['field_amplitude']})
-                self.l01_values['CLA-L01-CAV-SOL-01'].update({'sub_elements': collections.OrderedDict()})
-                self.l01_values['CLA-L01-CAV-SOL-01']['sub_elements'].update(
-                    {'CLA-L01-CAV-SOL-01': collections.OrderedDict()})
-                self.l01_values['CLA-L01-CAV-SOL-01']['sub_elements']['CLA-L01-CAV-SOL-01'].update(
-                    {'field_amplitude': self.l01_values['CLA-L01-CAV-SOL-01']['field_amplitude']})
-                self.l01_values['CLA-L01-CAV-SOL-02'].update({'sub_elements': collections.OrderedDict()})
-                self.l01_values['CLA-L01-CAV-SOL-02']['sub_elements'].update(
-                    {'CLA-L01-CAV-SOL-02': collections.OrderedDict()})
-                self.l01_values['CLA-L01-CAV-SOL-02']['sub_elements']['CLA-L01-CAV-SOL-02'].update(
-                    {'field_amplitude': self.l01_values['CLA-L01-CAV-SOL-02']['field_amplitude']})
+                self.l01_values.update({'CLA-L01-MAG-SOL-01': collections.OrderedDict()})
+                self.l01_values['CLA-L01-MAG-SOL-01'].update({'type': 'solenoid'})
+                self.l01_values['CLA-L01-MAG-SOL-01'].update({'cavity': cavity['objectname']})
+                self.l01_values['CLA-L01-MAG-SOL-01'].update(
+                    {'field_amplitude': cavity['sub_elements']['CLA-L01-MAG-SOL-01']['field_amplitude']})
+                self.l01_values.update({'CLA-L01-MAG-SOL-02': collections.OrderedDict()})
+                self.l01_values['CLA-L01-MAG-SOL-02'].update({'type': 'solenoid'})
+                self.l01_values['CLA-L01-MAG-SOL-02'].update({'cavity': cavity['objectname']})
+                self.l01_values['CLA-L01-MAG-SOL-02'].update(
+                    {'field_amplitude': cavity['sub_elements']['CLA-L01-MAG-SOL-02']['field_amplitude']})
+                self.l01_values['CLA-L01-MAG-SOL-01'].update({'sub_elements': collections.OrderedDict()})
+                self.l01_values['CLA-L01-MAG-SOL-01']['sub_elements'].update(
+                    {'CLA-L01-MAG-SOL-01': collections.OrderedDict()})
+                self.l01_values['CLA-L01-MAG-SOL-01']['sub_elements']['CLA-L01-MAG-SOL-01'].update(
+                    {'field_amplitude': self.l01_values['CLA-L01-MAG-SOL-01']['field_amplitude']})
+                self.l01_values['CLA-L01-MAG-SOL-02'].update({'sub_elements': collections.OrderedDict()})
+                self.l01_values['CLA-L01-MAG-SOL-02']['sub_elements'].update(
+                    {'CLA-L01-MAG-SOL-02': collections.OrderedDict()})
+                self.l01_values['CLA-L01-MAG-SOL-02']['sub_elements']['CLA-L01-MAG-SOL-02'].update(
+                    {'field_amplitude': self.l01_values['CLA-L01-MAG-SOL-02']['field_amplitude']})
         self.charge_values.update({'charge': collections.OrderedDict()})
         self.charge_values['charge'].update({'type': 'generator'})
         self.charge_values['charge'].update({'value': self.Framework.generator.charge})
