@@ -75,7 +75,15 @@ class RunParameterController(QObject):
                                ]
         self.formLayoutList = [formLayout for layout in self.runParameterLayouts for
                           formLayout in layout.findChildren((QFormLayout,QGridLayout))]
-        #self.model.data.self.model.data.runParameterDict = self.initialize_run_parameter_data()
+        self.accessibleNames = {}
+        for layout in self.formLayoutList:
+            childCount = layout.count()
+            for child in range(0,childCount):
+                widget = layout.itemAt(child).widget()
+                if widget is not None and widget.accessibleName() is not None:
+                    self.accessibleNames[widget.accessibleName()] = widget
+                else:
+                    pass
         self.update_macro_particle_combo()
         self.initialize_run_parameter_data()
         self.model.data.scannableParametersDict = self.get_scannable_parameters_dict()
@@ -151,13 +159,9 @@ class RunParameterController(QObject):
                 print('Error ', dictname, pv, param, value)
 
     def analyse_children(self, layout):
-        childCount = layout.count()
-        for child in range(0,childCount):
-            widget = layout.itemAt(child).widget()
-            if type(widget) is QWidget:
-                for layout in widget.findChildren((QFormLayout,QGridLayout)):
-                    self.analyse_children(layout)
-            elif type(widget) is QLineEdit:
+        for k, v in self.accessibleNames.items():
+            widget = v
+            if type(widget) is QLineEdit:
                 widget.textChanged.connect(self.update_value_in_dict)
                 widget.textChanged.emit(widget.placeholderText())
             elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
@@ -203,16 +207,10 @@ class RunParameterController(QObject):
         self.update_widgets_with_values(aname, value)
 
     def get_object_by_accessible_name(self, aname):
-        for layout in self.formLayoutList:
-            childCount = layout.count()
-            for child in range(0,childCount):
-                widget = layout.itemAt(child).widget()
-                try:
-                    if widget.accessibleName() == aname:
-                        return widget
-                except:
-                    pass
-        return None
+        if aname in self.accessibleNames:
+            return self.accessibleNames[aname]
+        else:
+            return None
 
     def update_widgets_with_values(self, aname, value):
         if isinstance(value, (dict)):
@@ -223,8 +221,10 @@ class RunParameterController(QObject):
             if widget is not None:
                 if type(widget) is QLineEdit:
                     widget.setText(str(value))
-                if type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
-                    widget.setValue(value)
+                if type(widget) is QDoubleSpinBox:
+                    widget.setValue(float(value))
+                if type(widget) is QSpinBox:
+                    widget.setValue(int(value))
                 if type(widget) is QCheckBox:
                     if value is True:
                         widget.setChecked(True)
@@ -310,13 +310,34 @@ class RunParameterController(QObject):
             self.view.parameter_scan_to_value.setEnabled(False)
             self.view.parameter_scan_step_size.setEnabled(False)
 
-    def disable_run_button(self):
-        self.view.runButton.setEnabled(False)
+    def disable_run_button(self, scan=False):
+        if not scan:
+            self.view.runButton.setEnabled(False)
+        else:
+            self.view.runButton.clicked.disconnect()
+            self.view.runButton.setText('Abort')
+            self.view.runButton.clicked.connect(self.abort_ongoing_scan)
         return
 
-    def enable_run_button(self):
-        self.view.runButton.setEnabled(True)
+    def abort_ongoing_scan(self):
+        self.abort_scan = True
+
+    def enable_run_button(self, scan=False):
+        self.view.runButton.setText('Track')
+        self.view.runButton.clicked.disconnect()
+        if not scan:
+            self.view.runButton.setEnabled(True)
+        else:
+            pass
+        self.view.runButton.clicked.connect(self.run_astra)
+        self.view.runButton.clicked.connect(lambda: self.export_parameter_values_to_yaml_file(auto=True))
         return
+
+    def toggle_finished_tracking(self):
+        if self.finished_tracking:
+            self.finished_tracking = False
+        else:
+            self.finished_tracking = True
 
     def app_sequence(self):
         if self.model.data.scanDict['parameter_scan']:
@@ -328,25 +349,29 @@ class RunParameterController(QObject):
                 print("Enter a numerical value to conduct a scan")
             par = self.model.data.scanDict['parameter']
             basedir = str(self.model.data.parameterDict['simulation']['directory'])
+            basevalue = self.get_widget_value(self.get_object_by_accessible_name(par))
             dictname, pv, param = self.split_accessible_name(par)
             scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
-            basevalue = self.get_widget_value(self.get_object_by_accessible_name(par))
-            for i, current_scan_value in enumerate(scan_range):
-                current_scan_value = round(current_scan_value, 5)
-                self.scan_progress = i+1
-                print('Scanning['+str(i)+']: Setting ', par, ' to ', current_scan_value)
+            scan_no = 0
+            while not self.abort_scan and scan_no < len(scan_range):
+                self.view.progressBar.setValue(scan_no+1)
+                current_scan_value = round(scan_range[scan_no], 5)
+                self.scan_progress = scan_no+1
+                print('Scanning['+str(scan_no)+']: Setting ', par, ' to ', current_scan_value)
                 self.update_widgets_with_values(par, current_scan_value)
                 subdir = (basedir + '/' + pv + '_' + str(current_scan_value)).replace('//','/')
                 self.update_widgets_with_values('simulation:directory', subdir)
+                self.run_script()
+                scan_no += 1
                 current_scan_value += scan_step_size
-                self.model.run_script()
-                if self.abort_scan:
-                    self.abort_scan = False
-                    break
+            self.abort_scan = False
+            self.enable_run_button(scan=self.model.data.scanDict['parameter_scan'])
+            self.reset_progress_bar_timer()
             self.update_widgets_with_values(par, basevalue)
             self.update_widgets_with_values('simulation:directory', basedir)
         else:
-            self.model.run_script()
+            self.run_script()
+            self.enable_run_button(scan=self.model.data.scanDict['parameter_scan'])
         return
 
     def reset_progress_bar_timer(self):
@@ -364,14 +389,17 @@ class RunParameterController(QObject):
             scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
             self.view.progressBar.setRange(0,len(scan_range))
         self.disable_run_button(scan=self.model.data.scanDict['parameter_scan'])
-        self.sm.start()
-        self.thread = GenericThread(self.app_sequence)
-        self.thread.finished.connect(self.enable_run_button)
-        self.thread.finished.connect(self.sm.stop)
-        self.thread.finished.connect(self.reset_progress_bar_timer)
+        self.app_sequence()
+
+    def run_script(self):
+        self.thread = GenericThread(self.model.run_script)
+        self.thread.finished.connect(self.toggle_finished_tracking)
+        self.finished_tracking = False
         self.thread.start()
-
-
+        while not self.finished_tracking:
+            qApp.processEvents()
+            time.sleep(0.1)
+        return
 
     # @pyqtSlot()
     # def handle_existent_file(self):
