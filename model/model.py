@@ -82,19 +82,35 @@ class Model(object):
             lattice = self.data.Framework[l]
             elements = lattice.elements.values()
             for e in elements:
-                e.csr_enable = True
-                e.sr_enable = True
-                e.isr_enable = True
+                e.csr_enable = c
+                e.sr_enable = c
+                e.isr_enable = c
                 e.csr_bins = self.data.simulationDict['csr_bins'][l]
                 e.current_bins = 0
-                e.longitudinal_wakefield_enable = True
-                e.transverse_wakefield_enable = True
-            lattice.csrDrifts = True
+                e.longitudinal_wakefield_enable = c
+                e.transverse_wakefield_enable = c
+            lattice.csrDrifts = c
+
+    def update_LSC(self):
+        for l, c in self.data.simulationDict['lsc'].items():
+            lattice = self.data.Framework[l]
+            elements = lattice.elements.values()
+            for e in elements:
+                e.lsc_enable = c
+                e.lsc_bins = self.data.simulationDict['lsc_bins'][l]
+            #     e.smoothing_half_width = 1
+            #     e.lsc_high_frequency_cutoff_start = -1#0.25
+            #     e.lsc_high_frequency_cutoff_end = -1#0.33
+            # lattice.lsc_high_frequency_cutoff_start = -1#0.25
+            # lattice.lsc_high_frequency_cutoff_end = -1#0.33
+            lattice.lsc_bins = self.data.simulationDict['lsc_bins'][l]
+            lattice.lscDrifts = c
 
     def run_script(self):
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
         self.update_tracking_codes()
         self.update_CSR()
+        self.update_LSC()
         startLattice = self.data.simulationDict['starting_lattice']
         endLattice = self.data.simulationDict['final_lattice']
         self.data.Framework.setSubDirectory(str(self.data.parameterDict['simulation']['directory']))
