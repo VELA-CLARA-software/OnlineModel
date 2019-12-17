@@ -100,10 +100,8 @@ class RunParameterController(QObject):
 
     def connect_auto_load_settings(self, state):
         if state:
-            print('Autoload now true!')
             self.view.directory.textChanged[str].connect(self.load_settings_from_directory)
         else:
-            print('Autoload now false!')
             try:
                 self.view.directory.textChanged[str].disconnect(self.load_settings_from_directory)
             except:
