@@ -146,7 +146,9 @@ class Data(object):
         self.laser_values.update({'sig_clock': collections.OrderedDict()})
         self.laser_values['sig_clock'].update({'type': 'generator'})
         self.laser_values['sig_clock'].update({'value': self.Framework.generator.parameters['sig_clock']})
-        self.tracking_code.update({'tracking_code':  collections.OrderedDict(), 'csr':  collections.OrderedDict(), 'csr_bins':  collections.OrderedDict()})
+        self.tracking_code.update({'tracking_code':  collections.OrderedDict(), 'csr':  collections.OrderedDict(), 'csr_bins':  collections.OrderedDict(),
+            'lsc':  collections.OrderedDict(), 'lsc_bins':  collections.OrderedDict(),
+        })
 
     def get_pv_alias(self, dict, name, param=None, rf_type=None):
         if dict[name]['type'] == 'quadrupole':

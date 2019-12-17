@@ -77,9 +77,24 @@ class Model(object):
         for l, c in self.data.simulationDict['tracking_code'].items():
             self.data.Framework.change_Lattice_Code(l, c)
 
+    def update_CSR(self):
+        for l, c in self.data.simulationDict['csr'].items():
+            lattice = self.data.Framework[l]
+            elements = lattice.elements.values()
+            for e in elements:
+                e.csr_enable = True
+                e.sr_enable = True
+                e.isr_enable = True
+                e.csr_bins = self.data.simulationDict['csr_bins'][l]
+                e.current_bins = 0
+                e.longitudinal_wakefield_enable = True
+                e.transverse_wakefield_enable = True
+            lattice.csrDrifts = True
+
     def run_script(self):
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
         self.update_tracking_codes()
+        self.update_CSR()
         startLattice = self.data.simulationDict['starting_lattice']
         endLattice = self.data.simulationDict['final_lattice']
         self.data.Framework.setSubDirectory(str(self.data.parameterDict['simulation']['directory']))
