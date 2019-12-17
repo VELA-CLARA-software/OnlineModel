@@ -24,8 +24,9 @@ class Data(object):
         object.__init__(self)
         self.my_name = "data"
         self.parameterDict = collections.OrderedDict()
-        self.parameterDict['lattice'] = collections.OrderedDict()
-        self.latticeDict = self.parameterDict['lattice']
+        self.lattices = ['INJ', 'S02', 'C2V', 'EBT', 'BA1']
+        [self.parameterDict.update({l:collections.OrderedDict()}) for l in self.lattices]
+        # self.latticeDict = self.parameterDict['lattice']
         self.parameterDict['scan'] = collections.OrderedDict()
         self.scanDict = self.parameterDict['scan']
         self.scanDict['parameter_scan'] = False
@@ -45,8 +46,8 @@ class Data(object):
 
     def initialise_data(self):
         # [self.runParameterDict.update({key: value}) for key, value in zip(data_keys, data_v)]
-        [self.latticeDict.update({key: value}) for key, value in self.quad_values.items()]
-        [self.latticeDict.update({key: value}) for key, value in self.rf_values.items()]
+        [[self.parameterDict[l].update({key: value}) for key, value in self.quad_values.items() if l in key] for l in self.lattices]
+        [self.parameterDict['INJ'].update({key: value}) for key, value in self.rf_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.laser_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.charge_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.number_of_particles.items()]
@@ -145,6 +146,9 @@ class Data(object):
         self.laser_values.update({'sig_clock': collections.OrderedDict()})
         self.laser_values['sig_clock'].update({'type': 'generator'})
         self.laser_values['sig_clock'].update({'value': self.Framework.generator.parameters['sig_clock']})
+        self.tracking_code.update({'tracking_code':  collections.OrderedDict(), 'csr':  collections.OrderedDict(), 'csr_bins':  collections.OrderedDict(),
+            'lsc':  collections.OrderedDict(), 'lsc_bins':  collections.OrderedDict(),
+        })
 
     def get_pv_alias(self, dict, name, param=None, rf_type=None):
         if dict[name]['type'] == 'quadrupole':
@@ -181,9 +185,9 @@ class Data(object):
         # print(value)
         return value
 
-    def get_energy_gain(self, dict, time_from=None, time_to=None, lattice=False):
-        if lattice:
-            for key, value in dict.items():
+    def get_energy_gain(self, time_from=None, time_to=None):
+        for l in self.lattices:
+            for key, value in self.parameterDict[l].items():
                 if value['type'] == 'cavity':
                     cavity_length = value['length']
                     pv_amp_alias = value['pv_root_alias'] + ":" + value['pv_field_amplitude_alias']
@@ -202,14 +206,12 @@ class Data(object):
                         value['field_amplitude'] = float(l01_energy_gain)
                     value['phase'] = phase
                     value['pulse_length'] = pulse_length
-            fudge = 0
-            total_energy_gain = gun_energy_gain + l01_energy_gain + fudge
-            return total_energy_gain
-        else:
-            return False
+        fudge = 0
+        total_energy_gain = gun_energy_gain + l01_energy_gain + fudge
+        return total_energy_gain
 
     def read_values_from_epics(self, dict, time_from=None, time_to=None, lattice=False):
-        self.total_energy_gain = self.get_energy_gain(dict, time_from, time_to, lattice)
+        self.total_energy_gain = self.get_energy_gain(time_from, time_to)
         speed_of_light = scipy.constants.speed_of_light / 1e6
         for key, value in dict.items():
             if value['type'] == 'quadrupole':
