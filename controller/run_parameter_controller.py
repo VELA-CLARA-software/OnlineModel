@@ -3,7 +3,8 @@ from PyQt4.QtGui import *
 from copy import copy,deepcopy
 from decimal import Decimal
 import run_parameters_parser as yaml_parser
-import sys, os, time
+import sys, os, math, epics, scipy.constants, numpy
+import json, requests, datetime, time
 import collections
 import numpy as np
 
@@ -71,7 +72,7 @@ class RunParameterController(QObject):
                                self.view.injector_parameter_groupbox,
                                self.view.simulation_parameter_groupbox,
                                self.view.scan_groupBox,
-                               self.view.directory_groupBox,
+                               self.view.directory_groupBox
                                ]
         self.formLayoutList = [formLayout for layout in self.runParameterLayouts for
                           formLayout in layout.findChildren((QFormLayout,QGridLayout))]
@@ -317,6 +318,25 @@ class RunParameterController(QObject):
             self.view.runButton.clicked.disconnect()
             self.view.runButton.setText('Abort')
             self.view.runButton.clicked.connect(self.abort_ongoing_scan)
+
+
+    def read_from_epics(self, time_from=None, time_to=None):
+        for l in self.model.data.lattices:
+            self.model.data.read_values_from_epics(self.model.data.parameterDict[l], lattice=True)
+            for key, value in self.model.data.parameterDict[l].items():
+                if value['type'] == "quadrupole":
+                    self.update_widgets_with_values(l + ':' + key + ':k1l', value['k1l'])
+                if value['type'] == "solenoid":
+                    self.update_widgets_with_values(l + ':' + key + ':field_amplitude', value['field_amplitude'])
+                if value['type'] == "cavity":
+                    self.update_widgets_with_values(l + ':' + key + ':phase', value['phase'])
+                    self.update_widgets_with_values(l + ':' + key + ':field_amplitude', value['field_amplitude'])
+        self.model.data.read_values_from_epics(self.model.data.parameterDict['generator'], lattice=False)
+        for key, value in self.model.data.parameterDict['generator'].items():
+            if key == "charge":
+                self.update_widgets_with_values('generator:' + key + ':value', value['value'])
+            # self.update_widget_from_dict(key)
+
         return
 
     def abort_ongoing_scan(self):

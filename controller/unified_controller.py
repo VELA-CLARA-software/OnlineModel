@@ -10,6 +10,7 @@ class UnifiedController():
             #self.rpc.enable_run_button()
             self.rpc.view.actionImport_YAML.triggered.connect(self.rpc.import_parameter_values_from_yaml_file)
             self.rpc.view.actionExport_YAML.triggered.connect(self.rpc.export_parameter_values_to_yaml_file)
+            self.rpc.view.actionRead_from_EPICS.triggered.connect(self.rpc.read_from_epics)
             #self.rpc.view.runButton.clicked.connect(self.rpc.run_astra)
             #self.rpc.view.runButton.clicked.connect(self.run_rpc_process)
             #self.ppc.view.runButton_post.clicked.connect(self.run_ppc_process)

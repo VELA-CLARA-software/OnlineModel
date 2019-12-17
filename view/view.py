@@ -1151,8 +1151,11 @@ class Ui_MainWindow(object):
         self.actionImport_YAML.setObjectName(_fromUtf8("actionImport_YAML"))
         self.actionExport_YAML = QtGui.QAction(MainWindow)
         self.actionExport_YAML.setObjectName(_fromUtf8("actionExport_YAML"))
+        self.actionRead_from_EPICS = QtGui.QAction(MainWindow)
+        self.actionRead_from_EPICS.setObjectName(_fromUtf8("actionRead_from_EPICS"))
         self.menuFile.addAction(self.actionImport_YAML)
         self.menuFile.addAction(self.actionExport_YAML)
+        self.menuFile.addAction(self.actionRead_from_EPICS)
         self.menubar.addAction(self.menuFile.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -1355,7 +1358,7 @@ class Ui_MainWindow(object):
         self.simulation_parameter_groupbox.setTitle(_translate("MainWindow", "Simulation Parameters", None))
         self.macro_particle.setAccessibleName(_translate("MainWindow", "generator:number_of_particles:value", None))
         self.charge_label.setText(_translate("MainWindow", "Charge", None))
-        self.doubleSpinBox_3.setAccessibleName(_translate("MainWindow", "generator:spot_size", None))
+        self.doubleSpinBox_3.setAccessibleName(_translate("MainWindow", "generator:spot_size:value", None))
         self.doubleSpinBox_3.setSuffix(_translate("MainWindow", " mm", None))
         self.laser_pulse_length_label.setText(_translate("MainWindow", "Laser Pulse Length (FWHM)", None))
         self.spot_size_label.setText(_translate("MainWindow", "Spot Size (sigma)", None))
@@ -1426,5 +1429,6 @@ class Ui_MainWindow(object):
         self.menuFile.setTitle(_translate("MainWindow", "File", None))
         self.actionImport_YAML.setText(_translate("MainWindow", "Import YAML", None))
         self.actionExport_YAML.setText(_translate("MainWindow", "Export YAML", None))
+        self.actionRead_from_EPICS.setText(_translate("MainWindow", "Read from EPICS", None))
 
 from pyqtgraph import PlotWidget

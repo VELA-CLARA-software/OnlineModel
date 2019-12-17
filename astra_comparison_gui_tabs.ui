@@ -1839,7 +1839,7 @@
               </size>
              </property>
              <property name="accessibleName">
-              <string>generator:spot_size</string>
+              <string>generator:spot_size:value</string>
              </property>
              <property name="suffix">
               <string> mm</string>
@@ -3070,6 +3070,7 @@
     </property>
     <addaction name="actionImport_YAML"/>
     <addaction name="actionExport_YAML"/>
+    <addaction name="actionRead_from_EPICS"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -3082,6 +3083,11 @@
   <action name="actionExport_YAML">
    <property name="text">
     <string>Export YAML</string>
+   </property>
+  </action>
+  <action name="actionRead_from_EPICS">
+   <property name="text">
+    <string>Read from EPICS</string>
    </property>
   </action>
  </widget>
