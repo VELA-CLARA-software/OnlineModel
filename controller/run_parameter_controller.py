@@ -93,10 +93,31 @@ class RunParameterController(QObject):
         self.view.bsol_track_checkBox.stateChanged.connect(self.toggle_BSOL_tracking)
         self.view.runButton.clicked.connect(self.run_astra)
         self.view.runButton.clicked.connect(lambda: self.export_parameter_values_to_yaml_file(auto=True))
-        self.value_to_be_checked = 0
-        self.sm = signalling_monitor(self.model, 'scan_progress')
-        self.sm.valueChanged.connect(self.view.progressBar.setValue)
+        self.view.loadSettingsButton.clicked.connect(self.load_settings_from_directory)
+        self.view.directory.textChanged[str].connect(self.check_load_settings_button)
+        self.view.directory.textChanged[str].emit(self.view.directory.text())
         self.abort_scan = False
+
+    def connect_auto_load_settings(self, state):
+        if state:
+            print('Autoload now true!')
+            self.view.directory.textChanged[str].connect(self.load_settings_from_directory)
+        else:
+            print('Autoload now false!')
+            try:
+                self.view.directory.textChanged[str].disconnect(self.load_settings_from_directory)
+            except:
+                pass
+
+    def check_load_settings_button(self, text):
+        if os.path.isfile(text + '/settings.yaml'):
+            self.view.loadSettingsButton.setEnabled(True)
+        else:
+            self.view.loadSettingsButton.setEnabled(False)
+
+    def load_settings_from_directory(self):
+        if os.path.isfile(self.model.data.parameterDict['simulation']['directory'] + '/settings.yaml'):
+            self.import_parameter_values_from_yaml_file(self.model.data.parameterDict['simulation']['directory'] + '/settings.yaml')
 
     def toggle_BSOL_tracking(self):
         widget = self.view.bsol_track_checkBox
@@ -239,12 +260,13 @@ class RunParameterController(QObject):
 
     ## Need to port this to the unified controller
     @pyqtSlot()
-    def import_parameter_values_from_yaml_file(self):
-        dialog = QFileDialog()
-        filename = QFileDialog.getOpenFileName(dialog, caption='Open file',
-                                                     directory=self.model.data.parameterDict['simulation']['directory'],
-                                                     filter="YAML files (*.YAML *.YML *.yaml *.yml)")
-        if not filename == '':
+    def import_parameter_values_from_yaml_file(self, filename=None):
+        if filename is None:
+            dialog = QFileDialog()
+            filename = QFileDialog.getOpenFileName(dialog, caption='Open file',
+                                                         directory=self.model.data.parameterDict['simulation']['directory'],
+                                                         filter="YAML files (*.YAML *.YML *.yaml *.yml)")
+        if not filename == '' and not filename is None and (filename[-4:].lower() == '.yml' or filename[-5:].lower() == '.yaml'):
             loaded_parameter_dict = yaml_parser.parse_parameter_input_file(filename)
             for (parameter, value) in loaded_parameter_dict.items():
                     self.update_widgets_with_values(parameter, value)
