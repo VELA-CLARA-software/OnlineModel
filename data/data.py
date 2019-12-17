@@ -184,25 +184,26 @@ class Data(object):
         return value
 
     def get_energy_gain(self, time_from=None, time_to=None):
-        for key, value in self.parameterDict['INJ'].items():
-            if value['type'] == 'cavity':
-                cavity_length = value['length']
-                pv_amp_alias = value['pv_root_alias'] + ":" + value['pv_field_amplitude_alias']
-                pv_phase_alias = value['pv_root_alias'] + ":" + value['pv_phase_alias']
-                forward_power = self.read_values_from_archiver(pv_amp_alias, time_from, time_to) * 10 ** 6
-                phase = 0 # self.read_values_from_archiver(pv_phase_alias, time_from, time_to)
-                if value['controller_name'] == "GUN10":
-                    pulse_length = 2.5
-                    gun_energy_gain = self.get_energy_from_rf(forward_power, phase, pulse_length) / cavity_length
-                    value.update({'energy_gain': float(gun_energy_gain)})
-                    value['field_amplitude'] = float(gun_energy_gain)
-                elif value['controller_name'] == "L01":
-                    pulse_length = 0.75
-                    l01_energy_gain = self.get_energy_from_rf(forward_power, phase, pulse_length) / cavity_length
-                    value.update({'energy_gain': float(l01_energy_gain)})
-                    value['field_amplitude'] = float(l01_energy_gain)
-                value['phase'] = phase
-                value['pulse_length'] = pulse_length
+        for l in self.lattices:
+            for key, value in self.parameterDict[l].items():
+                if value['type'] == 'cavity':
+                    cavity_length = value['length']
+                    pv_amp_alias = value['pv_root_alias'] + ":" + value['pv_field_amplitude_alias']
+                    pv_phase_alias = value['pv_root_alias'] + ":" + value['pv_phase_alias']
+                    forward_power = self.read_values_from_archiver(pv_amp_alias, time_from, time_to) * 10 ** 6
+                    phase = 0 # self.read_values_from_archiver(pv_phase_alias, time_from, time_to)
+                    if value['controller_name'] == "GUN10":
+                        pulse_length = 2.5
+                        gun_energy_gain = self.get_energy_from_rf(forward_power, phase, pulse_length) / cavity_length
+                        value.update({'energy_gain': float(gun_energy_gain)})
+                        value['field_amplitude'] = float(gun_energy_gain)
+                    elif value['controller_name'] == "L01":
+                        pulse_length = 0.75
+                        l01_energy_gain = self.get_energy_from_rf(forward_power, phase, pulse_length) / cavity_length
+                        value.update({'energy_gain': float(l01_energy_gain)})
+                        value['field_amplitude'] = float(l01_energy_gain)
+                    value['phase'] = phase
+                    value['pulse_length'] = pulse_length
         fudge = 0
         total_energy_gain = gun_energy_gain + l01_energy_gain + fudge
         return total_energy_gain
