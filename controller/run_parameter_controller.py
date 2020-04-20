@@ -1,5 +1,10 @@
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+try:
+    from PyQt4.QtCore import *
+    from PyQt4.QtGui import *
+except:
+    from PyQt5.QtCore import *
+    from PyQt5.QtGui import *
+    from PyQt5.QtWidgets import *
 from copy import copy,deepcopy
 from decimal import Decimal
 import run_parameters_parser as yaml_parser
@@ -125,7 +130,10 @@ class RunParameterController(QObject):
             self.view.sol_strength.valueChanged.emit(self.view.sol_strength.value())
         else:
             self.view.buckingsol_strength.setEnabled(True)
-            self.view.sol_strength.valueChanged.disconnect(self.set_BSOL_tracked_value)
+            try:
+                self.view.sol_strength.valueChanged.disconnect(self.set_BSOL_tracked_value)
+            except:
+                pass
 
     def set_BSOL_tracked_value(self, value):
         self.view.buckingsol_strength.setValue(float(-0.9*value))
@@ -163,6 +171,9 @@ class RunParameterController(QObject):
             if isinstance(value, QVariant):
                 value = value.toString()
             value = str(value)
+        else:
+            print('Widget Error! Type = ', type(widget))
+            value = None
         return value
 
     @pyqtSlot()
@@ -264,6 +275,8 @@ class RunParameterController(QObject):
             filename = QFileDialog.getOpenFileName(dialog, caption='Open file',
                                                          directory=self.model.data.parameterDict['simulation']['directory'],
                                                          filter="YAML files (*.YAML *.YML *.yaml *.yml)")
+        filename = filename[0] if isinstance(filename,tuple) else filename
+        filename = str(filename)
         if not filename == '' and not filename is None and (filename[-4:].lower() == '.yml' or filename[-5:].lower() == '.yaml'):
             loaded_parameter_dict = yaml_parser.parse_parameter_input_file(filename)
             for (parameter, value) in loaded_parameter_dict.items():
@@ -287,30 +300,38 @@ class RunParameterController(QObject):
                     edict.update({key:value})
         return export_dict
 
-    @pyqtSlot()
+    def create_subdirectory(self, dir):
+        if not os.path.exists(dir):
+            os.mkdir(dir)
+
     def export_parameter_values_to_yaml_file(self, auto=False):
         export_dict = dict()
-        data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'BA1', 'simulation']
+        data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'EBT', 'BA1', 'simulation']
         if self.model.data.scanDict['parameter_scan']:
             if not auto:
                 dialog = QFileDialog()
                 directory = QFileDialog.getExistingDirectory(dialog,"Select Directory")
-                filename =  directory + '/scan_settings.yaml'
+                filename =  '/scan_settings.yaml'
             else:
                 directory = self.model.data.parameterDict['simulation']['directory']
-                filename =  directory + '/scan_settings.yaml'
+                filename =  '/scan_settings.yaml'
             data_dicts.append('scan')
         else:
             if not auto:
                 dialog = QFileDialog()
                 filename, _filter = QFileDialog.getSaveFileNameAndFilter(dialog, caption='Save File', directory='c:\\',
                                                                      filter="YAML Files (*.YAML *.YML *.yaml *.yml")
+                filename = filename[0] if isinstance(filename,tuple) else filename
+                dirctory, filename = os.path.split(filename)
             else:
-                filename = self.model.data.parameterDict['simulation']['directory'] + '/settings.yaml'
+                directory = self.model.data.parameterDict['simulation']['directory']
+                filename = 'settings.yaml'
         if not filename == "":
+            print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
+            self.create_subdirectory(directory)
             for n in data_dicts:
                 export_dict = self.convert_data_types(export_dict, self.model.data.parameterDict[n], n)
-            yaml_parser.write_parameter_output_file(str(filename), export_dict)
+            yaml_parser.write_parameter_output_file(str(os.path.relpath(directory + '/' + filename)), export_dict)
         else:
             print( 'Failed to export, please provide a filename.')
 
@@ -380,6 +401,7 @@ class RunParameterController(QObject):
             self.finished_tracking = True
 
     def setup_scan(self):
+        self.export_parameter_values_to_yaml_file(auto=True)
         try:
             scan_start = float(self.model.data.scanDict['parameter_scan_from_value'])
             scan_end = float(self.model.data.scanDict['parameter_scan_to_value'])

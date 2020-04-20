@@ -152,14 +152,14 @@ class Model(object):
 
         [self.update_framework_elements(self.data.parameterDict[l]) for l in self.data.lattices]
         if self.data.parameterDict['simulation']['bsol_tracking']:
-            self.data.Framework.modifyElement('CLA-LRG1-MAG-BSOL-01', 'field_amplitude', 0.3462 * 0.9 * self.data.Framework['CLA-LRG1-MAG-SOL-01']['field_amplitude'])
+            self.data.Framework.modifyElement('CLA-LRG1-MAG-BSOL-01', 'field_amplitude', -0.3462 * 0.9 * self.data.Framework['CLA-LRG1-MAG-SOL-01']['field_amplitude'])
         if scan==True and type is not None:
             print(self.data.parameterDict[dictname][pv])
         self.data.Framework.generator.number_of_particles = int(2**(3*int(self.data.generatorDict['number_of_particles']['value'])))
         self.data.Framework.generator.charge = 1e-9*float(self.data.generatorDict['charge']['value'])
         self.data.Framework.generator.sig_clock = float(self.data.generatorDict['sig_clock']['value']) / (2354.82)
-        self.data.Framework.generator.sig_x = self.data.generatorDict['sig_x']['value']
-        self.data.Framework.generator.sig_y = self.data.generatorDict['sig_y']['value']
+        self.data.Framework.generator.sig_x = self.data.generatorDict['spot_size']['value']
+        self.data.Framework.generator.sig_y = self.data.generatorDict['spot_size']['value']
 
     def path_command_ensemble(self, script, dictionary):
         path_command = self.pathscript + script

@@ -1,5 +1,10 @@
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+try:
+    from PyQt4.QtCore import *
+    from PyQt4.QtGui import *
+except:
+    from PyQt5.QtCore import *
+    from PyQt5.QtGui import *
+    from PyQt5.QtWidgets import *
 from copy import copy, deepcopy
 import os
 import shutil
@@ -165,4 +170,3 @@ class PostProcessingController(QObject):
         pixmap_scaled = pixmap.scaled(0.75 * self.model.width, 0.6 * self.model.height, Qt.KeepAspectRatio)
         scene.addPixmap(pixmap_scaled)
         view.setScene(scene)
-

@@ -1,12 +1,17 @@
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+try:
+    from PyQt4.QtCore import *
+    from PyQt4.QtGui import *
+except:
+    from PyQt5.QtCore import *
+    from PyQt5.QtGui import *
+    from PyQt5.QtWidgets import *
 from copy import copy,deepcopy
 from decimal import Decimal
 import run_parameters_parser as yaml_parser
 import sys, os
 sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
 sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
-from SimulationFramework.Modules.online_model_plotter import astraPlotWidget
+from SimulationFramework.Modules.online_model_plotter import onlineModelPlotter
 
 class GenericThread(QThread):
     signal = pyqtSignal()
@@ -39,6 +44,6 @@ class DynamicPlotController(QObject):
         self.model = model
         self.view = view
         self.view.main_tab_widget.removeTab(2)
-        self.astraPlot = astraPlotWidget('./directory_summary_line_edit/')
+        self.astraPlot = onlineModelPlotter('./directory_summary_line_edit/')
         self.view.post_tab = self.astraPlot
         self.view.main_tab_widget.addTab(self.astraPlot, "Plots")

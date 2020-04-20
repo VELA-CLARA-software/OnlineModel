@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1026</width>
-    <height>784</height>
+    <height>786</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -71,7 +71,16 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -421,7 +430,16 @@
         <item row="3" column="1" colspan="3">
          <widget class="QWidget" name="widget_2" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -675,7 +693,16 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -999,7 +1026,16 @@
            <bool>false</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -1394,13 +1430,13 @@
                    <widget class="QDoubleSpinBox" name="buckingsol_strength">
                     <property name="minimumSize">
                      <size>
-                      <width>130</width>
+                      <width>115</width>
                       <height>0</height>
                      </size>
                     </property>
                     <property name="maximumSize">
                      <size>
-                      <width>150</width>
+                      <width>115</width>
                       <height>16777215</height>
                      </size>
                     </property>
@@ -1431,7 +1467,7 @@
                    <widget class="QCheckBox" name="bsol_track_checkBox">
                     <property name="minimumSize">
                      <size>
-                      <width>0</width>
+                      <width>20</width>
                       <height>20</height>
                      </size>
                     </property>
@@ -1455,6 +1491,9 @@
                     </property>
                     <property name="text">
                      <string/>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
@@ -1510,7 +1549,16 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -2273,7 +2321,16 @@
               <bool>true</bool>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
-              <property name="margin">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
                <number>0</number>
               </property>
               <item row="0" column="2">
@@ -2289,7 +2346,7 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>110</width>
+                  <width>96</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -2368,7 +2425,7 @@
                 </property>
                 <property name="minimumSize">
                  <size>
-                  <width>110</width>
+                  <width>96</width>
                   <height>0</height>
                  </size>
                 </property>
@@ -2467,7 +2524,16 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -3391,6 +3457,7 @@
      <string>Settings</string>
     </property>
     <addaction name="actionAuto_load_Settings"/>
+    <addaction name="actionClean_Directory"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSettings"/>
@@ -3417,6 +3484,14 @@
    </property>
    <property name="text">
     <string>Auto-load Settings</string>
+   </property>
+  </action>
+  <action name="actionClean_Directory">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Clean Directory</string>
    </property>
   </action>
  </widget>
