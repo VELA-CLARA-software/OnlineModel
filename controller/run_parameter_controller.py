@@ -302,7 +302,7 @@ class RunParameterController(QObject):
 
     def create_subdirectory(self, dir):
         if not os.path.exists(dir):
-            os.mkdir(dir)
+            os.makedirs(dir, exist_ok=True)
 
     def export_parameter_values_to_yaml_file(self, auto=False):
         export_dict = dict()
