@@ -38,6 +38,7 @@ class Data(object):
         self.Framework = Fw.Framework(directory=directory_summary, clean=False, verbose=True)
         print('self.Framework.master_lattice_location = ', self.Framework.master_lattice_location)
         self.Framework.defineElegantCommand(location=[self.Framework.master_lattice_location+'Codes/elegant'])
+        os.environ['RPN_DEFNS'] = self.Framework.master_lattice_location+'Codes/defns.rpn'
         self.Framework.loadSettings('Lattices/CLA10-BA1_OM.def')
         self.my_name = "data"
         self.get_data()
