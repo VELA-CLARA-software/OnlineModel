@@ -36,6 +36,8 @@ class Data(object):
         self.generatorDict = self.parameterDict['generator']
         self.scannableParametersDict = collections.OrderedDict()
         self.Framework = Fw.Framework(directory=directory_summary, clean=False, verbose=True)
+        print('self.Framework.master_lattice_location = ', self.Framework.master_lattice_location)
+        self.Framework.defineElegantCommand(location=[self.Framework.master_lattice_location+'Codes/elegant'])
         self.Framework.loadSettings('Lattices/CLA10-BA1_OM.def')
         self.my_name = "data"
         self.get_data()
