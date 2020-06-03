@@ -71,16 +71,7 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
@@ -427,19 +418,36 @@
           </layout>
          </widget>
         </item>
+        <item row="2" column="4">
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="0">
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
         <item row="3" column="1" colspan="3">
          <widget class="QWidget" name="widget_2" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
@@ -465,59 +473,10 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="4">
-               <widget class="QLineEdit" name="parameter_scan_to_value">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="accessibleName">
-                 <string>scan:parameter_scan_to_value</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="3">
-               <widget class="QLabel" name="parameter_scan_to_value_label_2">
-                <property name="text">
-                 <string>Scan To:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="1" column="2" colspan="5">
-               <widget class="QComboBox" name="parameter">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="accessibleName">
-                 <string>scan:parameter</string>
-                </property>
-               </widget>
-              </item>
               <item row="2" column="5">
                <widget class="QLabel" name="parameter_scan_step_size_label_2">
                 <property name="text">
                  <string>Step Size:</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="2">
-               <widget class="QLineEdit" name="parameter_scan_from_value">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="accessibleName">
-                 <string>scan:parameter_scan_from_value</string>
                 </property>
                </widget>
               </item>
@@ -550,6 +509,55 @@
                 </property>
                </widget>
               </item>
+              <item row="1" column="2" colspan="5">
+               <widget class="QComboBox" name="parameter">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="accessibleName">
+                 <string>scan:parameter</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="4">
+               <widget class="QLineEdit" name="parameter_scan_to_value">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="accessibleName">
+                 <string>scan:parameter_scan_to_value</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="2">
+               <widget class="QLineEdit" name="parameter_scan_from_value">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="accessibleName">
+                 <string>scan:parameter_scan_from_value</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="3">
+               <widget class="QLabel" name="parameter_scan_to_value_label_2">
+                <property name="text">
+                 <string>Scan To:</string>
+                </property>
+               </widget>
+              </item>
              </layout>
             </widget>
            </item>
@@ -562,6 +570,16 @@
               <bool>false</bool>
              </property>
              <layout class="QGridLayout" name="directory_form_layout">
+              <item row="0" column="4">
+               <widget class="QPushButton" name="runButton">
+                <property name="accessibleName">
+                 <string>runButton</string>
+                </property>
+                <property name="text">
+                 <string>Track</string>
+                </property>
+               </widget>
+              </item>
               <item row="0" column="2">
                <widget class="QLineEdit" name="directory">
                 <property name="minimumSize">
@@ -574,7 +592,13 @@
                  <string>simulation:directory</string>
                 </property>
                 <property name="text">
-                 <string>./test/</string>
+                 <string/>
+                </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
+                <property name="placeholderText">
+                 <string>&lt;Run Directory&gt;</string>
                 </property>
                </widget>
               </item>
@@ -585,13 +609,19 @@
                 </property>
                </widget>
               </item>
-              <item row="0" column="4">
-               <widget class="QPushButton" name="runButton">
+              <item row="2" column="4">
+               <widget class="QCheckBox" name="checkBox">
                 <property name="accessibleName">
-                 <string>runButton</string>
+                 <string>simulation:track</string>
+                </property>
+                <property name="accessibleDescription">
+                 <string/>
                 </property>
                 <property name="text">
-                 <string>Track</string>
+                 <string>Track?</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>
@@ -621,53 +651,11 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="4">
-               <widget class="QCheckBox" name="checkBox">
-                <property name="accessibleName">
-                 <string>simulation:track</string>
-                </property>
-                <property name="accessibleDescription">
-                 <string/>
-                </property>
-                <property name="text">
-                 <string>Track?</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
              </layout>
             </widget>
            </item>
           </layout>
          </widget>
-        </item>
-        <item row="2" column="4">
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="0">
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
         </item>
         <item row="2" column="2">
          <widget class="QGroupBox" name="c2v_parameter_groupbox">
@@ -693,16 +681,7 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
@@ -1026,16 +1005,7 @@
            <bool>false</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
@@ -1525,6 +1495,19 @@
           </layout>
          </widget>
         </item>
+        <item row="0" column="2">
+         <spacer name="verticalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
         <item row="2" column="3">
          <widget class="QGroupBox" name="ba1_parameter_groupbox">
           <property name="minimumSize">
@@ -1549,16 +1532,7 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
@@ -2034,19 +2008,6 @@
           </layout>
          </widget>
         </item>
-        <item row="0" column="2">
-         <spacer name="verticalSpacer_7">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
         <item row="1" column="1">
          <widget class="QGroupBox" name="simulation_parameter_groupbox">
           <property name="sizePolicy">
@@ -2321,16 +2282,7 @@
               <bool>true</bool>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
-              <property name="leftMargin">
-               <number>0</number>
-              </property>
-              <property name="topMargin">
-               <number>0</number>
-              </property>
-              <property name="rightMargin">
-               <number>0</number>
-              </property>
-              <property name="bottomMargin">
+              <property name="margin">
                <number>0</number>
               </property>
               <item row="0" column="2">
@@ -2500,6 +2452,19 @@
           </layout>
          </widget>
         </item>
+        <item row="4" column="1">
+         <spacer name="verticalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
         <item row="1" column="3">
          <widget class="QGroupBox" name="vela_parameter_groupbox">
           <property name="minimumSize">
@@ -2524,16 +2489,7 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
            <item>
@@ -2964,19 +2920,6 @@
            </item>
           </layout>
          </widget>
-        </item>
-        <item row="4" column="1">
-         <spacer name="verticalSpacer_8">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </widget>

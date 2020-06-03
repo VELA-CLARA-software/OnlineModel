@@ -4,17 +4,21 @@ import time
 import stat
 import numpy as np
 from copy import deepcopy
+import collections
 
 sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
 sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
 import SimulationFramework.Framework as Fw
+sys.path.append(os.path.abspath(__file__+'/../../'))
+import controller.run_parameters_parser as yaml_parser
 
 class Model(object):
 
-    def __init__(self, data=None, runno=1):
+    def __init__(self, directoryname, data, runno=1):
         self.generator_params = ['number_of_particles', 'dist_x', 'dist_y', 'dist_z', 'sig_x', 'sig_y', 'sig_z']
         self.scan_progress = -1
         self.data = data
+        self.directoryname = directoryname
         sddsindex = runno % 20
         self.Framework = Fw.Framework(directory='.', clean=False, verbose=False, sddsindex=sddsindex)
         print('self.Framework.master_lattice_location = ', self.Framework.master_lattice_location)
@@ -66,13 +70,15 @@ class Model(object):
         self.update_LSC()
         startLattice = self.data.simulationDict['starting_lattice']
         endLattice = self.data.simulationDict['final_lattice']
-        self.Framework.setSubDirectory(str(self.data.parameterDict['simulation']['directory']))
+        self.Framework.setSubDirectory(str(self.directoryname))
         self.modify_framework(scan=False)
         self.Framework.save_changes_file(filename=self.Framework.subdirectory+'/changes.yaml')
+        self.export_parameter_values_to_yaml_file()
         if self.data.simulationDict['track']:
             self.Framework.track(startfile=startLattice, endfile=endLattice)
         else:
             time.sleep(0.5)
+            self.Framework.progress = 100
 
     ##### Find Starting Filename based on z-position ####
     def find_starting_lattice(self, z):
@@ -113,3 +119,42 @@ class Model(object):
         self.Framework.generator.sig_clock = float(self.data.generatorDict['sig_clock']['value']) / (2354.82)
         self.Framework.generator.sig_x = self.data.generatorDict['spot_size']['value']
         self.Framework.generator.sig_y = self.data.generatorDict['spot_size']['value']
+
+    def convert_data_types(self, export_dict={}, data_dict={}, keyname=None):
+        if keyname is not None:
+            export_dict[keyname] = dict()
+            edict = export_dict[keyname]
+        else:
+            edict = export_dict
+        for key, value in data_dict.items():
+            if isinstance(value, (dict, collections.OrderedDict)) and not key == 'sub_elements':
+                subdict = self.convert_data_types({}, value)
+                edict.update({key:subdict})
+            else:
+                if not key == 'sub_elements':
+                    # value = self.model.data.Framework.convert_numpy_types(value)
+                    edict.update({key:value})
+        return export_dict
+
+    def create_subdirectory(self, dir):
+        if not os.path.exists(dir):
+            os.makedirs(dir, exist_ok=True)
+
+    def export_parameter_values_to_yaml_file(self):
+        export_dict = dict()
+        data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'EBT', 'BA1', 'simulation']
+        if self.data.scanDict['parameter_scan']:
+            directory = self.directoryname
+            filename =  '/scan_settings.yaml'
+            data_dicts.append('scan')
+        else:
+            directory = self.directoryname
+            filename = 'settings.yaml'
+        if not filename == "":
+            print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
+            self.create_subdirectory(directory)
+            for n in data_dicts:
+                export_dict = self.convert_data_types(export_dict, self.data.parameterDict[n], n)
+            yaml_parser.write_parameter_output_file(str(os.path.relpath(directory + '/' + filename)), export_dict)
+        else:
+            print( 'Failed to export, please provide a filename.')

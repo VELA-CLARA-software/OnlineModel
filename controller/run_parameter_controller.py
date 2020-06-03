@@ -97,7 +97,7 @@ class RunParameterController(QObject):
         self.view.parameter_scan.stateChanged.connect(lambda: self.toggle_scan_parameters_state(self.view.parameter_scan))
         self.view.bsol_track_checkBox.stateChanged.connect(self.toggle_BSOL_tracking)
         self.view.runButton.clicked.connect(self.run_astra)
-        self.view.runButton.clicked.connect(lambda: self.export_parameter_values_to_yaml_file(auto=True))
+        # self.view.runButton.clicked.connect(lambda: self.export_parameter_values_to_yaml_file(auto=True))
         self.view.loadSettingsButton.clicked.connect(self.load_settings_from_directory)
         self.view.directory.textChanged[str].connect(self.check_load_settings_button)
         self.view.directory.textChanged[str].emit(self.view.directory.text())
@@ -391,7 +391,7 @@ class RunParameterController(QObject):
         else:
             pass
         self.view.runButton.clicked.connect(self.run_astra)
-        self.view.runButton.clicked.connect(lambda: self.export_parameter_values_to_yaml_file(auto=True))
+        # self.view.runButton.clicked.connect(lambda: self.export_parameter_values_to_yaml_file(auto=True))
         return
 
     def toggle_finished_tracking(self):
@@ -440,7 +440,7 @@ class RunParameterController(QObject):
             self.enable_run_button(scan=self.model.data.scanDict['parameter_scan'])
             self.reset_progress_bar_timer()
             self.update_widgets_with_values(self.scan_parameter, self.scan_basevalue)
-            self.update_widgets_with_values('simulation:directory', self.scan_basedir)
+            self.update_directory_widget()
 
     def app_sequence(self):
         if self.model.data.scanDict['parameter_scan']:
@@ -448,8 +448,13 @@ class RunParameterController(QObject):
         else:
             self.thread = GenericThread(self.do_scan)
             self.thread.finished.connect(self.enable_run_button)
+            self.thread.finished.connect(self.update_directory_widget)
             self.thread.start()
         return
+
+    def update_directory_widget(self):
+        dirname = self.model.get_directory_name()
+        self.update_widgets_with_values('simulation:directory', dirname)
 
     def reset_progress_bar_timer(self):
         self.timer = QTimer()

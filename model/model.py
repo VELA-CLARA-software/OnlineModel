@@ -24,15 +24,16 @@ class Model(object):
         self.progress = 0
 
     def run_script(self):
-        data_dict = {'type': 'data dictionary'}
+        data_dict = {}
         data_dict['parameterDict'] = self.data.parameterDict
         data_dict['generatorDict'] = self.data.generatorDict
         data_dict['simulationDict'] = self.data.simulationDict
         data_dict['scanDict'] = self.data.scanDict
         data_dict['lattices'] = self.data.lattices
         # print('self.data.parameterDict = ', json.dumps(self.data.parameterDict))
-        self.socket.send_pyobj(data_dict)
+        self.socket.send_pyobj(['data dictionary',data_dict])
         response = run_number = self.socket.recv_pyobj()
+        self.run_number = run_number
         print(response)
         while not response == 'finished':
             response = self.socket.send_pyobj(['status', run_number])
@@ -41,6 +42,11 @@ class Model(object):
             print('Progress: ', self.progress, '%')
             time.sleep(1)
         return True
+
+    def get_directory_name(self):
+        response = self.socket.send_pyobj(['directoryname', self.run_number])
+        response = self.socket.recv_pyobj()
+        return response
 
 if __name__ == "__main__":
     model = Model()
