@@ -12,6 +12,7 @@ import sys, os, math, epics, scipy.constants, numpy
 import json, requests, datetime, time
 import collections
 import numpy as np
+import pyqtgraph as pg
 
 class GenericThread(QThread):
     signal = pyqtSignal()
@@ -101,7 +102,35 @@ class RunParameterController(QObject):
         self.view.loadSettingsButton.clicked.connect(self.load_settings_from_directory)
         self.view.directory.textChanged[str].connect(self.check_load_settings_button)
         self.view.directory.textChanged[str].emit(self.view.directory.text())
+        # self.view.run_parameters_table.cellClicked.connect(self.show_row_settings)
         self.abort_scan = False
+        self.create_datatree_widget()
+        self.populate_run_parameters_table()
+
+    def create_datatree_widget(self):
+        self.view.yaml_tree_widget = pg.DataTreeWidget()
+        layout = self.view.run_Tab.layout()
+        layout.addWidget(self.view.yaml_tree_widget,0,1)
+        table = self.view.run_parameters_table
+        table.cellClicked.connect(self.show_yaml_in_datatree)
+
+    def show_yaml_in_datatree(self, row, col):
+        table = self.view.run_parameters_table
+        runno = table.itemAt(row,0).text()
+        data = self.model.import_yaml_from_server(runno)
+        self.view.yaml_tree_widget.setData(data)
+
+    def populate_run_parameters_table(self):
+        dirnames = self.model.get_all_directory_names()
+        for k,v in dirnames.items():
+            self.add_run_table_row(k, v)
+
+    def add_run_table_row(self, k, v, row=None):
+        table = self.view.run_parameters_table
+        rowPosition = table.rowCount() if row is None else row
+        table.insertRow(rowPosition)
+        table.setItem(rowPosition, 0, QTableWidgetItem(str(k)))
+        table.setItem(rowPosition, 1, QTableWidgetItem(str(v)))
 
     def connect_auto_load_settings(self, state):
         if state:
@@ -305,35 +334,30 @@ class RunParameterController(QObject):
             os.makedirs(dir, exist_ok=True)
 
     def export_parameter_values_to_yaml_file(self, auto=False):
-        export_dict = dict()
-        data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'EBT', 'BA1', 'simulation']
-        if self.model.data.scanDict['parameter_scan']:
-            if not auto:
+        if auto:
+            self.model.export_yaml_on_server()
+        else:
+            export_dict = dict()
+            data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'EBT', 'BA1', 'simulation']
+            if self.model.data.scanDict['parameter_scan']:
                 dialog = QFileDialog()
                 directory = QFileDialog.getExistingDirectory(dialog,"Select Directory")
                 filename =  '/scan_settings.yaml'
+                data_dicts.append('scan')
             else:
-                directory = self.model.data.parameterDict['simulation']['directory']
-                filename =  '/scan_settings.yaml'
-            data_dicts.append('scan')
-        else:
-            if not auto:
                 dialog = QFileDialog()
                 filename, _filter = QFileDialog.getSaveFileNameAndFilter(dialog, caption='Save File', directory='c:\\',
                                                                      filter="YAML Files (*.YAML *.YML *.yaml *.yml")
                 filename = filename[0] if isinstance(filename,tuple) else filename
                 dirctory, filename = os.path.split(filename)
+            if not filename == "":
+                print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
+                self.create_subdirectory(directory)
+                for n in data_dicts:
+                    export_dict = self.convert_data_types(export_dict, self.model.data.parameterDict[n], n)
+                yaml_parser.write_parameter_output_file(str(os.path.relpath(directory + '/' + filename)), export_dict)
             else:
-                directory = self.model.data.parameterDict['simulation']['directory']
-                filename = 'settings.yaml'
-        if not filename == "":
-            print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
-            self.create_subdirectory(directory)
-            for n in data_dicts:
-                export_dict = self.convert_data_types(export_dict, self.model.data.parameterDict[n], n)
-            yaml_parser.write_parameter_output_file(str(os.path.relpath(directory + '/' + filename)), export_dict)
-        else:
-            print( 'Failed to export, please provide a filename.')
+                print( 'Failed to export, please provide a filename.')
 
     def toggle_scan_parameters_state(self, object):
         performScanCheckbox = object
@@ -449,12 +473,18 @@ class RunParameterController(QObject):
             self.thread = GenericThread(self.do_scan)
             self.thread.finished.connect(self.enable_run_button)
             self.thread.finished.connect(self.update_directory_widget)
+            self.thread.finished.connect(self.update_runs_widget)
             self.thread.start()
         return
 
     def update_directory_widget(self):
         dirname = self.model.get_directory_name()
         self.update_widgets_with_values('simulation:directory', dirname)
+
+    def update_runs_widget(self):
+        dirname = self.model.get_directory_name()
+        # settings = self.model.import_yaml_from_server()
+        self.add_run_table_row(str(self.model.run_number),dirname)
 
     def reset_progress_bar_timer(self):
         self.timer = QTimer()
