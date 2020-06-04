@@ -3,7 +3,6 @@ from collections import OrderedDict, defaultdict
 
 
 def parse_parameter_input_file(filename):
-    yaml_parameter_dict = defaultdict(dict)
     with open(filename, 'r') as stream:
         yaml_parameter_dict = yaml.safe_load(stream)
         return yaml_parameter_dict

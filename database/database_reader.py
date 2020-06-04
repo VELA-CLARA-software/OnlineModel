@@ -65,7 +65,7 @@ class DatabaseReader():
 if __name__ == '__main__':
     db_creator = DatabaseReader()
     table_run_id_dict = db_creator.get_unique_run_id_and_table_dict()
-    settings_dict_to_save = yaml_parser.parse_parameter_input_file('scan_settings.yaml')
+    settings_dict_to_save = yaml_parser.parse_parameter_input_file('scan_settings_no_sim_or_scan.yaml')
     print(table_run_id_dict)
     run_id_settings_dict = db_creator.run_id_settings_dict
     # print("+++++++++  DATABASE ++++++++++++")
@@ -75,15 +75,29 @@ if __name__ == '__main__':
     
     
     print('+++++ COMPARE +++++')
-    sorted_yaml_dict = sorted(settings_dict_to_save.items())
-    sorted_run_id_settings_dict = sorted(run_id_settings_dict['6660535c-91f4-4579-b074-1edc01e747f5'].items())
-    print("SORTED YAML DICT: ", sorted_yaml_dict)
-    print("SORTED DB SETTINGS: ", sorted_run_id_settings_dict)
-    if (sorted_yaml_dict == sorted_run_id_settings_dict):
-        print("Settings can be found : '6660535c-91f4-4579-b074-1edc01e747f5'")
+    sorted_yaml_dict = dict(sorted(settings_dict_to_save.items()))
+    sorted_run_id_settings_dict = dict(sorted(run_id_settings_dict['5c7fc20b-aea1-4652-afc6-6d156b6bac27'].items()))
+    #print("SORTED YAML DICT: ", sorted_yaml_dict)
+    #print("SORTED DB SETTINGS: ", sorted_run_id_settings_dict)
+    yaml_dump = json.dumps(sorted_yaml_dict, sort_keys=True, indent=1)
+    yaml_dump = yaml_dump.replace('"', "")
+    yaml_dump = yaml_dump.replace("\n","")
+    yaml_dump = "".join(yaml_dump.split())
+    db_dump = json.dumps(sorted_run_id_settings_dict, sort_keys=True, indent=1)
+    db_dump = bytes(db_dump, "utf-8").decode("unicode_escape")
+    db_dump = db_dump.replace('"', "")
+    db_dump = db_dump.replace("\n","")
+    db_dump = "".join(db_dump.split())
+    print("YAML DUMP: ")
+    print(yaml_dump)
+    print("DB DUMP: ")
+    print(db_dump)
+    if (yaml_dump == db_dump):
+        print("Settings can be found : '5c7fc20b-aea1-4652-afc6-6d156b6bac27'")
     else:
         print("Settings could not be found in DB")
-        print("Mismatched Items: ", sorted_yaml_dict & sorted_run_id_settings_dict)
+        print(matching_values_dict)
+        #print("Mismatched Items: ", sorted_yaml_dict & sorted_run_id_settings_dict)
     ##### Now recreate the settings dict per run_number:
     ##### select * from table_name WHERE run_id = table_run_id_dict[table_name]
     #### and split up row into the form: table_name : {parameter_name : value}

@@ -74,7 +74,7 @@ class DatabaseWriter():
         valuestring =  '(?, ?, ?, ?)'
         sql = ''' INSERT INTO ''' + table_name + ''' '''+columnstring+'''
                VALUES''' + valuestring
-        self.sql_cursor.execute(sql, [run_id] + [component] + [parameter] + [str(json.dumps(value))])
+        self.sql_cursor.execute(sql, [run_id] + [component] + [parameter] + [json.dumps(value)])
 
 
 
@@ -84,7 +84,7 @@ class DatabaseWriter():
         if (len(data) < 2):
             data.insert(0,None)
         sql = '''INSERT INTO scan ''' + columnstring + ''' VALUES ''' + valuestring
-        self.cursor.execute(sql, [runno] + data + [str(json.dumps(values))])
+        self.cursor.execute(sql, [runno] + data + [json.dumps(values)])
 
 
     def save_entry_to_simulation_table(self, runno, data, values):
@@ -93,7 +93,7 @@ class DatabaseWriter():
             data.append(json.dumps(None))
         valuestring = '(?,' + ','.join(['?' for i in range(len(data)+1)]) + ')'
         sql = '''INSERT INTO simulation ''' + columnstring + '''VALUES''' + valuestring
-        self.cursor.execute(sql, [runno] + data + [str(json.dumps(values))])
+        self.cursor.execute(sql, [runno] + data + [json.dumps(values)])
 
 
 
