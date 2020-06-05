@@ -163,7 +163,7 @@ class zmqServer():
 
     def do_twiss_run(self, runno):
         # print('TWISS runno = ', runno)
-        directoryname = self.dirnames[runno]
+        directoryname = self.dirnames[int(runno)]
         thread = twissThread(directoryname, runno)
         self.twiss_thread_objects[runno] = thread
         thread.start()
