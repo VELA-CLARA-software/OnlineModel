@@ -64,6 +64,9 @@ class signalling_monitor(QObject):
 
 class RunParameterController(QObject):
 
+    add_plot_signal = pyqtSignal(int, str)
+    remove_plot_signal = pyqtSignal(int)
+
     def __init__(self, app, view, model):
         super(RunParameterController, self).__init__()
         self.my_name = 'controller'
@@ -109,10 +112,11 @@ class RunParameterController(QObject):
 
     def create_datatree_widget(self):
         self.view.yaml_tree_widget = pg.DataTreeWidget()
-        layout = self.view.run_Tab.layout()
-        layout.addWidget(self.view.yaml_tree_widget,0,1)
+        layout = self.view.run_splitter
+        layout.addWidget(self.view.yaml_tree_widget)
         table = self.view.run_parameters_table
         table.cellClicked.connect(self.show_yaml_in_datatree)
+        table.resizeColumnsToContents()
 
     def show_yaml_in_datatree(self, row, col):
         table = self.view.run_parameters_table
@@ -130,7 +134,18 @@ class RunParameterController(QObject):
         rowPosition = table.rowCount() if row is None else row
         table.insertRow(rowPosition)
         table.setItem(rowPosition, 0, QTableWidgetItem(str(k)))
-        table.setItem(rowPosition, 1, QTableWidgetItem(str(v)))
+        dir = os.path.basename(v)
+        table.setItem(rowPosition, 1, QTableWidgetItem(str(dir)))
+        add_plot_button = QCheckBox('Plot')
+        add_plot_button.stateChanged.connect(lambda x: self.emit_plot_signals(k, v, x))
+        table.setCellWidget(rowPosition, 2, add_plot_button)
+        table.resizeColumnsToContents()
+
+    def emit_plot_signals(self, k, v, state):
+        if state == Qt.Checked:
+            self.add_plot_signal.emit(k,v)
+        elif state == Qt.Unchecked:
+            self.remove_plot_signal.emit(k)
 
     def connect_auto_load_settings(self, state):
         if state:

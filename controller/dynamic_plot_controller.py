@@ -11,7 +11,8 @@ import run_parameters_parser as yaml_parser
 import sys, os
 sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
 sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
-from SimulationFramework.Modules.online_model_plotter import onlineModelPlotter
+# from SimulationFramework.Modules.online_model_plotter import onlineModelPlotter
+from SimulationFramework.Modules.online_model_twissPlot import twissPlotWidget
 
 class GenericThread(QThread):
     signal = pyqtSignal()
@@ -43,7 +44,18 @@ class DynamicPlotController(QObject):
         self.app = app
         self.model = model
         self.view = view
-        self.view.main_tab_widget.removeTab(2)
-        self.astraPlot = onlineModelPlotter('./directory_summary_line_edit/')
-        self.view.post_tab = self.astraPlot
-        self.view.main_tab_widget.addTab(self.astraPlot, "Plots")
+        self.view.main_tab_widget.removeTab(3)
+        self.omp = twissPlotWidget()
+        # self.view.post_tab = self.omp
+        self.view.main_tab_widget.addTab(self.omp, "Plots")
+
+    def add_twiss_plot(self, id, dir):
+        # dir = dir.replace('/mnt/','\\\\').replace('/','\\')+'\\'
+        # print('adding twiss plot: ', dir)
+        # self.omp.addTwissDirectory([{'directory': dir, 'sections': 'All'}], name=id)
+        twissdata = self.model.run_twiss(id)
+        self.omp.addtwissDataObject(dataobject=twissdata, name=id)
+
+    def remove_twiss_plot(self, id):
+        print('Removing twiss plot: ', id)
+        self.omp.removeCurve(id)

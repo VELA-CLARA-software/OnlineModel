@@ -63,5 +63,16 @@ class Model(object):
         response = self.socket.send_pyobj(['get_all_directory_names'])
         return self.socket.recv_pyobj()
 
+    def run_twiss(self, id):
+        self.socket.send_pyobj(['do_twiss_run',id])
+        run_number = self.socket.recv_pyobj()
+        response = self.socket.send_pyobj(['get_twiss_status', run_number])
+        response = self.socket.recv_pyobj()
+        while response == 'Running' or response == 'Not Started':
+            response = self.socket.send_pyobj(['get_twiss_status', run_number])
+            response = self.socket.recv_pyobj()
+            time.sleep(0.01)
+        return response
+
 if __name__ == "__main__":
     model = Model()

@@ -71,7 +71,16 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -447,7 +456,16 @@
         <item row="3" column="1" colspan="3">
          <widget class="QWidget" name="widget_2" native="true">
           <layout class="QHBoxLayout" name="horizontalLayout">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -681,7 +699,16 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -1005,7 +1032,16 @@
            <bool>false</bool>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_5">
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -1532,7 +1568,16 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -2282,7 +2327,16 @@
               <bool>true</bool>
              </property>
              <layout class="QGridLayout" name="gridLayout_5">
-              <property name="margin">
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
                <number>0</number>
               </property>
               <item row="0" column="2">
@@ -2489,7 +2543,16 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
            <item>
@@ -2927,46 +2990,56 @@
        <attribute name="title">
         <string>Runs</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
-         <widget class="QTableWidget" name="run_parameters_table">
+       <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item>
+         <widget class="QSplitter" name="run_splitter">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="accessibleName">
-           <string>run_data:table</string>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
-          <property name="dragDropOverwriteMode">
-           <bool>false</bool>
-          </property>
-          <property name="alternatingRowColors">
-           <bool>true</bool>
-          </property>
-          <property name="columnCount">
-           <number>4</number>
-          </property>
-          <attribute name="horizontalHeaderCascadingSectionResizes">
-           <bool>true</bool>
-          </attribute>
-          <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-           <bool>true</bool>
-          </attribute>
-          <attribute name="horizontalHeaderStretchLastSection">
-           <bool>false</bool>
-          </attribute>
-          <attribute name="verticalHeaderShowSortIndicator" stdset="0">
-           <bool>false</bool>
-          </attribute>
-          <attribute name="verticalHeaderStretchLastSection">
-           <bool>false</bool>
-          </attribute>
-          <column/>
-          <column/>
-          <column/>
-          <column/>
+          <widget class="QTableWidget" name="run_parameters_table">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="accessibleName">
+            <string>run_data:table</string>
+           </property>
+           <property name="dragDropOverwriteMode">
+            <bool>false</bool>
+           </property>
+           <property name="alternatingRowColors">
+            <bool>true</bool>
+           </property>
+           <property name="columnCount">
+            <number>3</number>
+           </property>
+           <attribute name="horizontalHeaderCascadingSectionResizes">
+            <bool>true</bool>
+           </attribute>
+           <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+            <bool>true</bool>
+           </attribute>
+           <attribute name="horizontalHeaderStretchLastSection">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+            <bool>false</bool>
+           </attribute>
+           <attribute name="verticalHeaderStretchLastSection">
+            <bool>false</bool>
+           </attribute>
+           <column/>
+           <column/>
+           <column/>
+          </widget>
          </widget>
         </item>
        </layout>

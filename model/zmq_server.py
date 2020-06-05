@@ -37,14 +37,33 @@ class modelThread(threading.Thread):
         # self.status = ""
 
     def run(self):
-        logging.info("Thread %s: starting", self.runno)
+        logging.info("Tracking Thread %s: starting", self.runno)
         # self.status = "\ttracking..."
         self.track_model.run_script()
-        logging.info("Thread %s: finishing", self.runno)
+        logging.info("Tracking Thread %s: finishing", self.runno)
         # self.status = "finished"
 
-    def status(self):
+    def get_status(self):
         return self.track_model.Framework.progress if self.track_model.Framework.progress < 100 else "finished"
+
+class twissThread(threading.Thread):
+
+    def __init__(self, directory, runno):
+        super(twissThread, self).__init__()
+        self.runno = runno
+        self.twiss_model = model.twissData(directory=directory, name=runno)
+        self.status = "Running"
+
+    def run(self):
+        logging.info("Twiss Thread %s: starting", self.runno)
+        # self.status = "\ttracking..."
+        self.twiss_model.run_script()
+        self.twissData = self.twiss_model.run_script()
+        self.status = self.twissData
+        logging.info("Twiss Thread %s: finishing", self.runno)
+
+    def get_status(self):
+        return self.status
 
 class zmqServer():
 
@@ -54,7 +73,8 @@ class zmqServer():
         self.socket = self.context.socket(zmq.REP)
         self.port = port
         self.status = ""
-        self.thread_objects = {}
+        self.track_thread_objects = {}
+        self.twiss_thread_objects = {}
         self.dirnames = self.load_dirnames_from_json()
         print(self.dirnames)
 
@@ -110,7 +130,6 @@ class zmqServer():
 
     def import_yaml(self, runno):
         runno = int(runno)
-        # print('import_yaml run = ', runno, runno in self.dirnames.keys(), self.dirnames[runno]+'/settings.yaml')
         if runno in self.dirnames.keys():
             return self.import_parameter_values_from_yaml_file(self.dirnames[runno]+'/settings.yaml')
 
@@ -128,15 +147,34 @@ class zmqServer():
         print('runno = ', runno)
         directoryname = self.create_random_directory_name(runno)
         thread = modelThread(datadict, runno, directoryname)
-        self.thread_objects[runno] = thread
+        self.track_thread_objects[runno] = thread
         thread.start()
         return runno
 
     def get_tracking_status(self, runno):
-        if runno in self.thread_objects:
-            status = self.thread_objects[runno].status()
+        if runno in self.track_thread_objects:
+            status = self.track_thread_objects[runno].get_status()
             if status == "finished":
                 self.save_dirnames_to_json()
+                del self.track_thread_objects[runno]
+            return status
+        else:
+            return 'Not Started'
+
+    def do_twiss_run(self, runno):
+        # print('TWISS runno = ', runno)
+        directoryname = self.dirnames[runno]
+        thread = twissThread(directoryname, runno)
+        self.twiss_thread_objects[runno] = thread
+        thread.start()
+        return runno
+
+    def get_twiss_status(self, runno):
+        if runno in self.twiss_thread_objects:
+            status = self.twiss_thread_objects[runno].get_status()
+            if not status == "Running":
+                data = self.twiss_thread_objects[runno].twissData
+                # del self.twiss_thread_objects[runno]
             return status
         else:
             return 'Not Started'
