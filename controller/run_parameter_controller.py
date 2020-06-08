@@ -125,6 +125,9 @@ class RunParameterController(QObject):
         self.view.yaml_tree_widget.setData(data)
 
     def populate_run_parameters_table(self):
+        table = self.view.run_parameters_table
+        table.clearContents()
+        table.setRowCount(0)
         dirnames = self.model.get_all_directory_names()
         for k,v in dirnames.items():
             self.add_run_table_row(k, v)
@@ -133,7 +136,7 @@ class RunParameterController(QObject):
         table = self.view.run_parameters_table
         rowPosition = table.rowCount() if row is None else row
         table.insertRow(rowPosition)
-        table.setItem(rowPosition, 0, QTableWidgetItem(str(k)))
+        table.setItem(rowPosition, 0, QTableWidgetItem(str(int(k))))
         dir = os.path.basename(v)
         table.setItem(rowPosition, 1, QTableWidgetItem(str(dir)))
         add_plot_button = QCheckBox('Plot')
@@ -499,7 +502,8 @@ class RunParameterController(QObject):
     def update_runs_widget(self):
         dirname = self.model.get_directory_name()
         # settings = self.model.import_yaml_from_server()
-        self.add_run_table_row(str(self.model.run_number),dirname)
+        # print('Adding row - ', str(self.model.run_number), dirname)
+        self.populate_run_parameters_table()
 
     def reset_progress_bar_timer(self):
         self.timer = QTimer()
