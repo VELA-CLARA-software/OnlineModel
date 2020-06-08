@@ -77,7 +77,7 @@ class Model(object):
         self.directoryname = directoryname
         sddsindex = runno % 20
         self.Framework = Fw.Framework(directory='.', clean=False, verbose=False, sddsindex=sddsindex)
-        print('self.Framework.master_lattice_location = ', self.Framework.master_lattice_location)
+        # print('self.Framework.master_lattice_location = ', self.Framework.master_lattice_location)
         # self.Framework.defineElegantCommand(location=[self.Framework.master_lattice_location+'Codes/elegant'])
         # os.environ['RPN_DEFNS'] = self.Framework.master_lattice_location+'Codes/defns.rpn'
         self.Framework.loadSettings('Lattices/CLA10-BA1_OM.def')
@@ -126,6 +126,7 @@ class Model(object):
         self.update_LSC()
         startLattice = self.data.simulationDict['starting_lattice']
         endLattice = self.data.simulationDict['final_lattice']
+        print('Changing directory to ', str(self.directoryname))
         self.Framework.setSubDirectory(str(self.directoryname))
         self.modify_framework(scan=False)
         self.Framework.save_changes_file(filename=self.Framework.subdirectory+'/changes.yaml')

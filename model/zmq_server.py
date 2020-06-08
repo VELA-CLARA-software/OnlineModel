@@ -33,6 +33,7 @@ class modelThread(threading.Thread):
                 setattr(self.data,k,v)
         self.runno = runno
         self.directoryname = directoryname
+        print('passing new run directory ', directoryname)
         self.track_model = model.Model(directoryname=self.directoryname, data=self.data, runno=self.runno)
         # self.status = ""
 
