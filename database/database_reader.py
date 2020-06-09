@@ -2,6 +2,7 @@ import sys, os
 import sqlite3
 import uuid
 import run_parameters_parser as yaml_parser
+import database_writer 
 import collections
 import json
 from collections import defaultdict
@@ -22,6 +23,14 @@ class DatabaseReader():
         self.sql_connection.row_factory = sqlite3.Row
         self.table_name_list = ["generator", "INJ", "EBT", "S02", "C2V", "BA1", "scan", "simulation"]
         self.table_run_id_dict = self.get_unique_run_id_and_table_dict()
+        #self.yaml_filename = ''
+        #self.yaml_dictionary = yaml_parser.parse_parameter_input_file(self.yaml_filename)
+        #self.yaml_settings = self.deformat_dictionary(self.yaml_dictionary)
+        
+        
+        # This dictionary is keyed by run-id and 
+        # the value is a string containing the deformatted dictionary of settings.
+        # To see the deformatting function, go to deformat_dictionary(dict)
         self.run_id_settings_dict = self.construct_run_id_and_settings_dict_from_database()
 
 
@@ -31,11 +40,15 @@ class DatabaseReader():
             self.sql_cursor.execute('select DISTINCT run_id from ' + table_name)
             unique_run_id = self.sql_cursor.fetchall()
             if len(unique_run_id) > 0:
-                run_number_table_dict[table_name].append(unique_run_id[0][0])
+                for entry in range(0, len(unique_run_id)):
+                    print('UNIQUE RUN ID: ', unique_run_id[entry][0])
+                    run_number_table_dict[table_name].append(unique_run_id[entry][0])
+        print(run_number_table_dict)
         return run_number_table_dict
     
     def construct_run_id_and_settings_dict_from_database(self):
         run_id_settings_dict = defaultdict(dict)
+        squashed_run_id_settings_dict = defaultdict(dict)
         for table_name, unique_runs in self.table_run_id_dict.items():
             for run_id in unique_runs:
                 self.sql_cursor.execute('select component,parameter,value from ' + table_name + ' where run_id=\'' +run_id + '\'')
@@ -44,15 +57,19 @@ class DatabaseReader():
                 for component, parameter, value in settings_for_run_id:
                     settings_dict[component][parameter] = value
                     run_id_settings_dict[run_id][table_name] = settings_dict
-        return run_id_settings_dict
+                    squashed_run_id_settings_dict[run_id] = self.deformat_dictionary(run_id_settings_dict[run_id])
+        return squashed_run_id_settings_dict
 
-    # def compare_database_dict_with_yaml_dict(self, yaml_dict):
-        # sorted_yaml_dict = sorted(yaml_dict)
-        # sorted_run_id_dict = sorted(self.run_id_settings_dict)
-        # for run_id in sorted_run_id_dict.keys():
-            # if (sorted_yaml_dict == sorted_run_id_dict[run_id])):
-                # print("Results for settings can be found at: ", run_id)
-                # return
+    def compare_entries(self, yaml_settings):
+        found_in_db = False
+        run_id_for_settings = ''
+        for run_id, db_settings in self.run_id_settings_dict.items():
+            if yaml_settings == db_settings:
+                found_in_db = True
+                run_id_for_settings = run_id
+            else:
+                continue
+        return found_in_db, run_id
 
     def pretty(self, d, indent=0):
        for key, value in d.items():
@@ -62,50 +79,33 @@ class DatabaseReader():
           else:
              print('  ' * (indent+1) + str(value))
 
+    def deformat_dictionary(self, dictionary_to_deformat):
+        sorted_dict = dict(sorted(dictionary_to_deformat.items()))
+        dict_dump = json.dumps(sorted_dict, sort_keys=True, indent=1)
+        dict_dump = bytes(dict_dump, "utf-8").decode("unicode_escape")
+        dict_dump = dict_dump.replace('"',"")
+        dict_dump = dict_dump.replace("\n","")
+        dict_dump = "".join(dict_dump.split())
+        return dict_dump
+
+    def are_settings_in_database(self, yaml_settings):
+        is_in_db, run_id = self.compare_entries(yaml_settings)
+        return is_in_db
+
+    def get_run_id_for_settings(self, yaml_settings):
+        is_in_db, run_id = self.compare_entries(yaml_settings)
+        return run_id
+
 if __name__ == '__main__':
-    db_creator = DatabaseReader()
-    table_run_id_dict = db_creator.get_unique_run_id_and_table_dict()
-    settings_dict_to_save = yaml_parser.parse_parameter_input_file('scan_settings_no_sim_or_scan.yaml')
-    print(table_run_id_dict)
-    run_id_settings_dict = db_creator.run_id_settings_dict
-    # print("+++++++++  DATABASE ++++++++++++")
-    # db_creator.pretty(run_id_settings_dict['6660535c-91f4-4579-b074-1edc01e747f5'])
-    # print("+++++++++  YAML ++++++++++++")
-    # db_creator.pretty(settings_dict_to_save)
-    
-    
+    db_reader = DatabaseReader()
+    db_writer = database_writer.DatabaseWriter()
+    settings_dict_to_save = yaml_parser.parse_parameter_input_file('scan_settings_no_sim_or_scan.yaml')    
     print('+++++ COMPARE +++++')
-    sorted_yaml_dict = dict(sorted(settings_dict_to_save.items()))
-    sorted_run_id_settings_dict = dict(sorted(run_id_settings_dict['5c7fc20b-aea1-4652-afc6-6d156b6bac27'].items()))
-    #print("SORTED YAML DICT: ", sorted_yaml_dict)
-    #print("SORTED DB SETTINGS: ", sorted_run_id_settings_dict)
-    yaml_dump = json.dumps(sorted_yaml_dict, sort_keys=True, indent=1)
-    yaml_dump = yaml_dump.replace('"', "")
-    yaml_dump = yaml_dump.replace("\n","")
-    yaml_dump = "".join(yaml_dump.split())
-    db_dump = json.dumps(sorted_run_id_settings_dict, sort_keys=True, indent=1)
-    db_dump = bytes(db_dump, "utf-8").decode("unicode_escape")
-    db_dump = db_dump.replace('"', "")
-    db_dump = db_dump.replace("\n","")
-    db_dump = "".join(db_dump.split())
-    print("YAML DUMP: ")
-    print(yaml_dump)
-    print("DB DUMP: ")
-    print(db_dump)
-    if (yaml_dump == db_dump):
-        print("Settings can be found : '5c7fc20b-aea1-4652-afc6-6d156b6bac27'")
+    yaml_dump = db_reader.deformat_dictionary(settings_dict_to_save)
+    if not db_reader.are_settings_in_database(yaml_dump):
+        print('Settings could not be found in DB, saving new settings')
+        db_writer.save_dict_to_db(settings_dict_to_save)
     else:
-        print("Settings could not be found in DB")
-        print(matching_values_dict)
-        #print("Mismatched Items: ", sorted_yaml_dict & sorted_run_id_settings_dict)
-    ##### Now recreate the settings dict per run_number:
-    ##### select * from table_name WHERE run_id = table_run_id_dict[table_name]
-    #### and split up row into the form: table_name : {parameter_name : value}
-    #### we can then have a full dictionary keyed by run_id: {run_id : {table_name : {parameter_name : value} } }
-    
-            # settings_entry_dict[table_name].append(tuple(item[1:]))
-            # print(item)
-    # run_entry_dict[row[0]] = settings_entry_dict
-    # for key, value in run_entry_dict.items():
-            # print("KEY: ", key, " VALUE: ", value, "\n")
-            # print("")
+        print('Settings can be found at: ', db_reader.get_run_id_for_settings(yaml_dump))
+        
+

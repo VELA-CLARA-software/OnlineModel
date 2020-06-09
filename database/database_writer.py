@@ -100,5 +100,5 @@ class DatabaseWriter():
 
 if __name__ == '__main__':
     db_writer = DatabaseWriter()
-    settings_dict_to_save = yaml_parser.parse_parameter_input_file('scan_settings.yaml')
+    settings_dict_to_save = yaml_parser.parse_parameter_input_file('scan_settings_no_sim_or_scan.yaml')
     db_writer.save_dict_to_db(settings_dict_to_save)

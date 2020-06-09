@@ -1,0 +1,397 @@
+BA1:
+  EBT-BA1-MAG-QUAD-01:
+    field_integral_coefficients: &id001
+    - 1.59491
+    - -0.0176
+    k1l: -0.264
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-BA1-MAG-QUAD-02:
+    field_integral_coefficients: &id002
+    - 1.59214
+    - -0.01508
+    k1l: -0.959
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-BA1-MAG-QUAD-03:
+    field_integral_coefficients: &id003
+    - 1.5902
+    - -0.01823
+    k1l: 1.225
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-BA1-MAG-QUAD-04:
+    field_integral_coefficients: &id004
+    - 1.58881
+    - -0.01033
+    k1l: 1.15
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-BA1-MAG-QUAD-05:
+    field_integral_coefficients: &id005
+    - 1.59298
+    - -0.02111
+    k1l: 0.039
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-BA1-MAG-QUAD-06:
+    field_integral_coefficients: &id006
+    - 1.58624
+    - 0.00451
+    k1l: -1.334
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-BA1-MAG-QUAD-07:
+    field_integral_coefficients: &id007
+    - 0.36799
+    - 0.00144
+    k1l: 1.361
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+C2V:
+  CLA-C2V-MAG-QUAD-01:
+    field_integral_coefficients:
+    - -1.30185900474931e-11
+    - 5.70352698264348e-09
+    - -9.08937880373639e-07
+    - 6.03053164909332e-05
+    - 0.014739040805921
+    - 0.0137593271780352
+    k1l: 5.757
+    magnetic_length: 121.567272525393
+    pv_suffix_alias: SETI
+    type: quadrupole
+  CLA-C2V-MAG-QUAD-02:
+    field_integral_coefficients:
+    - -1.30779403854705e-11
+    - 5.72293796261772e-09
+    - -9.08645007418186e-07
+    - 5.97762384752619e-05
+    - 0.0147596073775721
+    - 0.0158516912403471
+    k1l: -4.734
+    magnetic_length: 121.511900610076
+    pv_suffix_alias: SETI
+    type: quadrupole
+  CLA-C2V-MAG-QUAD-03:
+    field_integral_coefficients:
+    - -1.31651924239548e-11
+    - 5.76805215137824e-09
+    - -9.16843633799561e-07
+    - 6.036266595182e-05
+    - 0.0147634437187611
+    - 0.013343693771224
+    k1l: 5.757
+    magnetic_length: 121.550749828396
+    pv_suffix_alias: SETI
+    type: quadrupole
+EBT:
+  EBT-BA1-MAG-QUAD-01:
+    field_integral_coefficients: *id001
+    k1l: -0.264
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-BA1-MAG-QUAD-02:
+    field_integral_coefficients: *id002
+    k1l: -0.959
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-BA1-MAG-QUAD-03:
+    field_integral_coefficients: *id003
+    k1l: 1.225
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-BA1-MAG-QUAD-04:
+    field_integral_coefficients: *id004
+    k1l: 1.15
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-BA1-MAG-QUAD-05:
+    field_integral_coefficients: *id005
+    k1l: 0.039
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-BA1-MAG-QUAD-06:
+    field_integral_coefficients: *id006
+    k1l: -1.334
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-BA1-MAG-QUAD-07:
+    field_integral_coefficients: *id007
+    k1l: 1.361
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-INJ-MAG-QUAD-07:
+    field_integral_coefficients: &id008
+    - -1.51802828278694e-05
+    - 0.000208236492203741
+    - 0.102224127676636
+    - 0.00205656183129602
+    k1l: 1.724
+    magnetic_length: 125.299909233924
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-INJ-MAG-QUAD-08:
+    field_integral_coefficients: &id009
+    - -3.06357099595939e-05
+    - 0.000442533546326552
+    - 0.101577009522434
+    - 0.00146589509380893
+    k1l: -1.587
+    magnetic_length: 125.27558356645
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-INJ-MAG-QUAD-09:
+    field_integral_coefficients: &id010
+    - 0.111939163037871
+    - -0.00132252769474545
+    k1l: 0.376
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-INJ-MAG-QUAD-10:
+    field_integral_coefficients: &id011
+    - 0.111966157109812
+    - -0.00170732356716569
+    k1l: -0.39
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-INJ-MAG-QUAD-11:
+    field_integral_coefficients: &id012
+    - 0.112072763436341
+    - -0.00182025848896622
+    k1l: 0.171
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-INJ-MAG-QUAD-15:
+    field_integral_coefficients: &id013
+    - 0.111954754
+    - -0.001381788
+    k1l: 5.123
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+INJ:
+  CLA-L01-CAV:
+    controller_name: L01
+    field_amplitude: 0.0
+    length: 2.0333300000000003
+    phase: 0.0
+    pv_field_amplitude_alias: ad1:ch6:power_remote_s.POWER
+    pv_phase_alias: vm:dsp:sp_ph:phase
+    pv_root_alias: CLA-L01-LRF-CTRL-01
+    type: cavity
+  CLA-L01-MAG-SOL-01:
+    cavity: CLA-L01-CAV
+    field_amplitude: 0.05
+    field_integral_coefficients:
+    - 0.911580969
+    - -0.0374385376
+    - 0.00106926073
+    - -1.64644381e-05
+    - 1.01769629e-07
+    - 0
+    - 0
+    - 0.37651102
+    - 0.12171419
+    magnetic_length: 726.918205128205
+    pv_suffix_alias: SETI
+    type: solenoid
+  CLA-L01-MAG-SOL-02:
+    cavity: CLA-L01-CAV
+    field_amplitude: -0.05
+    field_integral_coefficients:
+    - 0.84768888
+    - -0.0653499119
+    - 0.00243270133
+    - -4.29020066e-05
+    - 2.87019853e-07
+    - 0
+    - 0
+    - 0.37651102
+    - 0.12171419
+    magnetic_length: 726.918205128205
+    pv_suffix_alias: SETI
+    type: solenoid
+  CLA-LRG1-GUN-CAV:
+    controller_name: GUN10
+    field_amplitude: 63.5
+    length: 0.17
+    phase: 5.0
+    pv_field_amplitude_alias: ad1:ch6:power_remote_s.POWER
+    pv_phase_alias: vm:dsp:sp_ph:phase
+    pv_root_alias: CLA-GUN-LRF-CTRL-01
+    type: cavity
+  CLA-LRG1-MAG-BSOL-01:
+    cavity: CLA-LRG1-GUN-CAV
+    field_amplitude: -0.24
+    field_integral_coefficients:
+    - 0.000513431
+    - -1.27695e-07
+    - 1.61655e-10
+    - -0.032733798
+    - -4.29885e-06
+    - 2.28967e-08
+    - 0.001833327
+    - -2.5354e-06
+    - -1.04715e-09
+    - -1.61177e-12
+    - -2.94837e-05
+    - 2.13938e-07
+    - -0.003957362
+    - 0.246073139
+    - -4.393602393
+    - 0.0
+    magnetic_length: 12.5
+    pv_suffix_alias: SETI
+    type: solenoid
+  CLA-LRG1-MAG-SOL-01:
+    cavity: CLA-LRG1-GUN-CAV
+    field_amplitude: 0.267
+    field_integral_coefficients:
+    - 2.17321571
+    - -0.858179277
+    - 0.17212713
+    - -0.0171033399
+    - 0.00067037153
+    - -3.53922e-08
+    - 1.53138e-05
+    - 0.167819191
+    - 0.0
+    magnetic_length: 139.5
+    pv_suffix_alias: SETI
+    type: solenoid
+  EBT-INJ-MAG-QUAD-07:
+    field_integral_coefficients: *id008
+    k1l: 1.724
+    magnetic_length: 125.299909233924
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-INJ-MAG-QUAD-08:
+    field_integral_coefficients: *id009
+    k1l: -1.587
+    magnetic_length: 125.27558356645
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-INJ-MAG-QUAD-09:
+    field_integral_coefficients: *id010
+    k1l: 0.376
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-INJ-MAG-QUAD-10:
+    field_integral_coefficients: *id011
+    k1l: -0.39
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-INJ-MAG-QUAD-11:
+    field_integral_coefficients: *id012
+    k1l: 0.171
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+  EBT-INJ-MAG-QUAD-15:
+    field_integral_coefficients: *id013
+    k1l: 0.123
+    magnetic_length: 70.4236023746139
+    pv_suffix_alias: SETI
+    type: quadrupole
+S02:
+  CLA-S02-MAG-QUAD-01:
+    field_integral_coefficients:
+    - -2.23133410405682e-10
+    - 4.5196171252132e-08
+    - -3.46208258004659e-06
+    - 0.000111195870210961
+    - 0.0238129337415767
+    - 0.00981229429460256
+    k1l: 1.79
+    magnetic_length: 128.68478212775
+    pv_suffix_alias: SETI
+    type: quadrupole
+  CLA-S02-MAG-QUAD-02:
+    field_integral_coefficients:
+    - -4.69068497199892e-10
+    - 7.81236692669882e-08
+    - -4.99557108021749e-06
+    - 0.000139687166906618
+    - 0.0232819099224878
+    - 0.00977695097574923
+    k1l: -1.651
+    magnetic_length: 126.817287248819
+    pv_suffix_alias: SETI
+    type: quadrupole
+  CLA-S02-MAG-QUAD-03:
+    field_integral_coefficients:
+    - -4.01132756980213e-10
+    - 7.04774652367448e-08
+    - -4.7303680012511e-06
+    - 0.000137571730391246
+    - 0.0233327839789932
+    - 0.00949568371388574
+    k1l: 2.304
+    magnetic_length: 127.241994829126
+    pv_suffix_alias: SETI
+    type: quadrupole
+  CLA-S02-MAG-QUAD-04:
+    field_integral_coefficients:
+    - -3.12868198002574e-10
+    - 5.87771428279647e-08
+    - -4.18748562338666e-06
+    - 0.000127524427731924
+    - 0.0234218216296292
+    - 0.00938588316008555
+    k1l: -1.386
+    magnetic_length: 127.421664936758
+    pv_suffix_alias: SETI
+    type: quadrupole
+generator:
+  cathode:
+    type: generator
+    value: true
+  charge:
+    pv_root_alias: CLA-S01-DIA-WCM-01
+    pv_suffix_alias: Q
+    type: generator
+    value: 0.07
+  dist_x:
+    type: generator
+    value: 2DGaussian
+  dist_y:
+    type: generator
+    value: 2DGaussian
+  dist_z:
+    type: generator
+    value: g
+  number_of_particles:
+    type: generator
+    value: '2'
+  sig_clock:
+    type: generator
+    value: 2.0
+  sig_x:
+    type: generator
+    value: 0.25
+  sig_y:
+    type: generator
+    value: 0.25
+  spot_size:
+    type: generator
+    value: 0.25
