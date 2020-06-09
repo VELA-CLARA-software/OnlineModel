@@ -22,6 +22,7 @@ class DatabaseCreator():
         self.create_table('BA1')
         self.create_table('simulation')
         self.create_table('scan')
+        #### NEED TO HAVE THE SAME COLUMNS AND WRITE None TO THEM IF EMPTY.
         self.create_runs_table()
 
     def create_runs_table(self):

@@ -400,7 +400,7 @@ scan:
   parameter_scan: true
   parameter_scan_from_value: -25.0
   parameter_scan_step_size: 5.0
-  parameter_scan_to_value: 35.0
+  parameter_scan_to_value: 32.0
 simulation:
   astra_run_number:
     astra_run_number: 101

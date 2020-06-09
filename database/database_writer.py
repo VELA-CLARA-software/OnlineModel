@@ -54,6 +54,21 @@ class DatabaseWriter():
                 print('Value: ', value)
                 print('---------------------------------')
                 self.save_entry_to_machine_area_table(run_id, table_name, component, parameter, value)
+            if (table_name == 'scan'):
+                component = json.dumps(None)
+                parameter = splitstr[0]
+                value = v
+                self.save_entry_to_scan_table(run_id, component, parameter, value)
+            if (table_name == 'simulation'):
+                if len(splitstr) < 2:
+                    parameter = splitstr[0]
+                    value = v
+                    component = json.dumps(None)
+                else:
+                    component = splitstr[0]
+                    parameter = splitstr[1]
+                    value = v
+                self.save_entry_to_simulation_table(run_id, component, parameter, value)
         self.sql_connection.commit()
 
 
@@ -77,28 +92,23 @@ class DatabaseWriter():
         self.sql_cursor.execute(sql, [run_id] + [component] + [parameter] + [json.dumps(value)])
 
 
-
-    def save_entry_to_scan_table(self, runno, data, values):
-        columnstring = '(runnumber, name, parameter, value)'
+    def save_entry_to_scan_table(self, run_id, component, parameter, value):
+        columnstring = '(run_id, component, parameter, value)'
         valuestring = '(?,?,?,?)'
-        if (len(data) < 2):
-            data.insert(0,None)
         sql = '''INSERT INTO scan ''' + columnstring + ''' VALUES ''' + valuestring
-        self.cursor.execute(sql, [runno] + data + [json.dumps(values)])
+        self.sql_cursor.execute(sql, [run_id] + [component] + [parameter] + [json.dumps(value)])
 
 
-    def save_entry_to_simulation_table(self, runno, data, values):
-        columnstring = '(runnumber, name, parameter, value)'
-        if (len(data) < 2):
-            data.append(json.dumps(None))
-        valuestring = '(?,' + ','.join(['?' for i in range(len(data)+1)]) + ')'
+    def save_entry_to_simulation_table(self, run_id, component, parameter, value):
+        columnstring = '(run_id, component, parameter, value)'
+        valuestring = '(?,?,?,?)'
         sql = '''INSERT INTO simulation ''' + columnstring + '''VALUES''' + valuestring
-        self.cursor.execute(sql, [runno] + data + [json.dumps(values)])
+        self.sql_cursor.execute(sql, [run_id] + [component] + [parameter] + [json.dumps(value)])
 
 
 
 
 if __name__ == '__main__':
     db_writer = DatabaseWriter()
-    settings_dict_to_save = yaml_parser.parse_parameter_input_file('scan_settings_no_sim_or_scan.yaml')
+    settings_dict_to_save = yaml_parser.parse_parameter_input_file('scan_settings.yaml')
     db_writer.save_dict_to_db(settings_dict_to_save)
