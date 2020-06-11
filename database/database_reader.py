@@ -21,7 +21,7 @@ class DatabaseReader():
         self.sql_connection = sqlite3.connect('SimulationDatabase.db')
         self.sql_cursor = self.sql_connection.cursor()
         self.sql_connection.row_factory = sqlite3.Row
-        self.table_name_list = ["generator", "INJ", "EBT", "S02", "C2V", "BA1", "scan", "simulation"]
+        self.table_name_list = ["generator", "INJ", "EBT", "S02", "C2V", "BA1", "simulation"]
         self.table_run_id_dict = self.get_unique_run_id_and_table_dict()
         #self.yaml_filename = ''
         #self.yaml_dictionary = yaml_parser.parse_parameter_input_file(self.yaml_filename)
@@ -32,6 +32,7 @@ class DatabaseReader():
         # the value is a string containing the deformatted dictionary of settings.
         # To see the deformatting function, go to deformat_dictionary(dict)
         self.run_id_settings_dict = self.construct_run_id_and_settings_dict_from_database()
+
 
 
     def get_unique_run_id_and_table_dict(self):
@@ -126,12 +127,16 @@ class DatabaseReader():
 if __name__ == '__main__':
     db_reader = DatabaseReader()
     db_writer = database_writer.DatabaseWriter()
-    settings_dict_to_save = yaml_parser.parse_parameter_input_file('scan_settings.yaml')    
+    settings_dict_to_save = yaml_parser.parse_parameter_input_file('scan_settings.yaml')
+    settings_dict_to_check = yaml_parser.parse_parameter_input_file('scan_settings.yaml')
+    ## WE WANT TO IGNORE THE SCAN SETTINGS BUT ALSO SAVE THEM INTO DB
+    if 'scan' in settings_dict_to_save:
+        del settings_dict_to_check['scan']
     print('+++++ COMPARE +++++')
-    yaml_dump = db_reader.deformat_dictionary(settings_dict_to_save)
+    yaml_dump = db_reader.deformat_dictionary(settings_dict_to_check)
     if not db_reader.are_settings_in_database(yaml_dump):
         print('Settings could not be found in DB, saving new settings')
-        db_writer.save_dict_to_db(settings_dict_to_save)
+        #db_writer.save_dict_to_db(settings_dict_to_save)
     else:
         print('Settings can be found at: ', db_reader.get_run_id_for_settings(yaml_dump))
         
