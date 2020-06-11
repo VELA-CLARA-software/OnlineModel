@@ -112,10 +112,20 @@ class DatabaseReader():
         dict_dump = bytes(dict_dump, "utf-8").decode("unicode_escape")
         dict_dump = dict_dump.replace('"',"")
         dict_dump = dict_dump.replace("\n","")
-        dict_dump = dict_dump.replace("null:{", "")
         dict_dump = "".join(dict_dump.split())
         return dict_dump
-
+    
+    def get_settings_dict_to_check(self, settings_to_save):
+        settings_to_check = settings_to_save
+        if 'scan' in settings_to_check:
+           del settings_to_check['scan']
+        return settings_to_check
+    
+    def prepare_dict_for_checking(self, settings_to_save):
+        settings_to_check_dict = self.get_settings_dict_to_check(settings_to_save)
+        settings_to_check_str = self.deformat_dictionary(settings_to_check_dict)
+        return settings_to_check_str
+    
     def are_settings_in_database(self, yaml_settings):
         is_in_db, run_id = self.compare_entries(yaml_settings)
         return is_in_db
@@ -128,12 +138,11 @@ if __name__ == '__main__':
     db_reader = DatabaseReader()
     db_writer = database_writer.DatabaseWriter()
     settings_dict_to_save = yaml_parser.parse_parameter_input_file('scan_settings.yaml')
-    settings_dict_to_check = yaml_parser.parse_parameter_input_file('scan_settings.yaml')
+    yaml_dump = db_reader.prepare_dict_for_checking(settings_dict_to_save)
     ## WE WANT TO IGNORE THE SCAN SETTINGS BUT ALSO SAVE THEM INTO DB
-    if 'scan' in settings_dict_to_save:
-        del settings_dict_to_check['scan']
+    
     print('+++++ COMPARE +++++')
-    yaml_dump = db_reader.deformat_dictionary(settings_dict_to_check)
+    #yaml_dump = db_reader.deformat_dictionary(settings_dict_to_check)
     if not db_reader.are_settings_in_database(yaml_dump):
         print('Settings could not be found in DB, saving new settings')
         #db_writer.save_dict_to_db(settings_dict_to_save)
