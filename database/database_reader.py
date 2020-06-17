@@ -34,7 +34,6 @@ class DatabaseReader():
         self.run_id_settings_dict = self.construct_run_id_and_settings_dict_from_database()
 
 
-
     def get_unique_run_id_and_table_dict(self):
         run_number_table_dict = defaultdict(list)
         for table_name in self.table_name_list:
@@ -94,6 +93,7 @@ class DatabaseReader():
             if yaml_settings == db_settings:
                 found_in_db = True
                 run_id_for_settings = run_id
+                return found_in_db, run_id
             else:
                 continue
         return found_in_db, run_id
