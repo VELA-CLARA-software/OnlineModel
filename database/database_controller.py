@@ -13,7 +13,8 @@ class DatabaseController():
         if settings_to_save == None:
             if self.settings_dict != None:
                 print('Checking YAML settings against database...')
-                return self.reader.prepare_dict_for_checking(self.settings_dict)
+                settings_to_check = self.reader.prepare_dict_for_checking(self.settings_dict)
+                return self.reader.are_settings_in_database(settings_to_check)
             else:
                 print('Supply a settings dictionary, or load yaml settings before checking database')
         else:
@@ -43,15 +44,20 @@ class DatabaseController():
         
 if __name__ == '__main__':
     dbc = DatabaseController()
-    dbc.load_yaml_settings('scan_settings.yaml')
-    if dbc.are_settings_in_database():
-        print(dbc.get_run_id_for_settings())
-    else:
-        print('FAILURE;')
+    for value in range(0,1000):
+        filename = 'scan_settings_'+str(value)+'.yaml'
+        dbc.load_yaml_settings(filename)
+        if dbc.are_settings_in_database():
+            print(dbc.get_run_id_for_settings())
+        else:
+            ## May need to create a 'refresh' function to update
+            ## settings dictionary when new settings have been saved.
+            dbc.writer.save_dict_to_db(dbc.settings_dict)
+
         
-    dbc_2 = DatabaseController()
-    settings_dict = yaml_parser.parse_parameter_input_file('scan_settings.yaml')
-    if dbc_2.are_settings_in_database(settings_dict):
-        print(dbc_2.get_run_id_for_settings(settings_dict))
-    else:
-        print('FAILURE;')
+    # dbc_2 = DatabaseController()
+    # settings_dict = yaml_parser.parse_parameter_input_file('scan_settings.yaml')
+    # if dbc_2.are_settings_in_database(settings_dict):
+        # print(dbc_2.get_run_id_for_settings(settings_dict))
+    # else:
+        # print('FAILURE;')
