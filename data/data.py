@@ -21,7 +21,7 @@ summary_output_file = 'summary_output_file_line_edit'
 class Data(object):
 
     def __init__(self):
-        object.__init__(self)
+        super(Data, self).__init__()
         self.my_name = "data"
         self.parameterDict = collections.OrderedDict()
         self.lattices = ['INJ', 'S02', 'C2V', 'EBT', 'BA1']
@@ -35,7 +35,7 @@ class Data(object):
         self.parameterDict['generator'] = collections.OrderedDict()
         self.generatorDict = self.parameterDict['generator']
         self.scannableParametersDict = collections.OrderedDict()
-        self.Framework = Fw.Framework(directory=directory_summary, clean=False, verbose=True)
+        self.Framework = Fw.Framework(directory='.', clean=False, verbose=True)
         self.Framework.loadSettings('Lattices/CLA10-BA1_OM.def')
         self.my_name = "data"
         self.get_data()
