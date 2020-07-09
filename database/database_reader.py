@@ -4,8 +4,8 @@ import uuid
 import run_parameters_parser as yaml_parser
 import database_writer
 import collections
-import ujson
-import json
+import ujson as json
+# import json
 from collections import defaultdict
 ## We can get rows back from SQL as a Row object
 ## This allows us to compare the yaml files and the DB entries more readily.
@@ -29,7 +29,7 @@ class DatabaseReader():
         # To see the deformatting function, go to deformat_dictionary(dict)
 
         self.run_id_settings_dict = self.construct_run_id_and_settings_dict_from_database()
-        # print('time run_id_settings_dict = ', time.time() - start)
+        print('time run_id_settings_dict = ', time.time() - start)
         # print(len(self.run_id_settings_dict))
         # exit()
 
@@ -39,12 +39,9 @@ class DatabaseReader():
     def create_dict_keys(self, dic, *keys):
         d = dic
         for k in keys:
-            try:
-                d[k]
-            except:
+            if not k in d:
                 d[k] = {}
             d = d[k]
-        return dic
 
     def construct_run_id_and_settings_dict_from_database(self):
         run_id_settings_dict = dict()
@@ -54,16 +51,13 @@ class DatabaseReader():
             self.sql_cursor.execute(sql)
             settings_for_run_id = self.sql_cursor.fetchall()
             # print('time fetch ',table_name,' = ', time.time() - start)
-            tmp = list(zip(*settings_for_run_id))
-            tmp[-1] = map(ujson.loads, tmp[-1])
-            settings_for_run_id = zip(*tmp)
             for run_id, component, parameter, value in settings_for_run_id:
                 if component == 'null':
                     self.create_dict_keys(run_id_settings_dict, run_id, table_name, parameter)
-                    run_id_settings_dict[run_id][table_name][parameter] = value
+                    run_id_settings_dict[run_id][table_name][parameter] = json.loads(value)
                 else:
                     self.create_dict_keys(run_id_settings_dict, run_id, table_name, component, parameter)
-                    run_id_settings_dict[run_id][table_name][component][parameter] = value
+                    run_id_settings_dict[run_id][table_name][component][parameter] = json.loads(value)
             # print('time ',table_name,' = ', time.time() - start)
         return run_id_settings_dict
 
