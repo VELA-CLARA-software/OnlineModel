@@ -30,35 +30,29 @@ class DatabaseReader():
 
         self.run_id_settings_dict = self.construct_run_id_and_settings_dict_from_database()
         print('time run_id_settings_dict = ', time.time() - start)
-        # print(len(self.run_id_settings_dict))
+        print(len(self.run_id_settings_dict))
         # exit()
 
     ## SHOULD SEPARATE THE FUNCTION BELOW OUT TO DEAL WITH:
     ## Machine area, Scan, Simulation tables separately.
 
-    def create_dict_keys(self, dic, *keys):
-        d = dic
-        for k in keys:
-            if not k in d:
-                d[k] = {}
-            d = d[k]
-
     def construct_run_id_and_settings_dict_from_database(self):
-        run_id_settings_dict = dict()
+        run_id_settings_dict = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
         for table_name in self.table_name_list:
             # start = time.time()
             sql = 'select run_id, component, parameter, value from '+table_name+''
             self.sql_cursor.execute(sql)
-            settings_for_run_id = self.sql_cursor.fetchall()
-            # print('time fetch ',table_name,' = ', time.time() - start)
-            for run_id, component, parameter, value in settings_for_run_id:
-                if component == 'null':
-                    self.create_dict_keys(run_id_settings_dict, run_id, table_name, parameter)
-                    run_id_settings_dict[run_id][table_name][parameter] = json.loads(value)
-                else:
-                    self.create_dict_keys(run_id_settings_dict, run_id, table_name, component, parameter)
-                    run_id_settings_dict[run_id][table_name][component][parameter] = json.loads(value)
-            # print('time ',table_name,' = ', time.time() - start)
+            chunk_size = 5000000
+            while True:
+                settings_for_run_id = self.sql_cursor.fetchmany(chunk_size)
+                if not settings_for_run_id:
+                    break
+                for run_id, component, parameter, value in settings_for_run_id:
+                    if component == 'null':
+                        run_id_settings_dict[run_id][table_name][parameter] = json.loads(value)
+                    else:
+                        run_id_settings_dict[run_id][table_name][component][parameter] = json.loads(value)
+                # print('time ',table_name,' = ', time.time() - start)
         return run_id_settings_dict
 
     def compare_entries(self, yaml_settings):
