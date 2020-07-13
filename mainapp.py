@@ -55,7 +55,7 @@ class MainApp(QObject):
         print('waiting for response!')
         poller = zmq.Poller()
         poller.register(self.socket, zmq.POLLIN)
-        if poller.poll(1*1000): # 10s timeout in milliseconds
+        if poller.poll(1*1000): # 1s timeout in milliseconds
             response = self.socket.recv_pyobj()
             print('response = ', response)
             return True
