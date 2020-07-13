@@ -3,12 +3,12 @@
 import sys, os
 import sqlite3
 import uuid
-import run_parameters_parser as yaml_parser
+import database.run_parameters_parser as yaml_parser
 import collections
 import json
 
 class DatabaseWriter():
-    
+
     def __init__(self, *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
@@ -28,14 +28,15 @@ class DatabaseWriter():
                 items.append((new_key, v))
         return dict(items)
 
-    def save_dict_to_db(self, settings_dict_to_save):
+    def save_dict_to_db(self, settings_dict_to_save, run_id=None):
         ### NEEDS TO CHECK THE STATE OF RESULTS IN TABLE ###
         ### AS SOON AS AN ENTRY DOES NOT EXIST, WRITE IT TO TABLE ###
-        
+
         # converting the dictionary to flattened form to save to db
         newdict = self.flatten(settings_dict_to_save)
-        # creating a new run_id with uuid
-        run_id = self.tempname()
+        # creating a new run_id with uuid IF NOT passed to function
+        if run_id is None:
+            run_id = self.tempname()
         # cycle through flattened dictionary key/value pairs
         # Flattened Format: <TABLE_NAME>£<HARDWARE_NAME>£<PARAMETER> : <VALUE>
         # Example: BA1£EBT-BA1-MAG-QUAD-01£kl1 : -0.959
@@ -47,12 +48,12 @@ class DatabaseWriter():
                 component = splitstr[0]
                 parameter = splitstr[1]
                 value = v
-                print('---------------------------------')
-                print('Machine Area: ', table_name)
-                print('Component: ', component)
-                print('Parameter: ', parameter)
-                print('Value: ', value)
-                print('---------------------------------')
+                # print('---------------------------------')
+                # print('Machine Area: ', table_name)
+                # print('Component: ', component)
+                # print('Parameter: ', parameter)
+                # print('Value: ', value)
+                # print('---------------------------------')
                 self.save_entry_to_machine_area_table(run_id, table_name, component, parameter, value)
             if (table_name == 'scan'):
                 component = json.dumps(None)

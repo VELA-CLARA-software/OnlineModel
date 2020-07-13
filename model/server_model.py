@@ -14,6 +14,31 @@ import SimulationFramework.Modules.read_twiss_file as rtf
 sys.path.append(os.path.abspath(__file__+'/../../'))
 import controller.run_parameters_parser as yaml_parser
 
+def convert_data_types( export_dict={}, data_dict={}, keyname=None):
+    if keyname is not None:
+        export_dict[keyname] = dict()
+        edict = export_dict[keyname]
+    else:
+        edict = export_dict
+    for key, value in data_dict.items():
+        if isinstance(value, (dict, collections.OrderedDict)) and not key == 'sub_elements':
+            subdict = convert_data_types({}, value)
+            edict.update({key:subdict})
+        else:
+            if not key == 'sub_elements':
+                # value = self.model.data.Framework.convert_numpy_types(value)
+                edict.update({key:value})
+    return export_dict
+
+def create_yaml_dictionary(data):
+    export_dict = dict()
+    data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'EBT', 'BA1', 'simulation']
+    if data['scanDict']['parameter_scan']:
+        data_dicts.append('scan')
+    for n in data_dicts:
+        export_dict = convert_data_types(export_dict, data['parameterDict'][n], n)
+    return export_dict
+
 class twissData(object):
 
     def __init__(self, directory, name):
@@ -177,41 +202,21 @@ class Model(object):
         self.Framework.generator.sig_x = self.data.generatorDict['spot_size']['value']
         self.Framework.generator.sig_y = self.data.generatorDict['spot_size']['value']
 
-    def convert_data_types(self, export_dict={}, data_dict={}, keyname=None):
-        if keyname is not None:
-            export_dict[keyname] = dict()
-            edict = export_dict[keyname]
-        else:
-            edict = export_dict
-        for key, value in data_dict.items():
-            if isinstance(value, (dict, collections.OrderedDict)) and not key == 'sub_elements':
-                subdict = self.convert_data_types({}, value)
-                edict.update({key:subdict})
-            else:
-                if not key == 'sub_elements':
-                    # value = self.model.data.Framework.convert_numpy_types(value)
-                    edict.update({key:value})
-        return export_dict
-
     def create_subdirectory(self, dir):
         if not os.path.exists(dir):
             os.makedirs(dir, exist_ok=True)
 
     def export_parameter_values_to_yaml_file(self):
-        export_dict = dict()
-        data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'EBT', 'BA1', 'simulation']
         if self.data.scanDict['parameter_scan']:
             directory = self.directoryname
             filename =  '/scan_settings.yaml'
-            data_dicts.append('scan')
         else:
             directory = self.directoryname
             filename = 'settings.yaml'
         if not filename == "":
             print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
             self.create_subdirectory(directory)
-            for n in data_dicts:
-                export_dict = self.convert_data_types(export_dict, self.data.parameterDict[n], n)
+            export_dict = create_yaml_dictionary(self.data)
             yaml_parser.write_parameter_output_file(str(os.path.relpath(directory + '/' + filename)), export_dict)
         else:
             print( 'Failed to export, please provide a filename.')

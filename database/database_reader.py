@@ -1,8 +1,8 @@
 import sys, os, time
 import sqlite3
 import uuid
-import run_parameters_parser as yaml_parser
-import database_writer
+import database.run_parameters_parser as yaml_parser
+import database.database_writer
 import collections
 import ujson as json
 # import json
@@ -36,24 +36,51 @@ class DatabaseReader():
     ## SHOULD SEPARATE THE FUNCTION BELOW OUT TO DEAL WITH:
     ## Machine area, Scan, Simulation tables separately.
 
-    def construct_run_id_and_settings_dict_from_database(self):
+    def update_from_sql(self, table_name, run_id_settings_dict):
+        chunk_size = 5000000
+        while True:
+            settings_for_run_id = self.sql_cursor.fetchmany(chunk_size)
+            if not settings_for_run_id:
+                break
+            for run_id, component, parameter, value in settings_for_run_id:
+                if component == 'null':
+                    run_id_settings_dict[run_id][table_name][parameter] = json.loads(value)
+                else:
+                    run_id_settings_dict[run_id][table_name][component][parameter] = json.loads(value)
+
+    def add_to_run_id_and_settings_dict_from_database(self, run_id):
+        run_id_settings_dict = self.run_id_settings_dict
+        for table_name in self.table_name_list:
+            sql = 'select run_id, component, parameter, value from '+table_name+' where run_id = \'' + run_id + '\''
+            self.sql_cursor.execute(sql)
+            self.update_from_sql(table_name, run_id_settings_dict)
+
+    def construct_run_id_and_settings_dict_from_database(self, run_id=None):
         run_id_settings_dict = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
         for table_name in self.table_name_list:
             # start = time.time()
             sql = 'select run_id, component, parameter, value from '+table_name+''
+            if run_id is not None:
+                sql += ' where run_id = \'' + run_id + '\''
             self.sql_cursor.execute(sql)
-            chunk_size = 5000000
-            while True:
-                settings_for_run_id = self.sql_cursor.fetchmany(chunk_size)
-                if not settings_for_run_id:
-                    break
-                for run_id, component, parameter, value in settings_for_run_id:
-                    if component == 'null':
-                        run_id_settings_dict[run_id][table_name][parameter] = json.loads(value)
-                    else:
-                        run_id_settings_dict[run_id][table_name][component][parameter] = json.loads(value)
-                # print('time ',table_name,' = ', time.time() - start)
+            self.update_from_sql(table_name, run_id_settings_dict)
         return run_id_settings_dict
+
+    def findDiff(self, d1, d2, path=""):
+        for k in d1:
+            if (k not in d2):
+                print (path, ":")
+                print (k + " as key not in d2", "\n")
+            else:
+                if type(d1[k]) is dict:
+                    if path == "":
+                        path = k
+                    else:
+                        path = path + "->" + k
+                    self.findDiff(d1[k],d2[k], path)
+                else:
+                    if d1[k] != d2[k]:
+                        self.differences += 1
 
     def compare_entries(self, yaml_settings):
         found_in_db = False
@@ -66,6 +93,9 @@ class DatabaseReader():
                 run_id_for_settings = run_id
                 return found_in_db, run_id
             else:
+                # self.differences = 0
+                # self.findDiff(yaml_settings, db_settings)
+                # print(run_id, self.differences)
                 continue
         return found_in_db, run_id
 

@@ -11,6 +11,7 @@ from copy import deepcopy
 
 sys.path.append(os.path.abspath(__file__+'/../../'))
 import controller.run_parameters_parser as yaml_parser
+import database.database_controller as dbc
 
 format = "%(asctime)s: %(message)s"
 logging.basicConfig(format=format, level=logging.INFO,
@@ -21,38 +22,47 @@ class Data(object):
     def __init__(self):
         super(Data, self).__init__()
 
+    def __getitem__(self, key):
+        return getattr(self, key)
+
 class modelThread(threading.Thread):
 
-    def __init__(self, msg, runno, directoryname):
+    def __init__(self, datadict, runno, directoryname, is_in_database=False):
         super(modelThread, self).__init__()
-        self.data = Data()
-        for k,v in msg.items():
-            if isinstance(v,dict):
-                setattr(self.data,k,v.copy())
-            else:
-                setattr(self.data,k,v)
         self.runno = runno
-        self.directoryname = directoryname
-        print('passing new run directory ', directoryname)
-        self.track_model = model.Model(directoryname=self.directoryname, data=self.data, runno=self.runno)
-        # self.status = ""
+        self.directoryname = 'test/'+directoryname
+        self.datadict = datadict
+        self.is_in_database = is_in_database
+        if not is_in_database:
+            self.data = Data()
+            for k,v in datadict.items():
+                if isinstance(v,dict):
+                    setattr(self.data,k,v.copy())
+                else:
+                    setattr(self.data,k,v)
+            print('passing new run directory ', directoryname)
+            self.track_model = model.Model(directoryname=self.directoryname, data=self.data, runno=self.runno)
 
     def run(self):
-        logging.info("Tracking Thread %s: starting", self.runno)
-        # self.status = "\ttracking..."
-        self.track_model.run_script()
-        logging.info("Tracking Thread %s: finishing", self.runno)
-        # self.status = "finished"
+        if not self.is_in_database:
+            logging.info("Tracking Thread %s: starting", self.runno)
+            self.track_model.run_script()
+            logging.info("Tracking Thread %s: finishing", self.runno)
+        else:
+            pass
 
     def get_status(self):
-        return self.track_model.Framework.progress if self.track_model.Framework.progress < 100 else "finished"
+        if self.is_in_database:
+            return "finished"
+        else:
+            return self.track_model.Framework.progress if self.track_model.Framework.progress < 100 else "finished"
 
 class twissThread(threading.Thread):
 
     def __init__(self, directory, runno):
         super(twissThread, self).__init__()
         self.runno = runno
-        self.twiss_model = model.twissData(directory=directory, name=runno)
+        self.twiss_model = model.twissData(directory='test/'+directory, name=runno)
         self.status = "Running"
 
     def run(self):
@@ -76,11 +86,13 @@ class zmqServer():
         self.status = ""
         self.track_thread_objects = {}
         self.twiss_thread_objects = {}
-        self.dirnames = self.load_dirnames_from_json()
-        print(self.dirnames)
+        self.run_number = 0
+        self.dbcontroller = dbc.DatabaseController()
 
     def get_next_runno(self):
-        return next(i for i, e in enumerate(sorted(self.dirnames.keys()) + [ None ], 1) if i != e)
+        runno = self.run_number
+        self.run_number += 1
+        return runno
 
     def poll_socket(self, socket, timetick = 100):
         poller = zmq.Poller()
@@ -129,74 +141,69 @@ class zmqServer():
         else:
             return {}
 
-    def import_yaml(self, runno):
-        runno = int(runno)
-        if runno in self.dirnames.keys():
-            return self.import_parameter_values_from_yaml_file(self.dirnames[runno]+'/settings.yaml')
-
-    def get_directory_name(self, runno):
-        if runno in self.dirnames.keys():
-            return os.path.abspath(self.dirnames[runno])
-        else:
-            return 'Directory Name not returned - key not found'
+    def import_yaml(self, directoryname):
+        return self.import_parameter_values_from_yaml_file(directoryname+'/settings.yaml')
 
     def get_all_directory_names(self, *args):
-        return {k:os.path.abspath(v) for k,v in self.dirnames.items()}
+        return {}#{k:os.path.abspath(v) for k,v in self.dirnames.items()}
 
     def do_tracking_run(self, datadict):
         runno = self.get_next_runno()
-        print('runno = ', runno)
-        directoryname = self.create_random_directory_name(runno)
-        thread = modelThread(datadict, runno, directoryname)
-        self.track_thread_objects[runno] = thread
+        yaml = model.create_yaml_dictionary(datadict)
+        if self.are_settings_in_database(yaml):
+            directoryname = self.get_run_id_for_settings(yaml)
+        else:
+            directoryname = self.create_random_directory_name()
+        thread = modelThread(datadict, runno, directoryname, is_in_database=self.are_settings_in_database(yaml))
+        self.track_thread_objects[directoryname] = thread
         thread.start()
-        return runno
+        return directoryname
 
-    def get_tracking_status(self, runno):
-        if runno in self.track_thread_objects:
-            status = self.track_thread_objects[runno].get_status()
+    def get_tracking_status(self, directoryname):
+        if directoryname in self.track_thread_objects:
+            status = self.track_thread_objects[directoryname].get_status()
             if status == "finished":
-                self.save_dirnames_to_json()
-                del self.track_thread_objects[runno]
+                yaml = model.create_yaml_dictionary(self.track_thread_objects[directoryname].datadict)
+                self.save_settings_to_database(yaml, directoryname)
+                del self.track_thread_objects[directoryname]
             return status
         else:
             return 'Not Started'
 
-    def do_twiss_run(self, runno):
-        # print('TWISS runno = ', runno)
-        directoryname = self.dirnames[int(runno)]
-        thread = twissThread(directoryname, runno)
-        self.twiss_thread_objects[runno] = thread
-        thread.start()
-        return runno
+    def are_settings_in_database(self, yaml):
+        return self.dbcontroller.are_settings_in_database(yaml)
 
-    def get_twiss_status(self, runno):
-        if runno in self.twiss_thread_objects:
-            status = self.twiss_thread_objects[runno].get_status()
+    def get_run_id_for_settings(self, yaml):
+        if self.are_settings_in_database(yaml):
+            return self.dbcontroller.get_run_id_for_settings(yaml)
+        else:
+            return None
+
+    def do_twiss_run(self, directoryname):
+        # print('TWISS runno = ', runno)
+        thread = twissThread(directoryname)
+        self.twiss_thread_objects[directoryname] = thread
+        thread.start()
+        return directoryname
+
+    def get_twiss_status(self, directoryname):
+        if directoryname in self.twiss_thread_objects:
+            status = self.twiss_thread_objects[directoryname].get_status()
             if not status == "Running":
-                data = self.twiss_thread_objects[runno].twissData
+                data = self.twiss_thread_objects[directoryname].twissData
                 # del self.twiss_thread_objects[runno]
             return status
         else:
             return 'Not Started'
 
-    def create_random_directory_name(self, runno):
-        dirname = 'test/'+str(uuid.uuid4())
-        while dirname in self.dirnames.values():
-            dirname = 'test/'+str(uuid.uuid4())
-        self.dirnames[runno] = dirname
+    def create_random_directory_name(self):
+        dirname = str(uuid.uuid4())
+        # while dirname in self.dirnames.values():
+        #     dirname = 'test/'+str(uuid.uuid4())
         return dirname
 
-    def save_dirnames_to_json(self):
-        with open('zmq_dirnames.json', 'w') as f:
-            json.dump(self.dirnames, f)
-
-    def load_dirnames_from_json(self):
-        if os.path.isfile('zmq_dirnames.json'):
-            with open('zmq_dirnames.json', 'r') as f:
-                return  {int(k):v for k,v in json.load(f).items() if os.path.isdir(v)}
-        else:
-            return {}
+    def save_settings_to_database(self, yaml, directoryname):
+        self.dbcontroller.save_settings_to_database(yaml, directoryname)
 
 if __name__ == "__main__":
     server = zmqServer()

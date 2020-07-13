@@ -497,7 +497,7 @@ class RunParameterController(QObject):
 
     def update_directory_widget(self):
         dirname = self.model.get_directory_name()
-        self.update_widgets_with_values('simulation:directory', dirname)
+        self.view.directory.setText(str(dirname))
 
     def update_runs_widget(self):
         dirname = self.model.get_directory_name()
