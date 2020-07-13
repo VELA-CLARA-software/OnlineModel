@@ -589,7 +589,7 @@
                  </size>
                 </property>
                 <property name="accessibleName">
-                 <string/>
+                 <string>simulation:directory</string>
                 </property>
                 <property name="text">
                  <string/>

@@ -492,12 +492,16 @@ class RunParameterController(QObject):
             self.thread.finished.connect(self.enable_run_button)
             self.thread.finished.connect(self.update_directory_widget)
             self.thread.finished.connect(self.update_runs_widget)
+            self.thread.finished.connect(self.save_settings_to_database)
             self.thread.start()
         return
 
+    def save_settings_to_database(self):
+        self.model.save_settings_to_database(self.model.yaml, self.model.directoryname)
+
     def update_directory_widget(self):
         dirname = self.model.get_directory_name()
-        self.view.directory.setText(str(dirname))
+        self.update_widgets_with_values('simulation:directory', dirname)
 
     def update_runs_widget(self):
         dirname = self.model.get_directory_name()

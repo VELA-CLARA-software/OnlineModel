@@ -49,6 +49,8 @@ class DatabaseController():
                 print('Saving Dictionary settings...')
                 self.writer.save_dict_to_db(settings_to_save, run_id)
                 self.reader.add_to_run_id_and_settings_dict_from_database(run_id)
+            # else:
+            #     print('setting exist!')
 
 
 

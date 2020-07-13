@@ -16,7 +16,8 @@ sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'd
 
 from controller import unified_controller, run_parameter_controller, post_processing_controller, dynamic_plot_controller
 from view import view
-from model import model
+from model import remote_model as rmodel
+from model import local_model as lmodel
 from database import database_controller
 
 class MainApp(QObject):
@@ -26,8 +27,13 @@ class MainApp(QObject):
         super(MainApp, self).__init__()
         self.app = app
         self.view = view.Ui_MainWindow()
-        self.initialise_zeromq()
-        self.model = model.Model(self.socket)
+        use_server = self.initialise_zeromq()
+        if use_server:
+            print('Using REMOTE Model')
+            self.model = rmodel.Model(self.socket)
+        else:
+            print('Using LOCAL Model')
+            self.model = lmodel.Model()
         self.MainWindow = QMainWindow()
         self.view.setupUi(self.MainWindow)
         self.RunParameterController = run_parameter_controller.RunParameterController(app, self.view, self.model)
@@ -41,14 +47,21 @@ class MainApp(QObject):
     def initialise_zeromq(self):
         context = zmq.Context()
         self.socket = context.socket(zmq.REQ)
+        self.socket.setsockopt(zmq.LINGER, 1)
         print('Connecting to server!')
-        # self.socket.connect("tcp://apclara2.dl.ac.uk:8192")
         self.socket.connect("tcp://localhost:8192")
         print('sending hello!')
         self.socket.send_pyobj('hello')
         print('waiting for response!')
-        response = self.socket.recv_pyobj()
-        print('response = ', response)
+        poller = zmq.Poller()
+        poller.register(self.socket, zmq.POLLIN)
+        if poller.poll(1*1000): # 10s timeout in milliseconds
+            response = self.socket.recv_pyobj()
+            print('response = ', response)
+            return True
+        else:
+            return False
+            # raise IOError("Timeout processing auth request")
 
 
 if __name__ == '__main__':

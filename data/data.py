@@ -20,6 +20,9 @@ summary_output_file = 'summary_output_file_line_edit'
 
 class Data(object):
 
+    def __getitem__(self, key):
+        return getattr(self, key)
+
     def __init__(self):
         super(Data, self).__init__()
         self.my_name = "data"
