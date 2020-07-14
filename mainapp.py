@@ -59,7 +59,7 @@ class MainApp(QObject):
         print('sending hello!')
         self.socket.send_pyobj('hello')
         print('waiting for response!')
-        print(self.zmq_timeout_pyobj())
+        return self.zmq_timeout_pyobj()
             # raise IOError("Timeout processing auth request")
 
     def zmq_timeout_pyobj(self):

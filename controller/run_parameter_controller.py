@@ -120,7 +120,7 @@ class RunParameterController(QObject):
 
     def show_yaml_in_datatree(self, row, col):
         table = self.view.run_parameters_table
-        runno = table.item(row,1).text()
+        runno = table.item(row,0).text()
         data = self.model.import_yaml_from_server(runno)
         self.view.yaml_tree_widget.setData(data)
 
@@ -136,13 +136,20 @@ class RunParameterController(QObject):
         table = self.view.run_parameters_table
         rowPosition = table.rowCount() if row is None else row
         table.insertRow(rowPosition)
-        table.setItem(rowPosition, 0, QTableWidgetItem(str(int(k))))
+        # table.setItem(rowPosition, 0, QTableWidgetItem(str(int(k))))
         dir = os.path.basename(v)
-        table.setItem(rowPosition, 1, QTableWidgetItem(str(dir)))
+        table.setItem(rowPosition, 0, QTableWidgetItem(str(dir)))
+        open_folder_button = QPushButton('Open')
+        open_folder_button.clicked.connect(lambda : self.open_folder_on_server(dir))
+        table.setCellWidget(rowPosition, 1, open_folder_button)
         add_plot_button = QCheckBox('Plot')
         add_plot_button.stateChanged.connect(lambda x: self.emit_plot_signals(k, v, x))
         table.setCellWidget(rowPosition, 2, add_plot_button)
         table.resizeColumnsToContents()
+
+    def open_folder_on_server(self, dir):
+        remote_dir = self.model.get_absolute_folder_location(dir)
+        os.startfile(remote_dir)
 
     def emit_plot_signals(self, k, v, state):
         if state == Qt.Checked:
@@ -449,7 +456,7 @@ class RunParameterController(QObject):
             scan_end = float(self.model.data.scanDict['parameter_scan_to_value'])
             scan_step_size = float(self.model.data.scanDict['parameter_scan_step_size'])
             scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
-            self.view.progressBar.setRange(0,len(scan_range))
+            self.view.progressBar.setRange(0,len(scan_range+1))
         except ValueError:
             print("Enter a numerical value to conduct a scan")
         self.scan_parameter = self.model.data.scanDict['parameter']

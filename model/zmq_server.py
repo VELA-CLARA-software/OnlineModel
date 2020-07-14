@@ -12,6 +12,7 @@ from copy import deepcopy
 sys.path.append(os.path.abspath(__file__+'/../../'))
 import controller.run_parameters_parser as yaml_parser
 import database.database_controller as dbc
+import twissData as twissData
 
 format = "%(asctime)s: %(message)s"
 logging.basicConfig(format=format, level=logging.INFO,
@@ -62,13 +63,13 @@ class twissThread(threading.Thread):
     def __init__(self, directory):
         super(twissThread, self).__init__()
         self.directory = directory
-        self.twiss_model = model.twissData(directory='test/'+directory, name=directory)
+        self.twiss_model = twissData.twissData(directory='test/'+directory, name=directory)
         self.status = "Running"
 
     def run(self):
         logging.info("Twiss Thread %s: starting", self.directory)
         # self.status = "\ttracking..."
-        self.twiss_model.run_script()
+        # self.twiss_model.run_script()
         self.twissData = self.twiss_model.run_script()
         self.status = self.twissData
         logging.info("Twiss Thread %s: finishing", self.directory)
@@ -140,6 +141,9 @@ class zmqServer():
             return loaded_parameter_dict
         else:
             return {}
+
+    def get_absolute_folder_location(self, directoryname):
+        return os.path.abspath(__file__+'/../../test/'+directoryname)
 
     def import_yaml(self, directoryname):
         return self.import_parameter_values_from_yaml_file('test/'+directoryname+'/settings.yaml')

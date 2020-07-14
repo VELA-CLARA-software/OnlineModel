@@ -13,6 +13,7 @@ sys.path.append(os.path.abspath(__file__+'/../../'))
 from data import data
 import controller.run_parameters_parser as yaml_parser
 import database.database_controller as dbc
+import model.twissData as twissData
 
 def convert_data_types( export_dict={}, data_dict={}, keyname=None):
     if keyname is not None:
@@ -50,8 +51,13 @@ class Model(object):
         self.scan_progress = -1
         self.dbcontroller = dbc.DatabaseController()
 
+    def run_twiss(self, directory):
+        twiss_model = twissData.twissData(directory='test/'+directory, name=directory)
+        twiss = twiss_model.run_script()
+        return twiss
+
     def get_all_directory_names(self):
-        return {}
+        return list(self.dbcontroller.get_all_run_ids())
 
     def close_connection(self):
         return self.client.close()
@@ -173,3 +179,6 @@ class Model(object):
             return self.dbcontroller.get_run_id_for_settings(yaml)
         else:
             return None
+
+    def get_absolute_folder_location(self, directoryname):
+        return os.path.abspath(__file__+'/../../test/'+directoryname)

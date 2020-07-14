@@ -65,5 +65,9 @@ class Model(object):
     def save_settings_to_database(self, *args, **kwargs):
         pass
 
+    def get_absolute_folder_location(self, dir):
+        response = self.socket.send_pyobj(['get_absolute_folder_location', dir])
+        return self.socket.recv_pyobj()
+
 if __name__ == "__main__":
     model = Model()
