@@ -52,6 +52,8 @@ class DatabaseController():
             # else:
             #     print('setting exist!')
 
+    def get_all_run_ids(self):
+        return self.reader.run_id_settings_dict.keys()
 
 
 if __name__ == '__main__':

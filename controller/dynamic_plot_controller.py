@@ -53,10 +53,10 @@ class DynamicPlotController(QObject):
         # dir = dir.replace('/mnt/','\\\\').replace('/','\\')+'\\'
         # print('adding twiss plot: ', dir)
         # self.omp.addTwissDirectory([{'directory': dir, 'sections': 'All'}], name=id)
-        print('Requesting Twiss - ', id)
-        twissdata = self.model.run_twiss(id)
-        self.omp.addtwissDataObject(dataobject=twissdata, name=id)
+        print('Requesting Twiss - ', dir)
+        twissdata = self.model.run_twiss(dir)
+        self.omp.addtwissDataObject(dataobject=twissdata, name=dir)
 
-    def remove_twiss_plot(self, id):
-        print('Removing twiss plot: ', id)
-        self.omp.removeCurve(id)
+    def remove_twiss_plot(self, dir):
+        print('Removing twiss plot: ', dir)
+        self.omp.removeCurve(dir)

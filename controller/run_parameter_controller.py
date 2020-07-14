@@ -65,7 +65,7 @@ class signalling_monitor(QObject):
 class RunParameterController(QObject):
 
     add_plot_signal = pyqtSignal(int, str)
-    remove_plot_signal = pyqtSignal(int)
+    remove_plot_signal = pyqtSignal(str)
 
     def __init__(self, app, view, model):
         super(RunParameterController, self).__init__()
@@ -120,7 +120,7 @@ class RunParameterController(QObject):
 
     def show_yaml_in_datatree(self, row, col):
         table = self.view.run_parameters_table
-        runno = table.itemAt(row,0).text()
+        runno = table.item(row,1).text()
         data = self.model.import_yaml_from_server(runno)
         self.view.yaml_tree_widget.setData(data)
 
@@ -129,7 +129,7 @@ class RunParameterController(QObject):
         table.clearContents()
         table.setRowCount(0)
         dirnames = self.model.get_all_directory_names()
-        for k,v in dirnames.items():
+        for k,v in enumerate(dirnames):
             self.add_run_table_row(k, v)
 
     def add_run_table_row(self, k, v, row=None):
@@ -148,7 +148,7 @@ class RunParameterController(QObject):
         if state == Qt.Checked:
             self.add_plot_signal.emit(k,v)
         elif state == Qt.Unchecked:
-            self.remove_plot_signal.emit(k)
+            self.remove_plot_signal.emit(v)
 
     def connect_auto_load_settings(self, state):
         if state:
@@ -443,7 +443,7 @@ class RunParameterController(QObject):
             self.finished_tracking = True
 
     def setup_scan(self):
-        self.export_parameter_values_to_yaml_file(auto=True)
+        # self.export_parameter_values_to_yaml_file(auto=True)
         try:
             scan_start = float(self.model.data.scanDict['parameter_scan_from_value'])
             scan_end = float(self.model.data.scanDict['parameter_scan_to_value'])
@@ -471,9 +471,10 @@ class RunParameterController(QObject):
             print('Scanning['+str(self.scan_no)+']: Setting ', self.scan_parameter, ' to ', current_scan_value)
             self.update_widgets_with_values(self.scan_parameter, current_scan_value)
             dictname, pv, param = self.split_accessible_name(self.scan_parameter)
-            subdir = (self.scan_basedir + '/' + pv + '_' + str(current_scan_value)).replace('//','/')
-            self.update_widgets_with_values('simulation:directory', subdir)
+            # subdir = (self.scan_basedir + '/' + pv + '_' + str(current_scan_value)).replace('//','/')
+            self.update_widgets_with_values('simulation:directory', self.scan_basedir)
             self.thread = GenericThread(self.do_scan)
+            self.thread.finished.connect(self.save_settings_to_database)
             self.thread.finished.connect(self.continue_scan)
             self.thread.start()
             self.scan_no += 1

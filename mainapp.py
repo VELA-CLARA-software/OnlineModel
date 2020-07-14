@@ -19,6 +19,12 @@ from view import view
 from model import remote_model as rmodel
 from model import local_model as lmodel
 from database import database_controller
+import argparse
+
+parser = argparse.ArgumentParser(description='Add Sets.')
+parser.add_argument('-s', '--server', default='apclara2.dl.ac.uk', type=str)
+parser.add_argument('-p', '--port', default='8192', type=str)
+args = parser.parse_args()
 
 class MainApp(QObject):
 
@@ -28,7 +34,7 @@ class MainApp(QObject):
         self.app = app
         self.view = view.Ui_MainWindow()
         use_server = self.initialise_zeromq()
-        if use_server:
+        if use_server is not False:
             print('Using REMOTE Model')
             self.model = rmodel.Model(self.socket)
         else:
@@ -48,21 +54,22 @@ class MainApp(QObject):
         context = zmq.Context()
         self.socket = context.socket(zmq.REQ)
         self.socket.setsockopt(zmq.LINGER, 1)
-        print('Connecting to server!')
-        self.socket.connect("tcp://localhost:8192")
+        print('Connecting to server at ',args.server,':',args.port)
+        self.socket.connect("tcp://"+args.server+":"+args.port+"")
         print('sending hello!')
         self.socket.send_pyobj('hello')
         print('waiting for response!')
+        print(self.zmq_timeout_pyobj())
+            # raise IOError("Timeout processing auth request")
+
+    def zmq_timeout_pyobj(self):
         poller = zmq.Poller()
         poller.register(self.socket, zmq.POLLIN)
         if poller.poll(1*1000): # 1s timeout in milliseconds
             response = self.socket.recv_pyobj()
-            print('response = ', response)
-            return True
+            return response
         else:
             return False
-            # raise IOError("Timeout processing auth request")
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

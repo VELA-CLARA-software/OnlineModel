@@ -209,7 +209,7 @@ class Model(object):
     def export_parameter_values_to_yaml_file(self):
         if self.data.scanDict['parameter_scan']:
             directory = self.directoryname
-            filename =  '/scan_settings.yaml'
+            filename =  '/settings.yaml'
         else:
             directory = self.directoryname
             filename = 'settings.yaml'

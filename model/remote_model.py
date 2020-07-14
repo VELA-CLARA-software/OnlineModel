@@ -12,6 +12,8 @@ class Model(object):
         self.data = data.Data()
         self.progress = 0
         self.run_number = -1
+        self.yaml = None
+        self.directoryname = None
 
     def run_script(self):
         data_dict = {}
@@ -22,7 +24,7 @@ class Model(object):
         data_dict['lattices'] = self.data.lattices
         self.socket.send_pyobj(['do_tracking_run',data_dict])
         response = run_number = self.socket.recv_pyobj()
-        self.run_number = run_number
+        self.directoryname = run_number
         print(response)
         while not response == 'finished':
             response = self.socket.send_pyobj(['get_tracking_status', run_number])
@@ -33,15 +35,15 @@ class Model(object):
         return True
 
     def get_directory_name(self):
-        return self.run_number
+        return self.directoryname
 
     def export_yaml_on_server(self):
-        response = self.socket.send_pyobj(['export_yaml', self.run_number])
+        response = self.socket.send_pyobj(['export_yaml', self.directoryname])
         return self.socket.recv_pyobj()
 
     def import_yaml_from_server(self, runno=None):
         if runno is None:
-            runno = self.run_number
+            runno = self.directoryname
         response = self.socket.send_pyobj(['import_yaml', runno])
         return self.socket.recv_pyobj()
 
@@ -59,6 +61,9 @@ class Model(object):
             response = self.socket.recv_pyobj()
             time.sleep(0.01)
         return response
+
+    def save_settings_to_database(self, *args, **kwargs):
+        pass
 
 if __name__ == "__main__":
     model = Model()

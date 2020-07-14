@@ -59,19 +59,19 @@ class modelThread(threading.Thread):
 
 class twissThread(threading.Thread):
 
-    def __init__(self, directory, runno):
+    def __init__(self, directory):
         super(twissThread, self).__init__()
-        self.runno = runno
-        self.twiss_model = model.twissData(directory='test/'+directory, name=runno)
+        self.directory = directory
+        self.twiss_model = model.twissData(directory='test/'+directory, name=directory)
         self.status = "Running"
 
     def run(self):
-        logging.info("Twiss Thread %s: starting", self.runno)
+        logging.info("Twiss Thread %s: starting", self.directory)
         # self.status = "\ttracking..."
         self.twiss_model.run_script()
         self.twissData = self.twiss_model.run_script()
         self.status = self.twissData
-        logging.info("Twiss Thread %s: finishing", self.runno)
+        logging.info("Twiss Thread %s: finishing", self.directory)
 
     def get_status(self):
         return self.status
@@ -142,10 +142,10 @@ class zmqServer():
             return {}
 
     def import_yaml(self, directoryname):
-        return self.import_parameter_values_from_yaml_file(directoryname+'/settings.yaml')
+        return self.import_parameter_values_from_yaml_file('test/'+directoryname+'/settings.yaml')
 
     def get_all_directory_names(self, *args):
-        return {}#{k:os.path.abspath(v) for k,v in self.dirnames.items()}
+        return list(self.dbcontroller.get_all_run_ids())#{k:os.path.abspath(v) for k,v in self.dirnames.items()}
 
     def do_tracking_run(self, datadict):
         runno = self.get_next_runno()
