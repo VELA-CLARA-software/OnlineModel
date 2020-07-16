@@ -28,12 +28,13 @@ class Data(object):
 
 class modelThread(threading.Thread):
 
-    def __init__(self, datadict, runno, directoryname, is_in_database=False):
+    def __init__(self, datadict, runno, directoryname, is_in_database=False, user=None):
         super(modelThread, self).__init__()
         self.runno = runno
         self.directoryname = 'test/'+directoryname
         self.datadict = datadict
         self.is_in_database = is_in_database
+        self.user = user
         if not is_in_database:
             self.data = Data()
             for k,v in datadict.items():
@@ -151,7 +152,7 @@ class zmqServer():
     def get_all_directory_names(self, *args):
         return list(self.dbcontroller.get_all_run_ids())#{k:os.path.abspath(v) for k,v in self.dirnames.items()}
 
-    def do_tracking_run(self, datadict):
+    def do_tracking_run(self, datadict, user):
         runno = self.get_next_runno()
         yaml = model.create_yaml_dictionary(datadict)
         del yaml['simulation']['directory']
@@ -159,7 +160,7 @@ class zmqServer():
             directoryname = self.get_run_id_for_settings(yaml)
         else:
             directoryname = self.create_random_directory_name()
-        thread = modelThread(datadict, runno, directoryname, is_in_database=self.are_settings_in_database(yaml))
+        thread = modelThread(datadict, runno, directoryname, is_in_database=self.are_settings_in_database(yaml), user=user)
         self.track_thread_objects[directoryname] = thread
         thread.start()
         return directoryname
@@ -170,7 +171,7 @@ class zmqServer():
             if status == "finished":
                 yaml = model.create_yaml_dictionary(self.track_thread_objects[directoryname].datadict)
                 del yaml['simulation']['directory']
-                self.save_settings_to_database(yaml, directoryname)
+                self.save_settings_to_database(yaml, directoryname, self.track_thread_objects[directoryname].user)
                 del self.track_thread_objects[directoryname]
             return status
         else:
@@ -208,8 +209,9 @@ class zmqServer():
         #     dirname = 'test/'+str(uuid.uuid4())
         return dirname
 
-    def save_settings_to_database(self, yaml, directoryname):
+    def save_settings_to_database(self, yaml, directoryname, user):
         self.dbcontroller.save_settings_to_database(yaml, directoryname)
+        self.dbcontroller.save_run_information(directoryname, time.time(), user)
 
 if __name__ == "__main__":
     server = zmqServer()

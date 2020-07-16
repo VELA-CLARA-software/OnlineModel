@@ -170,6 +170,7 @@ class Model(object):
 
     def save_settings_to_database(self, yaml, directoryname):
         self.dbcontroller.save_settings_to_database(yaml, directoryname)
+        self.dbcontroller.save_run_information(directoryname, time.time(), os.getlogin())
 
     def are_settings_in_database(self, yaml):
         return self.dbcontroller.are_settings_in_database(yaml)

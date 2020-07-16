@@ -22,7 +22,7 @@ class Model(object):
         data_dict['simulationDict'] = self.data.simulationDict
         data_dict['scanDict'] = self.data.scanDict
         data_dict['lattices'] = self.data.lattices
-        self.socket.send_pyobj(['do_tracking_run',data_dict])
+        self.socket.send_pyobj(['do_tracking_run',data_dict, os.getlogin()])
         response = run_number = self.socket.recv_pyobj()
         self.directoryname = run_number
         print(response)

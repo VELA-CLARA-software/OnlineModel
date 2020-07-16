@@ -12,25 +12,28 @@ class DatabaseController():
     def are_settings_in_database(self, settings_to_read=None):
         if settings_to_read == None:
             if self.settings_dict != None:
+                settings = self.settings_dict.copy()
                 print('Checking YAML settings against database...')
-                return self.reader.are_settings_in_database(self.settings_dict)
+                return self.reader.are_settings_in_database(settings)
             else:
                 print('Supply a settings dictionary, or load yaml settings before checking database')
         else:
-            print('Checking Dictionary settings against database...', self.reader.are_settings_in_database(settings_to_read))
-            return self.reader.are_settings_in_database(settings_to_read)
+            settings = settings_to_read.copy()
+            print('Checking Dictionary settings against database...', self.reader.are_settings_in_database(settings))
+            return self.reader.are_settings_in_database(settings)
 
     def get_run_id_for_settings(self, settings_to_read=None):
         if settings_to_read == None:
             if self.settings_dict != None:
+                settings = self.settings_dict.copy()
                 print('Searching for RUN ID for YAML settings...')
-                # settings_to_check = self.reader.prepare_dict_for_checking(self.settings_dict)
-                return self.reader.get_run_id_for_settings(self.settings_dict)
+                return self.reader.get_run_id_for_settings(settings)
             else:
                 print('Supply a settings dictionary, or load yaml settings before checking database')
         else:
-            print('Searching for RUN ID for Dictionary settings...', self.reader.get_run_id_for_settings(settings_to_read))
-            return self.reader.get_run_id_for_settings(settings_to_read)
+            settings = settings_to_read.copy()
+            print('Searching for RUN ID for Dictionary settings...', self.reader.get_run_id_for_settings(settings))
+            return self.reader.get_run_id_for_settings(settings)
 
     def load_yaml_settings(self, yaml_filename):
         self.settings_dict = yaml_parser.parse_parameter_input_file(yaml_filename)
@@ -47,6 +50,7 @@ class DatabaseController():
         else:
             if not self.are_settings_in_database(settings_to_save):
                 print('Saving Dictionary settings...')
+                print('db controller keys = ', settings_to_save.keys())
                 self.writer.save_dict_to_db(settings_to_save, run_id)
                 self.reader.add_to_run_id_and_settings_dict_from_database(run_id)
             # else:
@@ -55,6 +59,8 @@ class DatabaseController():
     def get_all_run_ids(self):
         return self.reader.run_id_settings_dict.keys()
 
+    def save_run_information(self, *args):
+        self.writer.save_entry_to_run_table(*args)
 
 if __name__ == '__main__':
     dbc = DatabaseController()

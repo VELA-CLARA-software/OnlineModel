@@ -475,8 +475,9 @@ class RunParameterController(QObject):
             self.view.progressBar.setValue(self.scan_no+1)
             self.scan_progress = self.scan_no+1
             current_scan_value = round(self.scan_range[self.scan_no], 5)
-            print('Scanning['+str(self.scan_no)+']: Setting ', self.scan_parameter, ' to ', current_scan_value)
+            print('Scanning['+str(self.scan_no)+']: Setting ', self.scan_parameter, ' to ', current_scan_value, ' - ACTUAL Value = ', self.get_widget_value(self.get_object_by_accessible_name(self.scan_parameter)))
             self.update_widgets_with_values(self.scan_parameter, current_scan_value)
+            self.model.data.scanDict['value'] = self.get_widget_value(self.get_object_by_accessible_name(self.scan_parameter))
             dictname, pv, param = self.split_accessible_name(self.scan_parameter)
             # subdir = (self.scan_basedir + '/' + pv + '_' + str(current_scan_value)).replace('//','/')
             self.update_widgets_with_values('simulation:directory', self.scan_basedir)
