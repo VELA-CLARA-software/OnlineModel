@@ -103,14 +103,14 @@ class Model(object):
             self.directoryname = self.get_run_id_for_settings(self.yaml)
         else:
             self.directoryname = self.create_random_directory_name()
-        print('+++++++++++++++++ Using directory ', 'temp/'+self.directoryname, ' ++++++++++++++++++++++')
+        print('+++++++++++++++++ Using directory ', 'test/'+self.directoryname, ' ++++++++++++++++++++++')
         if not self.are_settings_in_database(self.yaml):
             self.update_tracking_codes()
             self.update_CSR()
             self.update_LSC()
             startLattice = self.data.simulationDict['starting_lattice']
             endLattice = self.data.simulationDict['final_lattice']
-            self.data.Framework.setSubDirectory('temp/'+self.directoryname)
+            self.data.Framework.setSubDirectory('test/'+self.directoryname)
             self.modify_framework(scan=False)
             self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
             if self.data.simulationDict['track']:

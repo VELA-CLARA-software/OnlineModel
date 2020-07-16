@@ -27,10 +27,11 @@ class DatabaseReader():
         # This dictionary is keyed by run-id and
         # the value is a string containing the deformatted dictionary of settings.
         # To see the deformatting function, go to deformat_dictionary(dict)
-
+        print('###### Loading Database ######')
         self.run_id_settings_dict = self.construct_run_id_and_settings_dict_from_database()
-        print('time run_id_settings_dict = ', time.time() - start)
-        print(len(self.run_id_settings_dict))
+        print('       time to load database = ', time.time() - start, 'seconds ')
+        print('       Number of entries in database = ', len(self.run_id_settings_dict))
+        print('###### Database Loaded ######')
         # exit()
 
     ## SHOULD SEPARATE THE FUNCTION BELOW OUT TO DEAL WITH:

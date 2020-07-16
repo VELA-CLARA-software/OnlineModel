@@ -1,10 +1,15 @@
 import database.run_parameters_parser as yaml_parser
 import database.database_reader as database_reader
 import database.database_writer as database_writer
+import database.database_creator as database_creator
 
 class DatabaseController():
 
     def __init__(self):
+        ### Check/Create database
+        self.creator = database_creator.DatabaseCreator()
+        self.creator.create_simulation_database(clean=False)
+        
         self.reader = database_reader.DatabaseReader()
         self.writer = database_writer.DatabaseWriter()
         self.settings_dict = None
@@ -50,7 +55,6 @@ class DatabaseController():
         else:
             if not self.are_settings_in_database(settings_to_save):
                 print('Saving Dictionary settings...')
-                print('db controller keys = ', settings_to_save.keys())
                 self.writer.save_dict_to_db(settings_to_save, run_id)
                 self.reader.add_to_run_id_and_settings_dict_from_database(run_id)
             # else:
@@ -61,6 +65,9 @@ class DatabaseController():
 
     def save_run_information(self, *args):
         self.writer.save_entry_to_run_table(*args)
+
+    def clean_database(self, tables=None):
+        self.creator.create_simulation_database(clean=True, tables=tables)
 
 if __name__ == '__main__':
     dbc = DatabaseController()
