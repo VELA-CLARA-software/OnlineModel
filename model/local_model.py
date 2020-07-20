@@ -33,7 +33,7 @@ def convert_data_types( export_dict={}, data_dict={}, keyname=None):
 
 def create_yaml_dictionary(data):
     export_dict = dict()
-    data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'EBT', 'BA1', 'simulation']
+    data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'EBT', 'BA1', 'simulation', 'runs']
     if data['scanDict']['parameter_scan']:
         data_dicts.append('scan')
     for n in data_dicts:
@@ -170,7 +170,6 @@ class Model(object):
 
     def save_settings_to_database(self, yaml, directoryname):
         self.dbcontroller.save_settings_to_database(yaml, directoryname)
-        self.dbcontroller.save_run_information(directoryname, time.time(), os.getlogin())
 
     def are_settings_in_database(self, yaml):
         return self.dbcontroller.are_settings_in_database(yaml)
@@ -183,3 +182,46 @@ class Model(object):
 
     def get_absolute_folder_location(self, directoryname):
         return os.path.abspath(__file__+'/../../test/'+directoryname)
+
+    def create_subdirectory(self, dir):
+        if not os.path.exists(dir):
+            os.makedirs(dir, exist_ok=True)
+
+    def convert_data_types(self, export_dict={}, data_dict={}, keyname=None):
+        if keyname is not None:
+            export_dict[keyname] = dict()
+            edict = export_dict[keyname]
+        else:
+            edict = export_dict
+        for key, value in data_dict.items():
+            if isinstance(value, (dict, collections.OrderedDict)) and not key == 'sub_elements':
+                subdict = self.convert_data_types({}, value)
+                edict.update({key:subdict})
+            else:
+                if not key == 'sub_elements':
+                    # value = self.model.data.Framework.convert_numpy_types(value)
+                    edict.update({key:value})
+        return export_dict
+
+    def export_parameter_values_to_yaml_file(self, auto=False):
+        export_dict = dict()
+        data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'EBT', 'BA1', 'simulation', 'runs']
+        if self.data.scanDict['parameter_scan']:
+            data_dicts.append('scan')
+        if auto:
+            directory = 'test/'+self.directoryname
+            filename = 'settings.yaml'
+        else:
+            dialog = QFileDialog()
+            filename, _filter = QFileDialog.getSaveFileNameAndFilter(dialog, caption='Save File', directory='c:\\',
+                                                                 filter="YAML Files (*.YAML *.YML *.yaml *.yml")
+            filename = filename[0] if isinstance(filename,tuple) else filename
+            dirctory, filename = os.path.split(filename)
+        if not filename == "":
+            print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
+            self.create_subdirectory(directory)
+            for n in data_dicts:
+                export_dict = self.convert_data_types(export_dict, self.data.parameterDict[n], n)
+            yaml_parser.write_parameter_output_file(str(os.path.relpath(directory + '/' + filename)), export_dict)
+        else:
+            print( 'Failed to export, please provide a filename.')

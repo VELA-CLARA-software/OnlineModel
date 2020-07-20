@@ -16,30 +16,34 @@ class Model(object):
         self.directoryname = None
 
     def run_script(self):
+        self.progress = 0
         data_dict = {}
         data_dict['parameterDict'] = self.data.parameterDict
         data_dict['generatorDict'] = self.data.generatorDict
         data_dict['simulationDict'] = self.data.simulationDict
         data_dict['scanDict'] = self.data.scanDict
+        data_dict['runsDict'] = self.data.runsDict
         data_dict['lattices'] = self.data.lattices
-        self.socket.send_pyobj(['do_tracking_run',data_dict, os.getlogin()])
+        self.socket.send_pyobj(['do_tracking_run', data_dict])
         response = run_number = self.socket.recv_pyobj()
         self.directoryname = run_number
         print(response)
         while not response == 'finished':
             response = self.socket.send_pyobj(['get_tracking_status', run_number])
             response = self.socket.recv_pyobj()
-            self.progress = response
-            print('Progress: ', self.progress, '%')
+            progress = response
+            if not progress == self.progress:
+                print('Progress: ', self.progress, '%')
+                self.progress = progress
             time.sleep(0.1)
+        print('Progress: ', response)
         return True
 
     def get_directory_name(self):
         return self.directoryname
 
-    def export_yaml_on_server(self):
-        response = self.socket.send_pyobj(['export_yaml', self.directoryname])
-        return self.socket.recv_pyobj()
+    def export_parameter_values_to_yaml_file(self, *args, **kwargs):
+        pass
 
     def import_yaml_from_server(self, runno=None):
         if runno is None:

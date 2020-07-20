@@ -31,7 +31,8 @@ class DatabaseCreator():
         sql = '''CREATE TABLE IF NOT EXISTS "runs" (
                 	"run_id"	TEXT UNIQUE,
                 	"timestamp"	TEXT,
-                	"username"	TEXT
+                	"username"	TEXT,
+                    "tags"	TEXT
                 );'''
         self.sql_cursor.execute(sql)
         if clean:
@@ -45,11 +46,14 @@ class DatabaseCreator():
                 	"area"	TEXT,
                 	"component"	TEXT,
                 	"parameter"	TEXT,
-                	"start"	TEXT,
-                	"stop"	TEXT,
-                	"step"	TEXT,
+                	"parameter_scan_from_value"	TEXT,
+                	"parameter_scan_to_value"	TEXT,
+                	"parameter_scan_step_size"	TEXT,
                 	"value"	TEXT
                 );'''
+        self.sql_cursor.execute(sql)
+        sql = '''CREATE UNIQUE INDEX IF NOT EXISTS unique_scans
+                ON scan(area, component, parameter, parameter_scan_from_value, parameter_scan_to_value, parameter_scan_step_size, value);'''
         self.sql_cursor.execute(sql)
         if clean:
             sql = 'delete from SCAN;'

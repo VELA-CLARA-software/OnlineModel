@@ -42,7 +42,7 @@ class DatabaseWriter():
             splitstr = k.split('£')
             table_name = splitstr[0]
             splitstr.remove(table_name)
-            if (table_name != 'scan' and table_name != 'simulation'):
+            if (table_name != 'scan' and table_name != 'simulation' and table_name != 'runs'):
                 component = splitstr[0]
                 parameter = splitstr[1]
                 value = v
@@ -66,8 +66,9 @@ class DatabaseWriter():
 
         # scan dictionary is now treated differently, so it is run separately
         if 'scan' in settings_dict_to_save:
-            self.save_entry_to_scan_table(run_id, settings_dict_to_save['scan'])
-
+            self.save_entry_to_scan_table(run_id, **settings_dict_to_save['scan'])
+        if 'runs' in settings_dict_to_save:
+            self.save_entry_to_runs_table(run_id, **settings_dict_to_save['runs'])
         # commit the changes
         self.sql_connection.commit()
 
@@ -86,16 +87,12 @@ class DatabaseWriter():
             dictname, pv = map(str, aname.split(':'))
         return dictname, pv, param
 
-    def save_entry_to_scan_table(self, run_id, scandict):
-        step = scandict['parameter_scan_step_size']
-        start = scandict['parameter_scan_from_value']
-        stop = scandict['parameter_scan_to_value']
-        value = scandict['value']
-        area, component, parameter = self.split_accessible_name(scandict['parameter'])
-        columnstring = '(run_id, area, component, parameter, start, stop, step, value)'
+    def save_entry_to_scan_table(self, run_id, parameter=None, parameter_scan_step_size=None, parameter_scan_from_value=None, parameter_scan_to_value=None, value=None, **kwargs):
+        area, component, parameter = self.split_accessible_name(parameter)
+        columnstring = '(run_id, area, component, parameter, parameter_scan_from_value, parameter_scan_to_value, parameter_scan_step_size, value)'
         valuestring = '(?,?,?,?,?,?,?,?)'
-        sql = '''INSERT INTO scan ''' + columnstring + ''' VALUES ''' + valuestring
-        self.sql_cursor.execute(sql, [run_id, area, component, parameter, start, stop, step, value])
+        sql = '''INSERT OR IGNORE INTO scan ''' + columnstring + ''' VALUES ''' + valuestring
+        self.sql_cursor.execute(sql, [run_id, area, component, parameter, parameter_scan_from_value, parameter_scan_to_value, parameter_scan_step_size, value])
 
     def save_entry_to_simulation_table(self, run_id, component, parameter, value):
         columnstring = '(run_id, component, parameter, value)'
@@ -103,11 +100,14 @@ class DatabaseWriter():
         sql = '''INSERT INTO simulation ''' + columnstring + '''VALUES''' + valuestring
         self.sql_cursor.execute(sql, [run_id] + [component] + [parameter] + [json.dumps(value)])
 
-    def save_entry_to_run_table(self, run_id, timestamp, user):
-        columnstring = '(run_id, timestamp, username)'
-        valuestring = '(?,?,?)'
+    def save_entry_to_runs_table(self, run_id, timestamp=None, username=None, tags=None):
+        columnstring = '(run_id, timestamp, username, tags)'
+        valuestring = '(?,?,?,?)'
         sql = '''INSERT OR IGNORE INTO runs ''' + columnstring + '''VALUES''' + valuestring
-        self.sql_cursor.execute(sql, [run_id, timestamp, user])
+        self.sql_cursor.execute(sql, [run_id, timestamp, username, json.dumps(tags)])
+        # if not self.sql_cursor.rowcount > 0:
+        #     sql = '''UPDATE runs SET tags = ? WHERE run_id = ?'''
+        #     self.sql_cursor.execute(sql, [json.dumps(tags), run_id])
         self.sql_connection.commit()
 
 

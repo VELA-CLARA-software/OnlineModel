@@ -9,7 +9,7 @@ class DatabaseController():
         ### Check/Create database
         self.creator = database_creator.DatabaseCreator()
         self.creator.create_simulation_database(clean=False)
-        
+
         self.reader = database_reader.DatabaseReader()
         self.writer = database_writer.DatabaseWriter()
         self.settings_dict = None
@@ -57,11 +57,16 @@ class DatabaseController():
                 print('Saving Dictionary settings...')
                 self.writer.save_dict_to_db(settings_to_save, run_id)
                 self.reader.add_to_run_id_and_settings_dict_from_database(run_id)
-            # else:
-            #     print('setting exist!')
+            elif 'scan' in settings_to_save and settings_to_save['scan']['parameter_scan']:
+                # If we run a scan, but a settings exists, we still need to add it to the scans table, so we can join all of the scan files up
+                # Some of the directories will be common but we will be unique in the parameter and the start/stop/step/value parameters
+                self.save_scan_information(run_id, **settings_to_save['scan'])
 
     def get_all_run_ids(self):
         return self.reader.run_id_settings_dict.keys()
+
+    def save_scan_information(self, *args, **kwargs):
+        self.writer.save_entry_to_scan_table(*args, **kwargs)
 
     def save_run_information(self, *args):
         self.writer.save_entry_to_run_table(*args)

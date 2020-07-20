@@ -5,20 +5,89 @@ except:
     from PyQt5.QtCore import *
     from PyQt5.QtGui import *
     from PyQt5.QtWidgets import *
-from copy import copy,deepcopy
-from decimal import Decimal
 import run_parameters_parser as yaml_parser
-import sys, os, math, epics, scipy.constants, numpy
-import json, requests, datetime, time
+import sys, os
+import time
 import collections
 import numpy as np
 import pyqtgraph as pg
+
+class CheckableComboBox(QComboBox):
+    # once there is a checkState set, it is rendered
+    # here we assume default Unchecked
+
+    tagChanged = pyqtSignal()
+    tagChecked = pyqtSignal(str)
+    tagUnchecked = pyqtSignal(str)
+
+    def __init__(self, *args, **kwargs):
+        super(CheckableComboBox, self).__init__()
+        self.view().clicked.connect(self.addRemoveTags)
+
+    def addCheckableItem(self, item):
+        self.addItem(item)
+        item = self.model().item(self.count()-1,0)
+        item.setFlags(Qt.ItemIsUserCheckable | Qt.ItemIsEnabled)
+        item.setCheckState(Qt.Unchecked)
+
+    def itemChecked(self, index):
+        item = self.model().item(index,0)
+        return item.checkState() == Qt.Checked
+
+    def addRemoveTags(self, index):
+        tag = self.model().item(index.row(),0).text()
+        if self.itemChecked(index.row()):
+            self.tagChecked.emit(tag)
+        else:
+            self.tagUnchecked.emit(tag)
+        self.tagChanged.emit()
+
+    def setTagState(self, tag, state):
+        if state == Qt.Unchecked or state == Qt.Checked:
+            for i in range(self.count()):
+                item = self.model().item(i-1,0)
+                if item.text == tag:
+                    item.setCheckState(state)
+
+    def setTagStates(self, checkedtags=[]):
+        for i in range(self.count()):
+            item = self.model().item(i-1,0)
+            if item.text in checkedtags:
+                item.setCheckState(Qt.Checked)
+            else:
+                item.setCheckState(Qt.Unchecked)
+
+    def getTagText(self, index):
+        return self.model().item(index,0).text()
+
+    def getCheckedTags(self, checkedtags=[]):
+        return [self.getTagText(i) for i in range(self.count()) if self.itemChecked(i)]
+
+class userWidget(QWidget):
+
+    update = pyqtSignal()
+
+    def __init__(self, *args, **kwargs):
+        super(userWidget, self).__init__()
+
+    def value(self):
+        return os.getlogin()
+
+class timeWidget(QWidget):
+
+    update = pyqtSignal()
+
+    def __init__(self, *args, **kwargs):
+        super(timeWidget, self).__init__()
+
+    def value(self):
+        return time.time()
 
 class GenericThread(QThread):
     signal = pyqtSignal()
 
     def __init__(self, function, *args, **kwargs):
-        QThread.__init__(self)
+        super(GenericThread, self).__init__()
         self._stopped = False
         self.existent = 'existent file'
         self.function = function
@@ -67,12 +136,15 @@ class RunParameterController(QObject):
     add_plot_signal = pyqtSignal(int, str)
     remove_plot_signal = pyqtSignal(str)
 
+    tags = ['BA1', 'User Experiment', 'Front End', 'Emittance', 'Energy Spread', 'Commissioning']
+
     def __init__(self, app, view, model):
         super(RunParameterController, self).__init__()
         self.my_name = 'controller'
         self.app = app
         self.model = model
         self.view = view
+        self.create_user_tag_combo_box()
         self.runParameterLayouts = [
                                self.view.s02_parameter_groupbox,
                                self.view.c2v_parameter_groupbox,
@@ -81,7 +153,8 @@ class RunParameterController(QObject):
                                self.view.injector_parameter_groupbox,
                                self.view.simulation_parameter_groupbox,
                                self.view.scan_groupBox,
-                               self.view.directory_groupBox
+                               self.view.directory_groupBox,
+                               self.view.tags_groupBox,
                                ]
         self.formLayoutList = [formLayout for layout in self.runParameterLayouts for
                           formLayout in layout.findChildren((QFormLayout,QGridLayout))]
@@ -101,7 +174,6 @@ class RunParameterController(QObject):
         self.view.parameter_scan.stateChanged.connect(lambda: self.toggle_scan_parameters_state(self.view.parameter_scan))
         self.view.bsol_track_checkBox.stateChanged.connect(self.toggle_BSOL_tracking)
         self.view.runButton.clicked.connect(self.run_astra)
-        # self.view.runButton.clicked.connect(lambda: self.export_parameter_values_to_yaml_file(auto=True))
         self.view.loadSettingsButton.clicked.connect(self.load_settings_from_directory)
         self.view.directory.textChanged[str].connect(self.check_load_settings_button)
         self.view.directory.textChanged[str].emit(self.view.directory.text())
@@ -225,6 +297,11 @@ class RunParameterController(QObject):
             if isinstance(value, QVariant):
                 value = value.toString()
             value = str(value)
+        elif isinstance(widget, CheckableComboBox):
+            value = widget.getCheckedTags()
+        elif isinstance(widget, userWidget) or isinstance(widget, timeWidget):
+            # print('time or user widget = ', widget)
+            value = str(widget.value())
         else:
             print('Widget Error! Type = ', type(widget))
             value = None
@@ -260,6 +337,17 @@ class RunParameterController(QObject):
             elif type(widget) is QComboBox:
                 widget.currentIndexChanged.connect(self.update_value_in_dict)
                 widget.currentIndexChanged.emit(widget.currentIndex())
+            elif isinstance(widget, CheckableComboBox):
+                # print('analyse_children: CheckableComboBox! ', widget)
+                widget.tagChanged.connect(self.update_value_in_dict)
+                widget.tagChanged.emit()
+            elif isinstance(widget, userWidget):
+                widget.update.connect(self.update_value_in_dict)
+                widget.update.emit()
+            elif isinstance(widget, timeWidget):
+                widget.update.connect(self.update_value_in_dict)
+                widget.update.emit()
+                self.view.runButton.clicked.connect(widget.update.emit)
 
     def initialize_run_parameter_data(self):
         self.scannableParameters = []
@@ -338,51 +426,8 @@ class RunParameterController(QObject):
         else:
             print('Failed to import, please provide a filename')
 
-    def convert_data_types(self, export_dict={}, data_dict={}, keyname=None):
-        if keyname is not None:
-            export_dict[keyname] = dict()
-            edict = export_dict[keyname]
-        else:
-            edict = export_dict
-        for key, value in data_dict.items():
-            if isinstance(value, (dict, collections.OrderedDict)) and not key == 'sub_elements':
-                subdict = self.convert_data_types({}, value)
-                edict.update({key:subdict})
-            else:
-                if not key == 'sub_elements':
-                    # value = self.model.data.Framework.convert_numpy_types(value)
-                    edict.update({key:value})
-        return export_dict
-
-    def create_subdirectory(self, dir):
-        if not os.path.exists(dir):
-            os.makedirs(dir, exist_ok=True)
-
     def export_parameter_values_to_yaml_file(self, auto=False):
-        if auto:
-            self.model.export_yaml_on_server()
-        else:
-            export_dict = dict()
-            data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'EBT', 'BA1', 'simulation']
-            if self.model.data.scanDict['parameter_scan']:
-                dialog = QFileDialog()
-                directory = QFileDialog.getExistingDirectory(dialog,"Select Directory")
-                filename =  '/scan_settings.yaml'
-                data_dicts.append('scan')
-            else:
-                dialog = QFileDialog()
-                filename, _filter = QFileDialog.getSaveFileNameAndFilter(dialog, caption='Save File', directory='c:\\',
-                                                                     filter="YAML Files (*.YAML *.YML *.yaml *.yml")
-                filename = filename[0] if isinstance(filename,tuple) else filename
-                dirctory, filename = os.path.split(filename)
-            if not filename == "":
-                print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
-                self.create_subdirectory(directory)
-                for n in data_dicts:
-                    export_dict = self.convert_data_types(export_dict, self.model.data.parameterDict[n], n)
-                yaml_parser.write_parameter_output_file(str(os.path.relpath(directory + '/' + filename)), export_dict)
-            else:
-                print( 'Failed to export, please provide a filename.')
+        self.model.export_parameter_values_to_yaml_file(auto=auto)
 
     def toggle_scan_parameters_state(self, object):
         performScanCheckbox = object
@@ -405,7 +450,7 @@ class RunParameterController(QObject):
         if not scan:
             self.view.runButton.setEnabled(False)
         else:
-            self.view.runButton.clicked.disconnect()
+            self.view.runButton.clicked.disconnect(self.run_astra)
             self.view.runButton.setText('Abort')
             self.view.runButton.clicked.connect(self.abort_ongoing_scan)
 
@@ -434,13 +479,19 @@ class RunParameterController(QObject):
 
     def enable_run_button(self, scan=False):
         self.view.runButton.setText('Track')
-        self.view.runButton.clicked.disconnect()
+        try:
+            self.view.runButton.clicked.disconnect(self.run_astra)
+        except:
+            pass
+        try:
+            self.view.runButton.clicked.disconnect(self.abort_ongoing_scan)
+        except:
+            pass
         if not scan:
             self.view.runButton.setEnabled(True)
         else:
             pass
         self.view.runButton.clicked.connect(self.run_astra)
-        # self.view.runButton.clicked.connect(lambda: self.export_parameter_values_to_yaml_file(auto=True))
         return
 
     def toggle_finished_tracking(self):
@@ -450,7 +501,6 @@ class RunParameterController(QObject):
             self.finished_tracking = True
 
     def setup_scan(self):
-        # self.export_parameter_values_to_yaml_file(auto=True)
         try:
             scan_start = float(self.model.data.scanDict['parameter_scan_from_value'])
             scan_end = float(self.model.data.scanDict['parameter_scan_to_value'])
@@ -469,6 +519,7 @@ class RunParameterController(QObject):
 
     def do_scan(self):
         self.model.run_script()
+        self.export_parameter_values_to_yaml_file(auto=True)
 
     def continue_scan(self):
         if not self.abort_scan and self.scan_no < len(self.scan_range):
@@ -528,3 +579,23 @@ class RunParameterController(QObject):
     def run_astra(self):
         self.disable_run_button(scan=self.model.data.scanDict['parameter_scan'])
         self.app_sequence()
+
+    ##### User tags
+
+    def create_user_tag_combo_box(self):
+        self.tagWidgets = {}
+        self.view.userTagComboBox = CheckableComboBox()
+        self.view.userTagComboBox.setAccessibleName('runs:tags')
+        self.view.userTagComboBox.addItem('User Tags')
+        for t in self.tags:
+            self.view.userTagComboBox.addCheckableItem(t)
+        self.view.username = userWidget()
+        self.view.username.setAccessibleName('runs:username')
+        self.view.username.hide()
+        self.view.time = timeWidget()
+        self.view.time.setAccessibleName('runs:timestamp')
+        self.view.time.hide()
+
+        self.view.tags_Layout.addWidget(self.view.userTagComboBox,0,0,1,2)
+        self.view.tags_Layout.addWidget(self.view.username,1,0,1,1)
+        self.view.tags_Layout.addWidget(self.view.time,1,1,1,1)

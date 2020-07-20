@@ -37,6 +37,8 @@ class Data(object):
         self.simulationDict = self.parameterDict['simulation']
         self.parameterDict['generator'] = collections.OrderedDict()
         self.generatorDict = self.parameterDict['generator']
+        self.parameterDict['runs'] = collections.OrderedDict()
+        self.runsDict = self.parameterDict['runs']
         self.scannableParametersDict = collections.OrderedDict()
         self.Framework = Fw.Framework(directory='.', clean=False, verbose=True)
         self.Framework.loadSettings('Lattices/CLA10-BA1_OM.def')

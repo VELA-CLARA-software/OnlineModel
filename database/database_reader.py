@@ -104,6 +104,8 @@ class DatabaseReader():
         settings_to_check = settings_to_save
         if 'scan' in settings_to_check:
            del settings_to_check['scan']
+        if 'runs' in settings_to_check:
+           del settings_to_check['runs']
         return settings_to_check
 
     def prepare_dict_for_checking(self, settings_to_save):
