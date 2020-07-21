@@ -46,16 +46,17 @@ class CheckableComboBox(QComboBox):
         if state == Qt.Unchecked or state == Qt.Checked:
             for i in range(self.count()):
                 item = self.model().item(i-1,0)
-                if item.text == tag:
+                if item.text() == tag:
                     item.setCheckState(state)
 
     def setTagStates(self, checkedtags=[]):
         for i in range(self.count()):
             item = self.model().item(i-1,0)
-            if item.text in checkedtags:
-                item.setCheckState(Qt.Checked)
-            else:
-                item.setCheckState(Qt.Unchecked)
+            if item is not None:
+                if item.text() in checkedtags:
+                    item.setCheckState(Qt.Checked)
+                else:
+                    item.setCheckState(Qt.Unchecked)
 
     def getTagText(self, index):
         return self.model().item(index,0).text()
@@ -394,20 +395,22 @@ class RunParameterController(QObject):
             if widget is not None:
                 if type(widget) is QLineEdit:
                     widget.setText(str(value))
-                if type(widget) is QDoubleSpinBox:
+                elif type(widget) is QDoubleSpinBox:
                     widget.setValue(float(value))
-                if type(widget) is QSpinBox:
+                elif type(widget) is QSpinBox:
                     widget.setValue(int(value))
-                if type(widget) is QCheckBox:
+                elif type(widget) is QCheckBox:
                     if value is True:
                         widget.setChecked(True)
                     else:
                         widget.setChecked(False)
-                if type(widget) is QComboBox:
+                elif type(widget) is QComboBox:
                     index = widget.findText(value)
                     if index == -1:
                         index = widget.findData(value)
                     widget.setCurrentIndex(index)
+                elif isinstance(widget, CheckableComboBox):
+                    widget.setTagStates(value)
 
     ## Need to port this to the unified controller
     @pyqtSlot()
