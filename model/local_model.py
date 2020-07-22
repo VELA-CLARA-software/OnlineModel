@@ -170,11 +170,14 @@ class Model(object):
 
         [self.update_framework_elements(self.data.parameterDict[l]) for l in self.data.lattices]
         if self.data.parameterDict['INJ']['bsol_tracking']['value']:
+            # This is the scaling factor for getting (approx) zero field on the cathode from the BSOL = -0.3462 * 90% (gives about 1% error on the emittance)
             self.data.Framework.modifyElement('CLA-LRG1-MAG-BSOL-01', 'field_amplitude', -0.3462 * 0.9 * self.data.Framework['CLA-LRG1-MAG-SOL-01']['field_amplitude'])
         if scan==True and type is not None:
             print(self.data.parameterDict[dictname][pv])
         self.data.Framework.generator.number_of_particles = int(2**(3*int(self.data.generatorDict['number_of_particles']['value'])))
+        # In ASTRA we need to be in nC
         self.data.Framework.generator.charge = 1e-9*float(self.data.generatorDict['charge']['value'])
+        # In ASTRA we need to be in RMS nano-seconds - here we convert from FWHM and divide by 1000 from pico-seconds
         self.data.Framework.generator.sig_clock = float(self.data.generatorDict['sig_clock']['value']) / (2354.82)
         self.data.Framework.generator.sig_x = self.data.generatorDict['spot_size']['value']
         self.data.Framework.generator.sig_y = self.data.generatorDict['spot_size']['value']
@@ -218,7 +221,10 @@ class Model(object):
         if not filename == "":
             # print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
             self.create_subdirectory(directory)
-            yaml_parser.write_parameter_output_file(str(os.path.relpath(directory + '/' + filename)), create_yaml_dictionary(self.data))
+            try:
+                yaml_parser.write_parameter_output_file(str(os.path.relpath(directory + '/' + filename)), create_yaml_dictionary(self.data))
+            except:
+                print('Can\'t write YAML file!')
         else:
             print( 'Failed to export, please provide a filename.')
 
