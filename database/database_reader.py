@@ -21,6 +21,7 @@ class DatabaseReader():
         self.kwargs = kwargs
         self.sql_connection = sqlite3.connect('SimulationDatabase.db')
         self.sql_cursor = self.sql_connection.cursor()
+        # List of lattice tables. This should be taken from a unified top-level controller at some point...
         self.table_name_list = ["generator", "INJ", "CLA-S02", "CLA-C2V", "EBT-INJ", "EBT-BA1"]
 
         # This dictionary is keyed by run-id and
@@ -31,48 +32,59 @@ class DatabaseReader():
         print('       time to load database = ', time.time() - start, 'seconds ')
         print('       Number of entries in database = ', len(self.run_id_settings_dict))
         print('###### Database Loaded ######')
-        # exit()
-
-    ## SHOULD SEPARATE THE FUNCTION BELOW OUT TO DEAL WITH:
-    ## Machine area, Scan, Simulation tables separately.
 
     def update_lattice_tables_from_sql(self, table_name, lattice_id_settings_dict):
+        """Take an SQL cursor and iteratively add elements to the lattice dictionary."""
+        # It's faster to do this in chunks (not sure why, might be an SQLite issue?)
         chunk_size = 5000000
         while True:
             settings_for_lattice_id = self.sql_cursor.fetchmany(chunk_size)
             if not settings_for_lattice_id:
+                # We've run out od data, so stop!
                 break
             for run_id, component, parameter, value in settings_for_lattice_id:
+                # Some tables don't use the component column, this will be 'null'
                 if component == 'null':
                     lattice_id_settings_dict[run_id][table_name][parameter] = json.loads(value)
                 else:
                     lattice_id_settings_dict[run_id][table_name][component][parameter] = json.loads(value)
 
     def update_run_tables_from_sql(self, table_name, run_id_settings_dict):
+        """Take an SQL cursor and iteratively add elements to the run dictionary."""
         settings_for_run_id = self.sql_cursor.fetchall()
         for run_id, prefix, start_lattice in settings_for_run_id:
             run_id_settings_dict[run_id]['runs']['prefix'] = prefix
             run_id_settings_dict[run_id]['runs']['start_lattice'] = start_lattice
 
     def add_to_run_id_and_settings_dict_from_database(self, run_id):
+        """Append a new run to the existing run and lattice dictionaries."""
         lattice_id_settings_dict = self.lattice_id_settings_dict
         run_id_settings_dict = self.run_id_settings_dict
+        # For each of the lattice sections
         for table_name in self.table_name_list:
+            # Load table rows from the DB given by the run_id
             sql = 'select run_id, component, parameter, value from \''+table_name+'\' where run_id = \'' + run_id + '\''
             self.sql_cursor.execute(sql)
+            # Add the data to the dictionary
             self.update_lattice_tables_from_sql(table_name, lattice_id_settings_dict)
+        # We need to do the same for the run table (which has a different format)
         sql = 'select run_id, prefix, start_lattice from \'runs\' where run_id = \'' + run_id + '\''
         self.sql_cursor.execute(sql)
         self.update_run_tables_from_sql(table_name, run_id_settings_dict)
 
     def construct_run_id_and_settings_dict_from_database(self):
+        """Construct the run and lattice dictionaries from the database entries."""
+        # Create some dictionaries (sub-dictionaries will be created automagically)
         lattice_id_settings_dict = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
         run_id_settings_dict = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
+        # For each of the lattice sections
         for table_name in self.table_name_list:
-            # print('loading table ', table_name)
+            # Load table rows from the DB
             sql = 'select run_id, component, parameter, value from \''+table_name+'\''
             self.sql_cursor.execute(sql)
+            # Add the data to the dictionary
             self.update_lattice_tables_from_sql(table_name, lattice_id_settings_dict)
+        # We need to do the same for the run table (which has a different format)
         sql = 'select run_id, prefix, start_lattice from \'runs\''
         self.sql_cursor.execute(sql)
         self.update_run_tables_from_sql(table_name, run_id_settings_dict)
@@ -80,6 +92,7 @@ class DatabaseReader():
         return lattice_id_settings_dict, run_id_settings_dict
 
     def findDiff(self, d1, d2, path=""):
+        """Compare two dictionaries and print the differences."""
         for k in d1:
             if (k not in d2):
                 print ('findDiff:', path, ":")
@@ -96,39 +109,49 @@ class DatabaseReader():
                         print('findDiff:', path+":"+k,':',d1[k],'=!=',d2[k])
 
     def compare_entries(self, yaml_settings):
+        """Compare enties between an input YAML dictionary and the database to find a match."""
         found_in_db = False
         run_id_for_settings = ''
         run_id = ''
         yaml_settings = self.prepare_dict_for_checking(yaml_settings)
-        lattice_exists = OrderedDict()
+        # Compare each lattice to the input yaml file and return true if the match
         for run_id, db_settings in self.lattice_id_settings_dict.items():
             if yaml_settings == db_settings:
                 found_in_db = True
                 run_id_for_settings = run_id
-                # print('compare_entries: found db entry exists')
                 return found_in_db, run_id
+        # If they didn't match, it may be because it is not a full run, so find the nearest match using the prefix runs
         found_run_id, lattices = self.find_lattices_that_dont_exist(yaml_settings)
-        # print('compare entries:', found_run_id, lattices)
+        # If there was a full match the function returns [False, []]
         if not found_run_id is False and lattices == []:
-            # print('compare_entries: Found all entries = ', found_run_id)
+            # We have found a full match, so return the run_id of the match
             found_in_db = True
             run_id = found_run_id
         return found_in_db, run_id
 
     def check_settings_including_prefix(self, run_id, yaml_settings, table):
+        """"Recursively search a tracking run and it's prefix's for a match."""
+        # These are the settings from the DB we are checking
         db_settings = self.lattice_id_settings_dict[run_id]
+        # position of the table we are investigating
         table_idx = self.table_name_list.index(table)
+        # Do the setting's exist? Remember that if we used a prefix, onlt new settings were saved, so this might be False
         settings_exist = (table in db_settings and yaml_settings[table] == db_settings[table])
-        run_id_prefix = self.run_id_settings_dict[run_id]['runs']['prefix']
         if settings_exist:
+            # We found a match!
             return settings_exist
-        elif run_id_prefix is not None:
+        # We didn't find a match, but maybe it is in the prefix run?
+        run_id_prefix = self.run_id_settings_dict[run_id]['runs']['prefix']
+        if run_id_prefix is not None:
+            # We have a prefix, so we need to search it
+            # Find which lattice this run starts from - if the table is before the current run, we need to search the prefix as well
             start_lattice_idx = self.table_name_list.index(self.run_id_settings_dict[run_id]['runs']['start_lattice'])
             if  table_idx < start_lattice_idx:
+                # We need to search the prefix, so recursively do it
                 return self.check_settings_including_prefix(run_id_prefix, yaml_settings, table)
             else:
-                prefix_settings_exist = (yaml_settings[table] == db_settings[table])
-                return prefix_settings_exist
+                # The table we are looking at is in this track (not the prefix) and we already tested this above (we know it will be False by deduction)
+                return settings_exist
         else:
             return False
 
@@ -136,31 +159,46 @@ class DatabaseReader():
         return x.index(False) if False in x else len(x)
 
     def find_lattices_that_dont_exist(self, yaml_settings):
+        """Find the closest match to an input file and return the run_id and the non-matching lattice sections."""
         lattice_exists = OrderedDict()
+        # Default answer (equates to run everything)
         result = [False, self.table_name_list]
+        # iterate through the database entries
         for run_id in self.lattice_id_settings_dict.keys():
             # comparison on each lattice and each run_id
             lattice_exists[run_id] = []
             for table in self.table_name_list:
+                # Check the if the lattice matches recursively through any prefix tracking runs
                 settings_exist = self.check_settings_including_prefix(run_id, yaml_settings, table)
                 if not settings_exist:
+                    # if we don't get a true, we can stop as we don't care after a False
                     break
                 else:
+                    # Append the true to the list. We will count these to determine which lattice we need to start from
                     lattice_exists[run_id].append(settings_exist)
+        # if the DB is empty, we need to run everything so return the default
         if len(lattice_exists) > 0:
-            most_trues = [self.count_trues(x) for x in lattice_exists.values()]
+            # Count the trues (lattice match) in each entry in the DB
+            most_trues = [len(x) for x in lattice_exists.values()]
+            # Find where this occurs
             idx_most_trues = most_trues.index(max(most_trues))
-            most_true = list(list(lattice_exists.items())[idx_most_trues])
-            result = most_true
-            idx_start_lattice = len(most_true[1])
-            if idx_start_lattice < len(self.table_name_list) and idx_start_lattice > 0:
+            # Return the lattice_exists entry with the most trues (this is ugly!?)
+            result = list(list(lattice_exists.items())[idx_most_trues])
+            # Since we are in order of lattice name, we can find the starting lattice based on the length of True's
+            idx_start_lattice = len(result[1])
+            # However, if all True's we don't want to run any lattices (since we actually found a full match!)
+            if idx_start_lattice < len(self.table_name_list):
+                # Set the lattice's that need to be run based on missing True's
                 result[-1] = self.table_name_list[idx_start_lattice:]
             else:
+                # Or return that we do not need to run any (a full match)
                 result[-1] = []
         return result
 
     def get_settings_dict_to_check(self, settings_to_save):
+        """Create a lattice dictionary from the input settings."""
         settings_to_check = {}
+        # We only want to lattice information for the dictionary!
         for table in self.table_name_list:
             settings_to_check[table] = settings_to_save[table]
         # if 'scan' in settings_to_check:
@@ -173,10 +211,12 @@ class DatabaseReader():
         return self.get_settings_dict_to_check(settings_to_save)
 
     def are_settings_in_database(self, yaml_settings):
+        """Find if settings exist in the DB."""
         is_in_db, run_id = self.compare_entries(yaml_settings)
         return is_in_db
 
     def get_run_id_for_settings(self, yaml_settings):
+        """Find the run_id for settings from the DB."""
         is_in_db, run_id = self.compare_entries(yaml_settings)
         return run_id
 
