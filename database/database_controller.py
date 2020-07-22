@@ -4,7 +4,8 @@ import database.database_writer as database_writer
 import database.database_creator as database_creator
 
 class DatabaseController():
-
+    """Top-level controller for DB operations."""
+    
     def __init__(self):
         ### Check/Create database
         self.creator = database_creator.DatabaseCreator()
@@ -15,6 +16,8 @@ class DatabaseController():
         self.settings_dict = None
     ## NEED TO CHECK IF YAML_DICT HAS BEEN SET, OTHERWISE USE ARGUMENT.
     def are_settings_in_database(self, settings_to_read=None):
+        """Check wether the YAML exists in the DB."""
+        # I'm not sure we need this top bit??
         if settings_to_read == None:
             if self.settings_dict != None:
                 settings = self.settings_dict.copy()
@@ -23,11 +26,13 @@ class DatabaseController():
             else:
                 print('Supply a settings dictionary, or load yaml settings before checking database')
         else:
+            # We make a copy because we don't want to overwrite anything in the original YAML (this might not be needed anymore?)
             settings = settings_to_read.copy()
-            # print('++++  Checking Dictionary settings against database...', self.reader.are_settings_in_database(settings),'++++')
             return self.reader.are_settings_in_database(settings)
 
     def get_run_id_for_settings(self, settings_to_read=None):
+        """Return the run_id of an existing run."""
+        # I'm not sure we need this top bit??
         if settings_to_read == None:
             if self.settings_dict != None:
                 settings = self.settings_dict.copy()
@@ -36,14 +41,16 @@ class DatabaseController():
             else:
                 print('Supply a settings dictionary, or load yaml settings before checking database')
         else:
+            # We make a copy because we don't want to overwrite anything in the original YAML (this might not be needed anymore?)
             settings = settings_to_read.copy()
-            # print('++++ Searching for RUN ID for Dictionary settings...', self.reader.get_run_id_for_settings(settings),'++++')
             return self.reader.get_run_id_for_settings(settings)
 
     def load_yaml_settings(self, yaml_filename):
         self.settings_dict = yaml_parser.parse_parameter_input_file(yaml_filename)
 
     def save_settings_to_database(self, settings_to_save=None, run_id=None):
+        """Save the settings YAML file to the DB."""
+        # I'm not sure we need this top bit??
         if settings_to_save == None:
             if self.settings_dict != None:
                 # settings_to_check = self.reader.prepare_dict_for_checking(self.settings_dict)
@@ -54,10 +61,11 @@ class DatabaseController():
                 print('Supply a settings dictionary, or load yaml settings before checking database')
         else:
             if not self.are_settings_in_database(settings_to_save):
-                closest_match, lattices_to_be_saved = self.reader.find_lattices_that_dont_exist(settings_to_save)
-                # print('++++Saving Dictionary settings... ++++')
-                # print('lattices_to_be_saved = ', lattices_to_be_saved)
+                # Settings don't exist, but we only want to save the settings that are not duplicates, so find them
+                __, lattices_to_be_saved = self.reader.find_lattices_that_dont_exist(settings_to_save)
+                # lattices_to_be_saved list all of the *new* lattices
                 self.writer.save_dict_to_db(settings_to_save, run_id, lattices=lattices_to_be_saved)
+                # We also need to save entries to the run table
                 self.reader.add_to_run_id_and_settings_dict_from_database(run_id)
             elif 'scan' in settings_to_save and settings_to_save['scan']['parameter_scan']:
                 # If we run a scan, but a settings exists, we still need to add it to the scans table, so we can join all of the scan files up

@@ -114,7 +114,7 @@ class DatabaseReader():
         run_id_for_settings = ''
         run_id = ''
         yaml_settings = self.prepare_dict_for_checking(yaml_settings)
-        # Compare each lattice to the input yaml file and return true if the match
+        # Compare each lattice to the input yaml file and return true if they match
         for run_id, db_settings in self.lattice_id_settings_dict.items():
             if yaml_settings == db_settings:
                 found_in_db = True
@@ -122,7 +122,7 @@ class DatabaseReader():
                 return found_in_db, run_id
         # If they didn't match, it may be because it is not a full run, so find the nearest match using the prefix runs
         found_run_id, lattices = self.find_lattices_that_dont_exist(yaml_settings)
-        # If there was a full match the function returns [False, []]
+        # If there was a full match the function returns [run_id, []]
         if not found_run_id is False and lattices == []:
             # We have found a full match, so return the run_id of the match
             found_in_db = True
@@ -168,7 +168,7 @@ class DatabaseReader():
             # comparison on each lattice and each run_id
             lattice_exists[run_id] = []
             for table in self.table_name_list:
-                # Check the if the lattice matches recursively through any prefix tracking runs
+                # Check if the lattice matches recursively through any prefix tracking runs
                 settings_exist = self.check_settings_including_prefix(run_id, yaml_settings, table)
                 if not settings_exist:
                     # if we don't get a true, we can stop as we don't care after a False
@@ -178,7 +178,7 @@ class DatabaseReader():
                     lattice_exists[run_id].append(settings_exist)
         # if the DB is empty, we need to run everything so return the default
         if len(lattice_exists) > 0:
-            # Count the trues (lattice match) in each entry in the DB
+            # Count the trues (lattice matches) in each entry in the DB
             most_trues = [len(x) for x in lattice_exists.values()]
             # Find where this occurs
             idx_most_trues = most_trues.index(max(most_trues))
@@ -186,7 +186,7 @@ class DatabaseReader():
             result = list(list(lattice_exists.items())[idx_most_trues])
             # Since we are in order of lattice name, we can find the starting lattice based on the length of True's
             idx_start_lattice = len(result[1])
-            # However, if all True's we don't want to run any lattices (since we actually found a full match!)
+            # However, if all True's, we don't want to run any lattices (since we actually found a full match!)
             if idx_start_lattice < len(self.table_name_list):
                 # Set the lattice's that need to be run based on missing True's
                 result[-1] = self.table_name_list[idx_start_lattice:]
