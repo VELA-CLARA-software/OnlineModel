@@ -106,12 +106,12 @@ class DatabaseReader():
                 found_in_db = True
                 run_id_for_settings = run_id
                 return found_in_db, run_id
-        found_run_id, lattices = self.find_lattices_that_dont_exist(yaml_settings)
+        # found_run_id, lattices = self.find_lattices_that_dont_exist(yaml_settings)
         # print('compare entries:', found_run_id, lattices)
-        if not found_run_id is False and lattices == self.table_name_list:
-            # print('compare_entries: Found all entries = ', found_run_id)
-            found_in_db = True
-            run_id = found_run_id
+        # if not found_run_id is False and lattices == self.table_name_list:
+        #     # print('compare_entries: Found all entries = ', found_run_id)
+        #     found_in_db = True
+        #     run_id = found_run_id
         return found_in_db, run_id
 
     def check_settings_including_prefix(self, run_id, yaml_settings, table):
@@ -135,31 +135,29 @@ class DatabaseReader():
         return x.index(False) if False in x else len(x)
 
     def find_lattices_that_dont_exist(self, yaml_settings):
-        run_id_for_settings = ''
-        run_id = ''
         lattice_exists = OrderedDict()
-        # start = time.time()
-        for run_id, db_settings in self.lattice_id_settings_dict.items():
+        result = [False, self.table_name_list]
+        for run_id in self.lattice_id_settings_dict.keys():
             # comparison on each lattice and each run_id
             lattice_exists[run_id] = []
             for table in self.table_name_list:
-                lattice_exists[run_id].append(self.check_settings_including_prefix(run_id, yaml_settings, table))
+                settings_exist = self.check_settings_including_prefix(run_id, yaml_settings, table)
+                if not settings_exist:
+                    break
+                else:
+                    lattice_exists[run_id].append(settings_exist)
         if len(lattice_exists) > 0:
-            most_trues = [self.count_trues(x) for x in lattice_exists.values()]
+            most_trues = [len(x) for x in lattice_exists.values()]
             idx_most_trues = most_trues.index(max(most_trues))
             most_true = list(list(lattice_exists.items())[idx_most_trues])
             if sum(most_true[1]) > 0:
-                idx_start_lattice = most_true[1].index(False) if False in most_true[1] else None
-                if idx_start_lattice is None:
-                    most_true[-1] = []
+                result = most_true
+                idx_start_lattice = len(most_true[1])
+                if idx_start_lattice < len(self.table_name_list):
+                    result[-1] = self.table_name_list[idx_start_lattice:]
                 else:
-                    most_true[-1] = self.table_name_list[idx_start_lattice:]
-            else:
-                most_true = [False, self.table_name_list]
-        else:
-            most_true = [False, self.table_name_list]
-        # print('total time = ', time.time() - start)
-        return most_true
+                    result[-1] = []
+        return result
 
     def get_settings_dict_to_check(self, settings_to_save):
         settings_to_check = {}

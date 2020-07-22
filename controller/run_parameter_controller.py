@@ -368,7 +368,7 @@ class RunParameterController(QObject):
         for key in self.scannableParameters:
             if key not in unscannableParameters:
                 if ':' in key:
-                    scannableParameterDict[' - '.join(list(key.split(':'))[1:])] = key
+                    scannableParameterDict[' - '.join(list(key.split(':')))] = key
         return scannableParameterDict
 
     def populate_scan_combo_box(self):

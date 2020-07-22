@@ -12,6 +12,7 @@ sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
 import SimulationFramework.Framework as Fw
 sys.path.append(os.path.abspath(__file__+'/../../'))
 import controller.run_parameters_parser as yaml_parser
+import database.database_controller as dbc
 
 def convert_data_types( export_dict={}, data_dict={}, keyname=None):
     if keyname is not None:
@@ -31,16 +32,18 @@ def convert_data_types( export_dict={}, data_dict={}, keyname=None):
 
 def create_yaml_dictionary(data):
     export_dict = dict()
-    data_dicts = ['generator', 'INJ', 'CLA-S02', 'CLA-C2V', 'EBT-INJ', 'EBT-BA1', 'runs']
+    print(type(data))
+    data_dicts = ['generator', 'INJ', 'CLA-S02', 'CLA-C2V', 'EBT-INJ', 'EBT-BA1']
     if data['scanDict']['parameter_scan']:
-        data_dicts.append('scan')
+        export_dict = convert_data_types(export_dict, data['scanDict'], 'scan')
+    export_dict = convert_data_types(export_dict, data['runsDict'], 'runs')
     for n in data_dicts:
         export_dict = convert_data_types(export_dict, data['parameterDict'][n], n)
     return export_dict
 
 class Model(object):
 
-    def __init__(self, directoryname, data, runno=1):
+    def __init__(self, directoryname, data, dbcontroller, runno=1):
         self.generator_params = ['number_of_particles', 'dist_x', 'dist_y', 'dist_z', 'sig_x', 'sig_y', 'sig_z']
         self.scan_progress = -1
         self.data = data
@@ -52,6 +55,7 @@ class Model(object):
         # os.environ['RPN_DEFNS'] = self.Framework.master_lattice_location+'Codes/defns.rpn'
         self.Framework.loadSettings('Lattices/CLA10-BA1_OM.def')
         self.lattices = ['INJ', 'CLA-S02', 'CLA-C2V', 'EBT-INJ', 'EBT-BA1']
+        self.dbcontroller = dbcontroller
 
     def create_subdirectory(self):
         self.data.runParameterDict['directory_line_edit'] = self.data.runParameterDict['directory_line_edit'] + '/' if not self.data.runParameterDict['directory_line_edit'].endswith('/') else self.data.runParameterDict['directory_line_edit']
@@ -60,7 +64,7 @@ class Model(object):
     def update_tracking_codes(self):
         for l in self.data.lattices:
             code = self.data.parameterDict[l]['tracking_code']['value']
-            self.data.Framework.change_Lattice_Code(l, code)
+            self.Framework.change_Lattice_Code(l, code)
 
     def update_CSR(self):
         for l in self.lattices:
@@ -101,6 +105,7 @@ class Model(object):
 
     def run_script(self):
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
+        self.yaml = create_yaml_dictionary(self.data)
         self.update_tracking_codes()
         self.update_CSR()
         self.update_LSC()
@@ -111,16 +116,16 @@ class Model(object):
             if closest_match is not False:
                 self.Framework[start_lattice].prefix = '../'+closest_match+'/'
                 self.data.runsDict['prefix'] = closest_match
-                print('Setting',start_lattice,'prefix = ', closest_match)
             self.data.runsDict['start_lattice'] = start_lattice
             self.yaml = create_yaml_dictionary(self.data)
-            self.Framework.setSubDirectory('test/'+self.directoryname)
+            self.Framework.setSubDirectory(self.directoryname)
             self.modify_framework(scan=False)
-            self.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
+            self.Framework.save_changes_file(filename=self.Framework.subdirectory+'/changes.yaml')
             if self.data.runsDict['track']:
                 self.Framework.track(startfile=start_lattice)#, endfile=endLattice)
             else:
                 time.sleep(0.5)
+        self.Framework.progress = 100
             # print(' now saving the settings... ')
 
     ##### Find Starting Filename based on z-position ####

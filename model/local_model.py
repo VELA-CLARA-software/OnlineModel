@@ -206,8 +206,6 @@ class Model(object):
 
     def export_parameter_values_to_yaml_file(self, auto=False):
         export_dict = dict()
-        if self.data.scanDict['parameter_scan']:
-            data_dicts.append('scan')
         if auto:
             directory = 'test/'+self.directoryname
             filename = 'settings.yaml'

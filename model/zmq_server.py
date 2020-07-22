@@ -28,26 +28,28 @@ class Data(object):
 
 class modelThread(threading.Thread):
 
-    def __init__(self, datadict, runno, directoryname, is_in_database=False):
+    def __init__(self, datadict, runno, directoryname, dbcontroller, is_in_database=False):
         super(modelThread, self).__init__()
         self.runno = runno
         self.directoryname = 'test/'+directoryname
         self.datadict = datadict
         self.is_in_database = is_in_database
+        self.data = Data()
+        for k,v in datadict.items():
+            print(k,v)
+            if isinstance(v,dict):
+                setattr(self.data,k,v.copy())
+            else:
+                setattr(self.data,k,v)
         if not is_in_database:
-            self.data = Data()
-            for k,v in datadict.items():
-                if isinstance(v,dict):
-                    setattr(self.data,k,v.copy())
-                else:
-                    setattr(self.data,k,v)
             print('passing new run directory ', directoryname)
-            self.track_model = model.Model(directoryname=self.directoryname, data=self.data, runno=self.runno)
+            self.track_model = model.Model(directoryname=self.directoryname, data=self.data, dbcontroller=dbcontroller, runno=self.runno)
 
     def run(self):
         if not self.is_in_database:
             logging.info("Tracking Thread %s: starting", self.runno)
             self.track_model.run_script()
+            self.data = self.track_model.data
             logging.info("Tracking Thread %s: finishing", self.runno)
         else:
             pass
@@ -153,7 +155,7 @@ class zmqServer():
             directoryname = self.get_run_id_for_settings(yaml)
         else:
             directoryname = self.create_random_directory_name()
-        thread = modelThread(datadict, runno, directoryname, is_in_database=self.are_settings_in_database(yaml))
+        thread = modelThread(datadict, runno, directoryname, self.dbcontroller, is_in_database=self.are_settings_in_database(yaml))
         self.track_thread_objects[directoryname] = thread
         thread.start()
         return directoryname
@@ -162,8 +164,7 @@ class zmqServer():
         if directoryname in self.track_thread_objects:
             status = self.track_thread_objects[directoryname].get_status()
             if status == "finished":
-                yaml = model.create_yaml_dictionary(self.track_thread_objects[directoryname].datadict)
-                del yaml['simulation']['directory']
+                yaml = model.create_yaml_dictionary(self.track_thread_objects[directoryname].data)
                 self.save_settings_to_database(yaml, directoryname)
                 del self.track_thread_objects[directoryname]
             return status
