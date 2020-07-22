@@ -122,8 +122,9 @@ class DatabaseReader():
                 return found_in_db, run_id
         # If they didn't match, it may be because it is not a full run, so find the nearest match using the prefix runs
         found_run_id, lattices = self.find_lattices_that_dont_exist(yaml_settings)
-        # If there was a full match the function returns [run_id, []]
-        if not found_run_id is False and lattices == []:
+        # If there was a full match the function returns [run_id, None]
+        # We do a double check: run_id is not False (which would be No match) and the lattices is None (nothing to re-run)
+        if found_run_id is not False and lattices is None:
             # We have found a full match, so return the run_id of the match
             found_in_db = True
             run_id = found_run_id
@@ -155,14 +156,11 @@ class DatabaseReader():
         else:
             return False
 
-    def count_trues(self, x):
-        return x.index(False) if False in x else len(x)
-
     def find_lattices_that_dont_exist(self, yaml_settings):
         """Find the closest match to an input file and return the run_id and the non-matching lattice sections."""
         lattice_exists = OrderedDict()
         # Default answer (equates to run everything)
-        result = [False, self.table_name_list]
+        null_result = [False, self.table_name_list]
         # iterate through the database entries
         for run_id in self.lattice_id_settings_dict.keys():
             # comparison on each lattice and each run_id
@@ -186,14 +184,18 @@ class DatabaseReader():
             result = list(list(lattice_exists.items())[idx_most_trues])
             # Since we are in order of lattice name, we can find the starting lattice based on the length of True's
             idx_start_lattice = len(result[1])
-            # However, if all True's, we don't want to run any lattices (since we actually found a full match!)
-            if idx_start_lattice < len(self.table_name_list):
-                # Set the lattice's that need to be run based on missing True's
+            if idx_start_lattice == 0:
+                # If we have to re-run all lattices, return the null result
+                return null_result
+            elif idx_start_lattice < len(self.table_name_list):
+                # If we have a partial result, set the lattice's that need to be run based on missing True's
                 result[-1] = self.table_name_list[idx_start_lattice:]
             else:
-                # Or return that we do not need to run any (a full match)
-                result[-1] = []
-        return result
+                # Or if we have a full match, set the lattice's that need to be run to None
+                result[-1] = None
+            return result
+        else:
+            return null_result
 
     def get_settings_dict_to_check(self, settings_to_save):
         """Create a lattice dictionary from the input settings."""
