@@ -105,13 +105,14 @@ class DatabaseReader():
             if yaml_settings == db_settings:
                 found_in_db = True
                 run_id_for_settings = run_id
+                # print('compare_entries: found db entry exists')
                 return found_in_db, run_id
-        # found_run_id, lattices = self.find_lattices_that_dont_exist(yaml_settings)
+        found_run_id, lattices = self.find_lattices_that_dont_exist(yaml_settings)
         # print('compare entries:', found_run_id, lattices)
-        # if not found_run_id is False and lattices == self.table_name_list:
-        #     # print('compare_entries: Found all entries = ', found_run_id)
-        #     found_in_db = True
-        #     run_id = found_run_id
+        if not found_run_id is False and lattices == []:
+            # print('compare_entries: Found all entries = ', found_run_id)
+            found_in_db = True
+            run_id = found_run_id
         return found_in_db, run_id
 
     def check_settings_including_prefix(self, run_id, yaml_settings, table):
@@ -123,10 +124,10 @@ class DatabaseReader():
             return settings_exist
         elif run_id_prefix is not None:
             start_lattice_idx = self.table_name_list.index(self.run_id_settings_dict[run_id]['runs']['start_lattice'])
-            if start_lattice_idx >= table_idx:
+            if  table_idx < start_lattice_idx:
                 return self.check_settings_including_prefix(run_id_prefix, yaml_settings, table)
             else:
-                prefix_settings_exist = (yaml_settings[table] == self.lattice_id_settings_dict[run_id_prefix][table])
+                prefix_settings_exist = (yaml_settings[table] == db_settings[table])
                 return prefix_settings_exist
         else:
             return False
@@ -147,16 +148,15 @@ class DatabaseReader():
                 else:
                     lattice_exists[run_id].append(settings_exist)
         if len(lattice_exists) > 0:
-            most_trues = [len(x) for x in lattice_exists.values()]
+            most_trues = [self.count_trues(x) for x in lattice_exists.values()]
             idx_most_trues = most_trues.index(max(most_trues))
             most_true = list(list(lattice_exists.items())[idx_most_trues])
-            if sum(most_true[1]) > 0:
-                result = most_true
-                idx_start_lattice = len(most_true[1])
-                if idx_start_lattice < len(self.table_name_list):
-                    result[-1] = self.table_name_list[idx_start_lattice:]
-                else:
-                    result[-1] = []
+            result = most_true
+            idx_start_lattice = len(most_true[1])
+            if idx_start_lattice < len(self.table_name_list) and idx_start_lattice > 0:
+                result[-1] = self.table_name_list[idx_start_lattice:]
+            else:
+                result[-1] = []
         return result
 
     def get_settings_dict_to_check(self, settings_to_save):

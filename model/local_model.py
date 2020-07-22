@@ -125,7 +125,7 @@ class Model(object):
                     self.data.Framework[start_lattice].prefix = '../'+closest_match+'/'
                     self.data.runsDict['prefix'] = closest_match
                     print('Setting',start_lattice,'prefix = ', closest_match)
-                self.data.runsDict['start_lattice'] = start_lattice
+                    self.data.runsDict['start_lattice'] = start_lattice
                 self.yaml = create_yaml_dictionary(self.data)
                 self.data.Framework.setSubDirectory('test/'+self.directoryname)
                 self.modify_framework(scan=False)

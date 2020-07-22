@@ -71,6 +71,10 @@ class DatabaseCreator():
             value TEXT\
             );'
         self.sql_cursor.execute(sql)
+        sql = 'CREATE INDEX IF NOT EXISTS \'' + table_name +'_run_id_idx\' ON \'' + table_name +'\' ( \
+	           "run_id" \
+                );'
+        self.sql_cursor.execute(sql)
         if clean:
             sql = 'delete from \'' + table_name + '\';'
             self.sql_cursor.execute(sql)
