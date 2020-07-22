@@ -14,7 +14,7 @@ class DatabaseCreator():
 
     def create_simulation_database(self, clean=False, tables=None):
         if tables is None:
-            tables = ['generator', 'INJ', 'EBT', 'S02', 'C2V', 'BA1', 'simulation', 'scan', 'runs']
+            tables = ['generator', 'INJ', 'CLA-S02', 'CLA-C2V', 'EBT-INJ', 'EBT-BA1', 'scan', 'runs']
         elif not isinstance(tables, (list, tuple)) and isinstance(tables, str):
             tables = [tables]
         else:
@@ -32,7 +32,9 @@ class DatabaseCreator():
                 	"run_id"	TEXT UNIQUE,
                 	"timestamp"	TEXT,
                 	"username"	TEXT,
-                    "tags"	TEXT
+                    "tags"	TEXT,
+                    "prefix" TEXT,
+                    "start_lattice" TEXT
                 );'''
         self.sql_cursor.execute(sql)
         if clean:
@@ -62,7 +64,7 @@ class DatabaseCreator():
 
 
     def create_table(self, table_name, clean=False):
-        sql = 'CREATE TABLE IF NOT EXISTS "' + table_name +'" ( \
+        sql = 'CREATE TABLE IF NOT EXISTS \'' + table_name +'\' ( \
             run_id TEXT,\
             component TEXT,\
             parameter TEXT,\
@@ -70,7 +72,7 @@ class DatabaseCreator():
             );'
         self.sql_cursor.execute(sql)
         if clean:
-            sql = 'delete from ' + table_name + ';'
+            sql = 'delete from \'' + table_name + '\';'
             self.sql_cursor.execute(sql)
         self.sql_connection.commit()
 

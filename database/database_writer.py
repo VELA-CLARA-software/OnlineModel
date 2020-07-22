@@ -27,7 +27,7 @@ class DatabaseWriter():
                 items.append((new_key, v))
         return dict(items)
 
-    def save_dict_to_db(self, settings_dict_to_save, run_id=None):
+    def save_dict_to_db(self, settings_dict_to_save, run_id=None, lattices=None):
         ### NEEDS TO CHECK THE STATE OF RESULTS IN TABLE ###
         ### AS SOON AS AN ENTRY DOES NOT EXIST, WRITE IT TO TABLE ###
         # converting the dictionary to flattened form to save to db
@@ -42,7 +42,7 @@ class DatabaseWriter():
             splitstr = k.split('£')
             table_name = splitstr[0]
             splitstr.remove(table_name)
-            if (table_name != 'scan' and table_name != 'simulation' and table_name != 'runs'):
+            if (table_name != 'scan' and table_name != 'simulation' and table_name != 'runs') and (table_name in lattices or lattices is None):
                 component = splitstr[0]
                 parameter = splitstr[1]
                 value = v
@@ -75,7 +75,7 @@ class DatabaseWriter():
     def save_entry_to_machine_area_table(self, run_id, table_name, component, parameter, value):
         columnstring = '(run_id,component,parameter,value)'
         valuestring =  '(?, ?, ?, ?)'
-        sql = ''' INSERT INTO ''' + table_name + ''' '''+columnstring+'''
+        sql = ''' INSERT INTO \'''' + table_name + '''\' '''+columnstring+'''
                VALUES''' + valuestring
         self.sql_cursor.execute(sql, [run_id] + [component] + [parameter] + [json.dumps(value)])
 
@@ -100,11 +100,11 @@ class DatabaseWriter():
         sql = '''INSERT INTO simulation ''' + columnstring + '''VALUES''' + valuestring
         self.sql_cursor.execute(sql, [run_id] + [component] + [parameter] + [json.dumps(value)])
 
-    def save_entry_to_runs_table(self, run_id, timestamp=None, username=None, tags=None):
-        columnstring = '(run_id, timestamp, username, tags)'
-        valuestring = '(?,?,?,?)'
+    def save_entry_to_runs_table(self, run_id, timestamp=None, username=None, tags=None, prefix=None, start_lattice=None, **kwargs):
+        columnstring = '(run_id, timestamp, username, tags, prefix, start_lattice)'
+        valuestring = '(?,?,?,?,?,?)'
         sql = '''INSERT OR IGNORE INTO runs ''' + columnstring + '''VALUES''' + valuestring
-        self.sql_cursor.execute(sql, [run_id, timestamp, username, json.dumps(tags)])
+        self.sql_cursor.execute(sql, [run_id, timestamp, username, json.dumps(tags), prefix, start_lattice])
         # if not self.sql_cursor.rowcount > 0:
         #     sql = '''UPDATE runs SET tags = ? WHERE run_id = ?'''
         #     self.sql_cursor.execute(sql, [json.dumps(tags), run_id])

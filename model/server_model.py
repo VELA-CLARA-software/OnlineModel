@@ -31,7 +31,7 @@ def convert_data_types( export_dict={}, data_dict={}, keyname=None):
 
 def create_yaml_dictionary(data):
     export_dict = dict()
-    data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'EBT', 'BA1', 'simulation', 'runs']
+    data_dicts = ['generator', 'INJ', 'CLA-S02', 'CLA-C2V', 'EBT-INJ', 'EBT-BA1', 'runs']
     if data['scanDict']['parameter_scan']:
         data_dicts.append('scan')
     for n in data_dicts:
@@ -51,61 +51,77 @@ class Model(object):
         # self.Framework.defineElegantCommand(location=[self.Framework.master_lattice_location+'Codes/elegant'])
         # os.environ['RPN_DEFNS'] = self.Framework.master_lattice_location+'Codes/defns.rpn'
         self.Framework.loadSettings('Lattices/CLA10-BA1_OM.def')
+        self.lattices = ['INJ', 'CLA-S02', 'CLA-C2V', 'EBT-INJ', 'EBT-BA1']
 
     def create_subdirectory(self):
         self.data.runParameterDict['directory_line_edit'] = self.data.runParameterDict['directory_line_edit'] + '/' if not self.data.runParameterDict['directory_line_edit'].endswith('/') else self.data.runParameterDict['directory_line_edit']
         self.check_if_directory_exists()
 
     def update_tracking_codes(self):
-        for l, c in self.data.simulationDict['tracking_code'].items():
-            self.Framework.change_Lattice_Code(l, c)
+        for l in self.data.lattices:
+            code = self.data.parameterDict[l]['tracking_code']['value']
+            self.data.Framework.change_Lattice_Code(l, code)
 
     def update_CSR(self):
-        for l, c in self.data.simulationDict['csr'].items():
+        for l in self.lattices:
+            csr = self.data.parameterDict[l]['csr']['value']
+            csr_bins = self.data.parameterDict[l]['csr_bins']['value']
             lattice = self.Framework[l]
             elements = lattice.elements.values()
             for e in elements:
-                e.csr_enable = c
-                e.sr_enable = c
-                e.isr_enable = c
-                e.csr_bins = self.data.simulationDict['csr_bins'][l]
+                e.csr_enable = csr
+                e.sr_enable = csr
+                e.isr_enable = csr
+                e.csr_bins = csr_bins
                 e.current_bins = 0
-                e.longitudinal_wakefield_enable = c
-                e.transverse_wakefield_enable = c
-            lattice.csrDrifts = c
+                e.longitudinal_wakefield_enable = csr
+                e.transverse_wakefield_enable = csr
+            lattice.csrDrifts = csr
 
     def update_LSC(self):
-        for l, c in self.data.simulationDict['lsc'].items():
+        for l in self.lattices:
+            lsc = self.data.parameterDict[l]['lsc']['value']
+            lsc_bins = self.data.parameterDict[l]['lsc_bins']['value']
             lattice = self.Framework[l]
             elements = lattice.elements.values()
             for e in elements:
-                e.lsc_enable = c
-                e.lsc_bins = self.data.simulationDict['lsc_bins'][l]
+                e.lsc_enable = lsc
+                e.lsc_bins = lsc_bins
             #     e.smoothing_half_width = 1
             #     e.lsc_high_frequency_cutoff_start = -1#0.25
             #     e.lsc_high_frequency_cutoff_end = -1#0.33
             # lattice.lsc_high_frequency_cutoff_start = -1#0.25
             # lattice.lsc_high_frequency_cutoff_end = -1#0.33
-            lattice.lsc_bins = self.data.simulationDict['lsc_bins'][l]
-            lattice.lscDrifts = c
+            lattice.lsc_bins = lsc_bins
+            lattice.lscDrifts = lsc
+
+    def clear_prefixes(self):
+        for l in self.lattices:
+            self.Framework[l].prefix = ''
 
     def run_script(self):
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
         self.update_tracking_codes()
         self.update_CSR()
         self.update_LSC()
-        startLattice = self.data.simulationDict['starting_lattice']
-        endLattice = self.data.simulationDict['final_lattice']
-        print('Changing directory to ', str(self.directoryname))
-        self.Framework.setSubDirectory(str(self.directoryname))
-        self.modify_framework(scan=False)
-        self.Framework.save_changes_file(filename=self.Framework.subdirectory+'/changes.yaml')
-        self.export_parameter_values_to_yaml_file()
-        if self.data.simulationDict['track']:
-            self.Framework.track(startfile=startLattice, endfile=endLattice)
-        else:
-            time.sleep(0.5)
-            self.Framework.progress = 100
+        self.clear_prefixes()
+        closest_match, lattices_to_be_saved = self.dbcontroller.reader.find_lattices_that_dont_exist(self.yaml)
+        if len(lattices_to_be_saved) > 0:
+            start_lattice = lattices_to_be_saved[0]
+            if closest_match is not False:
+                self.Framework[start_lattice].prefix = '../'+closest_match+'/'
+                self.data.runsDict['prefix'] = closest_match
+                print('Setting',start_lattice,'prefix = ', closest_match)
+            self.data.runsDict['start_lattice'] = start_lattice
+            self.yaml = create_yaml_dictionary(self.data)
+            self.Framework.setSubDirectory('test/'+self.directoryname)
+            self.modify_framework(scan=False)
+            self.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
+            if self.data.runsDict['track']:
+                self.Framework.track(startfile=start_lattice)#, endfile=endLattice)
+            else:
+                time.sleep(0.5)
+            # print(' now saving the settings... ')
 
     ##### Find Starting Filename based on z-position ####
     def find_starting_lattice(self, z):
@@ -137,7 +153,7 @@ class Model(object):
             self.Framework.define_gpt_command(scaling=int(self.data.generatorDict['number_of_particles']['value']))
 
         [self.update_framework_elements(self.data.parameterDict[l]) for l in self.data.lattices]
-        if self.data.parameterDict['simulation']['bsol_tracking']:
+        if self.data.parameterDict['INJ']['bsol_tracking']['value']:
             self.Framework.modifyElement('CLA-LRG1-MAG-BSOL-01', 'field_amplitude', -0.3462 * 0.9 * self.Framework['CLA-LRG1-MAG-SOL-01']['field_amplitude'])
         if scan==True and type is not None:
             print(self.data.parameterDict[dictname][pv])

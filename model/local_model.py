@@ -33,7 +33,7 @@ def convert_data_types( export_dict={}, data_dict={}, keyname=None):
 
 def create_yaml_dictionary(data):
     export_dict = dict()
-    data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'EBT', 'BA1', 'simulation', 'runs']
+    data_dicts = ['generator', 'INJ', 'CLA-S02', 'CLA-C2V', 'EBT-INJ', 'EBT-BA1', 'runs']
     if data['scanDict']['parameter_scan']:
         data_dicts.append('scan')
     for n in data_dicts:
@@ -63,42 +63,51 @@ class Model(object):
         return self.client.close()
 
     def update_tracking_codes(self):
-        for l, c in self.data.simulationDict['tracking_code'].items():
-            self.data.Framework.change_Lattice_Code(l, c)
+        for l in self.data.lattices:
+            code = self.data.parameterDict[l]['tracking_code']['value']
+            self.data.Framework.change_Lattice_Code(l, code)
 
     def update_CSR(self):
-        for l, c in self.data.simulationDict['csr'].items():
+        for l in self.data.lattices:
+            csr = self.data.parameterDict[l]['csr']['value']
+            csr_bins = self.data.parameterDict[l]['csr_bins']['value']
             lattice = self.data.Framework[l]
             elements = lattice.elements.values()
             for e in elements:
-                e.csr_enable = c
-                e.sr_enable = c
-                e.isr_enable = c
-                e.csr_bins = self.data.simulationDict['csr_bins'][l]
+                e.csr_enable = csr
+                e.sr_enable = csr
+                e.isr_enable = csr
+                e.csr_bins = csr_bins
                 e.current_bins = 0
-                e.longitudinal_wakefield_enable = c
-                e.transverse_wakefield_enable = c
-            lattice.csrDrifts = c
+                e.longitudinal_wakefield_enable = csr
+                e.transverse_wakefield_enable = csr
+            lattice.csrDrifts = csr
 
     def update_LSC(self):
-        for l, c in self.data.simulationDict['lsc'].items():
+        for l in self.data.lattices:
+            lsc = self.data.parameterDict[l]['lsc']['value']
+            lsc_bins = self.data.parameterDict[l]['lsc_bins']['value']
             lattice = self.data.Framework[l]
             elements = lattice.elements.values()
             for e in elements:
-                e.lsc_enable = c
-                e.lsc_bins = self.data.simulationDict['lsc_bins'][l]
+                e.lsc_enable = lsc
+                e.lsc_bins = lsc_bins
             #     e.smoothing_half_width = 1
             #     e.lsc_high_frequency_cutoff_start = -1#0.25
             #     e.lsc_high_frequency_cutoff_end = -1#0.33
             # lattice.lsc_high_frequency_cutoff_start = -1#0.25
             # lattice.lsc_high_frequency_cutoff_end = -1#0.33
-            lattice.lsc_bins = self.data.simulationDict['lsc_bins'][l]
-            lattice.lscDrifts = c
+            lattice.lsc_bins = lsc_bins
+            lattice.lscDrifts = lsc
+
+    def clear_prefixes(self):
+        for l in self.data.lattices:
+            self.data.Framework[l].prefix = ''
 
     def run_script(self):
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
         self.yaml = create_yaml_dictionary(self.data)
-        del self.yaml['simulation']['directory']
+        # del self.yaml['simulation']['directory']
         if self.are_settings_in_database(self.yaml):
             self.directoryname = self.get_run_id_for_settings(self.yaml)
         else:
@@ -108,16 +117,24 @@ class Model(object):
             self.update_tracking_codes()
             self.update_CSR()
             self.update_LSC()
-            startLattice = self.data.simulationDict['starting_lattice']
-            endLattice = self.data.simulationDict['final_lattice']
-            self.data.Framework.setSubDirectory('test/'+self.directoryname)
-            self.modify_framework(scan=False)
-            self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
-            if self.data.simulationDict['track']:
-                self.data.Framework.track(startfile=startLattice, endfile=endLattice)
-            else:
-                time.sleep(0.5)
-            print(' now saving the settings... ')
+            self.clear_prefixes()
+            closest_match, lattices_to_be_saved = self.dbcontroller.reader.find_lattices_that_dont_exist(self.yaml)
+            if len(lattices_to_be_saved) > 0:
+                start_lattice = lattices_to_be_saved[0]
+                if closest_match is not False:
+                    self.data.Framework[start_lattice].prefix = '../'+closest_match+'/'
+                    self.data.runsDict['prefix'] = closest_match
+                    print('Setting',start_lattice,'prefix = ', closest_match)
+                self.data.runsDict['start_lattice'] = start_lattice
+                self.yaml = create_yaml_dictionary(self.data)
+                self.data.Framework.setSubDirectory('test/'+self.directoryname)
+                self.modify_framework(scan=False)
+                self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
+                if self.data.runsDict['track']:
+                    self.data.Framework.track(startfile=start_lattice)#, endfile=endLattice)
+                else:
+                    time.sleep(0.5)
+                # print(' now saving the settings... ')
 
     def get_directory_name(self):
         return self.directoryname
@@ -152,7 +169,7 @@ class Model(object):
             self.data.Framework.define_gpt_command(scaling=int(self.data.generatorDict['number_of_particles']['value']))
 
         [self.update_framework_elements(self.data.parameterDict[l]) for l in self.data.lattices]
-        if self.data.parameterDict['simulation']['bsol_tracking']:
+        if self.data.parameterDict['INJ']['bsol_tracking']['value']:
             self.data.Framework.modifyElement('CLA-LRG1-MAG-BSOL-01', 'field_amplitude', -0.3462 * 0.9 * self.data.Framework['CLA-LRG1-MAG-SOL-01']['field_amplitude'])
         if scan==True and type is not None:
             print(self.data.parameterDict[dictname][pv])
@@ -187,25 +204,8 @@ class Model(object):
         if not os.path.exists(dir):
             os.makedirs(dir, exist_ok=True)
 
-    def convert_data_types(self, export_dict={}, data_dict={}, keyname=None):
-        if keyname is not None:
-            export_dict[keyname] = dict()
-            edict = export_dict[keyname]
-        else:
-            edict = export_dict
-        for key, value in data_dict.items():
-            if isinstance(value, (dict, collections.OrderedDict)) and not key == 'sub_elements':
-                subdict = self.convert_data_types({}, value)
-                edict.update({key:subdict})
-            else:
-                if not key == 'sub_elements':
-                    # value = self.model.data.Framework.convert_numpy_types(value)
-                    edict.update({key:value})
-        return export_dict
-
     def export_parameter_values_to_yaml_file(self, auto=False):
         export_dict = dict()
-        data_dicts = ['generator', 'INJ', 'S02', 'C2V', 'EBT', 'BA1', 'simulation', 'runs']
         if self.data.scanDict['parameter_scan']:
             data_dicts.append('scan')
         if auto:
@@ -218,10 +218,22 @@ class Model(object):
             filename = filename[0] if isinstance(filename,tuple) else filename
             dirctory, filename = os.path.split(filename)
         if not filename == "":
-            print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
+            # print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
             self.create_subdirectory(directory)
-            for n in data_dicts:
-                export_dict = self.convert_data_types(export_dict, self.data.parameterDict[n], n)
-            yaml_parser.write_parameter_output_file(str(os.path.relpath(directory + '/' + filename)), export_dict)
+            yaml_parser.write_parameter_output_file(str(os.path.relpath(directory + '/' + filename)), create_yaml_dictionary(self.data))
         else:
             print( 'Failed to export, please provide a filename.')
+
+    def import_yaml(self, directoryname):
+        return self.import_parameter_values_from_yaml_file('test/'+directoryname+'/settings.yaml')
+
+    def import_parameter_values_from_yaml_file(self, filename):
+        filename = filename[0] if isinstance(filename,tuple) else filename
+        filename = str(filename)
+        if not filename == '' and not filename is None and (filename[-4:].lower() == '.yml' or filename[-5:].lower() == '.yaml'):
+            # print('yaml filename = ', filename)
+            loaded_parameter_dict = yaml_parser.parse_parameter_input_file(filename)
+            # print('yaml data = ', loaded_parameter_dict)
+            return loaded_parameter_dict
+        else:
+            return {}

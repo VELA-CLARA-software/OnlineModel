@@ -194,7 +194,7 @@ class RunParameterController(QObject):
     def show_yaml_in_datatree(self, row, col):
         table = self.view.run_parameters_table
         runno = table.item(row,0).text()
-        data = self.model.import_yaml_from_server(runno)
+        data = self.model.import_yaml(runno)
         self.view.yaml_tree_widget.setData(data)
 
     def populate_run_parameters_table(self):
@@ -246,8 +246,8 @@ class RunParameterController(QObject):
             self.view.loadSettingsButton.setEnabled(False)
 
     def load_settings_from_directory(self):
-        if os.path.isfile(self.model.data.parameterDict['simulation']['directory'] + '/settings.yaml'):
-            self.import_parameter_values_from_yaml_file(self.model.data.parameterDict['simulation']['directory'] + '/settings.yaml')
+        if os.path.isfile(self.model.data.parameterDict['runs']['directory'] + '/settings.yaml'):
+            self.import_parameter_values_from_yaml_file(self.model.data.parameterDict['runs']['directory'] + '/settings.yaml')
 
     def toggle_BSOL_tracking(self):
         widget = self.view.bsol_track_checkBox
@@ -314,12 +314,17 @@ class RunParameterController(QObject):
         dictname, pv, param = self.split_accessible_name(widget.accessibleName())
         value = self.get_widget_value(widget)
         if param is None:
-            self.model.data.parameterDict[dictname].update({pv: value})
+            try:
+                self.model.data.parameterDict[dictname].update({pv: value})
+            except:
+                print('Error ', dictname, pv, value)
+                exit()
         else:
             try:
                 self.model.data.parameterDict[dictname][pv].update({param: value})
             except:
                 print('Error ', dictname, pv, param, value)
+                exit()
 
     def analyse_children(self, layout):
         for k, v in self.accessibleNames.items():
@@ -418,7 +423,7 @@ class RunParameterController(QObject):
         if filename is None:
             dialog = QFileDialog()
             filename = QFileDialog.getOpenFileName(dialog, caption='Open file',
-                                                         directory=self.model.data.parameterDict['simulation']['directory'],
+                                                         directory=self.model.data.parameterDict['runs']['directory'],
                                                          filter="YAML files (*.YAML *.YML *.yaml *.yml)")
         filename = filename[0] if isinstance(filename,tuple) else filename
         filename = str(filename)
@@ -513,7 +518,7 @@ class RunParameterController(QObject):
         except ValueError:
             print("Enter a numerical value to conduct a scan")
         self.scan_parameter = self.model.data.scanDict['parameter']
-        self.scan_basedir = str(self.model.data.parameterDict['simulation']['directory'])
+        self.scan_basedir = str(self.model.data.parameterDict['runs']['directory'])
         self.scan_basevalue = self.get_widget_value(self.get_object_by_accessible_name(self.scan_parameter))
         dictname, pv, param = self.split_accessible_name(self.scan_parameter)
         self.scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
@@ -534,7 +539,7 @@ class RunParameterController(QObject):
             self.model.data.scanDict['value'] = self.get_widget_value(self.get_object_by_accessible_name(self.scan_parameter))
             dictname, pv, param = self.split_accessible_name(self.scan_parameter)
             # subdir = (self.scan_basedir + '/' + pv + '_' + str(current_scan_value)).replace('//','/')
-            self.update_widgets_with_values('simulation:directory', self.scan_basedir)
+            self.update_widgets_with_values('runs:directory', self.scan_basedir)
             self.thread = GenericThread(self.do_scan)
             self.thread.finished.connect(self.save_settings_to_database)
             self.thread.finished.connect(self.continue_scan)
@@ -554,17 +559,17 @@ class RunParameterController(QObject):
             self.thread = GenericThread(self.do_scan)
             self.thread.finished.connect(self.enable_run_button)
             self.thread.finished.connect(self.update_directory_widget)
-            self.thread.finished.connect(self.update_runs_widget)
             self.thread.finished.connect(self.save_settings_to_database)
             self.thread.start()
         return
 
     def save_settings_to_database(self):
         self.model.save_settings_to_database(self.model.yaml, self.model.directoryname)
+        self.update_runs_widget()
 
     def update_directory_widget(self):
         dirname = self.model.get_directory_name()
-        self.update_widgets_with_values('simulation:directory', dirname)
+        self.update_widgets_with_values('runs:directory', dirname)
 
     def update_runs_widget(self):
         dirname = self.model.get_directory_name()

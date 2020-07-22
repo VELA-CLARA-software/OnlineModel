@@ -20,7 +20,7 @@ class Model(object):
         data_dict = {}
         data_dict['parameterDict'] = self.data.parameterDict
         data_dict['generatorDict'] = self.data.generatorDict
-        data_dict['simulationDict'] = self.data.simulationDict
+        # data_dict['simulationDict'] = self.data.simulationDict
         data_dict['scanDict'] = self.data.scanDict
         data_dict['runsDict'] = self.data.runsDict
         data_dict['lattices'] = self.data.lattices
@@ -45,7 +45,7 @@ class Model(object):
     def export_parameter_values_to_yaml_file(self, *args, **kwargs):
         pass
 
-    def import_yaml_from_server(self, runno=None):
+    def import_yaml(self, runno=None):
         if runno is None:
             runno = self.directoryname
         response = self.socket.send_pyobj(['import_yaml', runno])

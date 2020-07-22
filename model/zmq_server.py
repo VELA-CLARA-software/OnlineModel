@@ -148,7 +148,7 @@ class zmqServer():
     def do_tracking_run(self, datadict):
         runno = self.get_next_runno()
         yaml = model.create_yaml_dictionary(datadict)
-        del yaml['simulation']['directory']
+        # del yaml['simulation']['directory']
         if self.are_settings_in_database(yaml):
             directoryname = self.get_run_id_for_settings(yaml)
         else:

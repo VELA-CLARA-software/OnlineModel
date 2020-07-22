@@ -24,7 +24,7 @@ class DatabaseController():
                 print('Supply a settings dictionary, or load yaml settings before checking database')
         else:
             settings = settings_to_read.copy()
-            print('Checking Dictionary settings against database...', self.reader.are_settings_in_database(settings))
+            # print('++++  Checking Dictionary settings against database...', self.reader.are_settings_in_database(settings),'++++')
             return self.reader.are_settings_in_database(settings)
 
     def get_run_id_for_settings(self, settings_to_read=None):
@@ -37,7 +37,7 @@ class DatabaseController():
                 print('Supply a settings dictionary, or load yaml settings before checking database')
         else:
             settings = settings_to_read.copy()
-            print('Searching for RUN ID for Dictionary settings...', self.reader.get_run_id_for_settings(settings))
+            # print('++++ Searching for RUN ID for Dictionary settings...', self.reader.get_run_id_for_settings(settings),'++++')
             return self.reader.get_run_id_for_settings(settings)
 
     def load_yaml_settings(self, yaml_filename):
@@ -54,8 +54,10 @@ class DatabaseController():
                 print('Supply a settings dictionary, or load yaml settings before checking database')
         else:
             if not self.are_settings_in_database(settings_to_save):
-                print('Saving Dictionary settings...')
-                self.writer.save_dict_to_db(settings_to_save, run_id)
+                closest_match, lattices_to_be_saved = self.reader.find_lattices_that_dont_exist(settings_to_save)
+                # print('++++Saving Dictionary settings... ++++')
+                # print('lattices_to_be_saved = ', lattices_to_be_saved)
+                self.writer.save_dict_to_db(settings_to_save, run_id, lattices=lattices_to_be_saved)
                 self.reader.add_to_run_id_and_settings_dict_from_database(run_id)
             elif 'scan' in settings_to_save and settings_to_save['scan']['parameter_scan']:
                 # If we run a scan, but a settings exists, we still need to add it to the scans table, so we can join all of the scan files up

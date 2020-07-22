@@ -27,14 +27,14 @@ class Data(object):
         super(Data, self).__init__()
         self.my_name = "data"
         self.parameterDict = collections.OrderedDict()
-        self.lattices = ['INJ', 'S02', 'C2V', 'EBT', 'BA1']
+        self.lattices = ['INJ', 'CLA-S02', 'CLA-C2V', 'EBT-INJ', 'EBT-BA1']
         [self.parameterDict.update({l:collections.OrderedDict()}) for l in self.lattices]
         # self.latticeDict = self.parameterDict['lattice']
         self.parameterDict['scan'] = collections.OrderedDict()
         self.scanDict = self.parameterDict['scan']
         self.scanDict['parameter_scan'] = False
-        self.parameterDict['simulation'] = collections.OrderedDict()
-        self.simulationDict = self.parameterDict['simulation']
+        # self.parameterDict['simulation'] = collections.OrderedDict()
+        # self.simulationDict = self.parameterDict['simulation']
         self.parameterDict['generator'] = collections.OrderedDict()
         self.generatorDict = self.parameterDict['generator']
         self.parameterDict['runs'] = collections.OrderedDict()
@@ -51,15 +51,19 @@ class Data(object):
 
     def initialise_data(self):
         # [self.runParameterDict.update({key: value}) for key, value in zip(data_keys, data_v)]
-        [[self.parameterDict[l].update({key: value}) for key, value in self.quad_values.items() if l in key] for l in self.lattices]
+        [[self.parameterDict[l].update({key: value}) for key, value in self.quad_values.items() if l == key[:len(l)]] for l in self.lattices]
         [self.parameterDict['INJ'].update({key: value}) for key, value in self.rf_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.laser_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.charge_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.number_of_particles.items()]
         [self.generatorDict.update({key: value}) for key, value in self.cathode.items()]
-        [self.simulationDict.update({key: value}) for key, value in self.space_charge.items()]
-        [self.simulationDict.update({key: value}) for key, value in self.astra_run_number.items()]
-        [self.simulationDict.update({key: value}) for key, value in self.tracking_code.items()]
+        self.parameterDict['INJ']['bsol_tracking'] = {'value': True, 'type': 'simulation'}
+        # [self.generatorDict.update({key: value}) for key, value in self.space_charge.items()]
+        for l in self.lattices:
+            for key, value in self.simulation_parameters.items():
+                self.parameterDict[l][key] = collections.OrderedDict()
+                self.parameterDict[l][key]['value'] = value
+                self.parameterDict[l][key]['type'] = 'simulation'
         self.update_mag_field_coefficients()
 
     def initialise_scan(self):
@@ -88,8 +92,8 @@ class Data(object):
         self.space_charge = collections.OrderedDict()
         self.astra_run_number = collections.OrderedDict()
         self.tracking_code = collections.OrderedDict()
-
-        self.tracking_code.update({'tracking_code': collections.OrderedDict()})
+        self.simulation_parameters = collections.OrderedDict()
+        # self.tracking_code.update({'tracking_code': collections.OrderedDict()})
 
         for quad in self.Framework.getElementType('quadrupole'):
             self.quad_values.update({quad['objectname']: collections.OrderedDict()})
@@ -127,9 +131,9 @@ class Data(object):
         self.space_charge.update({'space_charge': collections.OrderedDict()})
         self.space_charge['space_charge'].update({'type': 'generator'})
         self.space_charge['space_charge'].update({'value': False})
-        self.astra_run_number.update({'astra_run_number': collections.OrderedDict()})
-        self.astra_run_number['astra_run_number'].update({'type': 'generator'})
-        self.astra_run_number['astra_run_number'].update({'astra_run_number': 101})
+        # self.astra_run_number.update({'astra_run_number': collections.OrderedDict()})
+        # self.astra_run_number['astra_run_number'].update({'type': 'generator'})
+        # self.astra_run_number['astra_run_number'].update({'astra_run_number': 101})
         self.laser_values.update({'dist_x': collections.OrderedDict()})
         self.laser_values['dist_x'].update({'type': 'generator'})
         self.laser_values['dist_x'].update({'value': self.Framework.generator.parameters['dist_x']})
@@ -151,9 +155,14 @@ class Data(object):
         self.laser_values.update({'sig_clock': collections.OrderedDict()})
         self.laser_values['sig_clock'].update({'type': 'generator'})
         self.laser_values['sig_clock'].update({'value': self.Framework.generator.parameters['sig_clock']})
-        self.tracking_code.update({'tracking_code':  collections.OrderedDict(), 'csr':  collections.OrderedDict(), 'csr_bins':  collections.OrderedDict(),
-            'lsc':  collections.OrderedDict(), 'lsc_bins':  collections.OrderedDict(),
-        })
+        # self.tracking_code.update({'tracking_code':  collections.OrderedDict(), 'csr':  collections.OrderedDict(), 'csr_bins':  collections.OrderedDict(),
+        #     'lsc':  collections.OrderedDict(), 'lsc_bins':  collections.OrderedDict(),
+        # })
+        self.simulation_parameters = {'tracking_code': 'elegant', 'csr': True, 'csr_bins': 200, 'lsc': True, 'lsc_bins': 200}
+        # for k,v in simulation_parameters_names.items():
+        #     self.simulation_parameters.update({k: collections.OrderedDict()})
+        #     self.simulation_parameters[k].update({'type': 'simulation'})
+        #     self.simulation_parameters[k].update({'value': v})
 
     def get_pv_alias(self, dict, name, param=None, rf_type=None):
         if dict[name]['type'] == 'quadrupole':
