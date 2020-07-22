@@ -455,9 +455,10 @@ class RunParameterController(QObject):
             self.view.parameter_scan_step_size.setEnabled(False)
 
     def disable_run_button(self, scan=False):
-        if not scan:
-            self.view.runButton.setEnabled(False)
-        else:
+        for k, v in self.accessibleNames.items():
+            v.setEnabled(False)
+        if scan:
+            self.view.runButton.setEnabled(True)
             self.view.runButton.clicked.disconnect(self.run_astra)
             self.view.runButton.setText('Abort')
             self.view.runButton.clicked.connect(self.abort_ongoing_scan)
@@ -490,15 +491,12 @@ class RunParameterController(QObject):
         try:
             self.view.runButton.clicked.disconnect(self.run_astra)
         except:
-            pass
-        try:
-            self.view.runButton.clicked.disconnect(self.abort_ongoing_scan)
-        except:
-            pass
-        if not scan:
-            self.view.runButton.setEnabled(True)
-        else:
-            pass
+            try:
+                self.view.runButton.clicked.disconnect(self.abort_ongoing_scan)
+            except:
+                pass
+        for k, v in self.accessibleNames.items():
+            v.setEnabled(True)
         self.view.runButton.clicked.connect(self.run_astra)
         return
 
