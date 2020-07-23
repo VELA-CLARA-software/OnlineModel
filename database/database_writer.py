@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+sys.path.append(os.path.abspath(__file__+'/../../'))
+
 import sys, os
 import sqlite3
 import uuid

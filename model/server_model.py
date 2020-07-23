@@ -13,6 +13,7 @@ import SimulationFramework.Framework as Fw
 sys.path.append(os.path.abspath(__file__+'/../../'))
 import controller.run_parameters_parser as yaml_parser
 import database.database_controller as dbc
+import data.lattices as lattices
 
 def convert_data_types( export_dict={}, data_dict={}, keyname=None):
     if keyname is not None:
@@ -33,7 +34,7 @@ def convert_data_types( export_dict={}, data_dict={}, keyname=None):
 def create_yaml_dictionary(data):
     export_dict = dict()
     print(type(data))
-    data_dicts = ['generator', 'INJ', 'CLA-S02', 'CLA-C2V', 'EBT-INJ', 'EBT-BA1']
+    data_dicts = ['generator'] + lattices.lattices
     if data['scanDict']['parameter_scan']:
         export_dict = convert_data_types(export_dict, data['scanDict'], 'scan')
     export_dict = convert_data_types(export_dict, data['runsDict'], 'runs')
@@ -53,8 +54,8 @@ class Model(object):
         # print('self.Framework.master_lattice_location = ', self.Framework.master_lattice_location)
         # self.Framework.defineElegantCommand(location=[self.Framework.master_lattice_location+'Codes/elegant'])
         # os.environ['RPN_DEFNS'] = self.Framework.master_lattice_location+'Codes/defns.rpn'
-        self.Framework.loadSettings('Lattices/CLA10-BA1_OM.def')
-        self.lattices = ['INJ', 'CLA-S02', 'CLA-C2V', 'EBT-INJ', 'EBT-BA1']
+        self.Framework.loadSettings(lattices.lattice_definition)
+        self.lattices = lattices.lattices
         self.dbcontroller = dbcontroller
 
     def create_subdirectory(self):
@@ -158,7 +159,7 @@ class Model(object):
             self.Framework.define_gpt_command(scaling=int(self.data.generatorDict['number_of_particles']['value']))
 
         [self.update_framework_elements(self.data.parameterDict[l]) for l in self.data.lattices]
-        if self.data.parameterDict['INJ']['bsol_tracking']['value']:
+        if self.data.parameterDict[lattices.lattices[0]]['bsol_tracking']['value']:
             self.Framework.modifyElement('CLA-LRG1-MAG-BSOL-01', 'field_amplitude', -0.3462 * 0.9 * self.Framework['CLA-LRG1-MAG-SOL-01']['field_amplitude'])
         if scan==True and type is not None:
             print(self.data.parameterDict[dictname][pv])

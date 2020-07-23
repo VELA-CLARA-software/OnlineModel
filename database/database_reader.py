@@ -1,8 +1,11 @@
+sys.path.append(os.path.abspath(__file__+'/../../'))
+
 import sys, os, time
 import sqlite3
 import uuid
 import database.run_parameters_parser as yaml_parser
 import database.database_writer
+import data.lattices as lattices
 import ujson as json
 # import json
 from collections import defaultdict, OrderedDict
@@ -22,7 +25,7 @@ class DatabaseReader():
         self.sql_connection = sqlite3.connect('SimulationDatabase.db')
         self.sql_cursor = self.sql_connection.cursor()
         # List of lattice tables. This should be taken from a unified top-level controller at some point...
-        self.table_name_list = ["generator", "INJ", "CLA-S02", "CLA-C2V", "EBT-INJ", "EBT-BA1"]
+        self.table_name_list = ['generator'] + lattices.lattices
 
         # This dictionary is keyed by run-id and
         # the value is a string containing the deformatted dictionary of settings.

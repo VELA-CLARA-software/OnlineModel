@@ -7,13 +7,12 @@ from copy import deepcopy
 import collections
 import uuid
 
-# sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'data'))
-# from data import data
 sys.path.append(os.path.abspath(__file__+'/../../'))
 from data import data
 import controller.run_parameters_parser as yaml_parser
 import database.database_controller as dbc
 import model.twissData as twissData
+import data.lattices as lattices
 
 def convert_data_types( export_dict={}, data_dict={}, keyname=None):
     if keyname is not None:
@@ -33,7 +32,7 @@ def convert_data_types( export_dict={}, data_dict={}, keyname=None):
 
 def create_yaml_dictionary(data):
     export_dict = dict()
-    data_dicts = ['generator', 'INJ', 'CLA-S02', 'CLA-C2V', 'EBT-INJ', 'EBT-BA1', 'runs']
+    data_dicts = ['generator'] + lattices.lattices + ['runs']
     if data['scanDict']['parameter_scan']:
         data_dicts.append('scan')
     for n in data_dicts:
@@ -169,7 +168,7 @@ class Model(object):
             self.data.Framework.define_gpt_command(scaling=int(self.data.generatorDict['number_of_particles']['value']))
 
         [self.update_framework_elements(self.data.parameterDict[l]) for l in self.data.lattices]
-        if self.data.parameterDict['INJ']['bsol_tracking']['value']:
+        if self.data.parameterDict[lattices.lattices[0]]['bsol_tracking']['value']:
             # This is the scaling factor for getting (approx) zero field on the cathode from the BSOL = -0.3462 * 90% (gives about 1% error on the emittance)
             self.data.Framework.modifyElement('CLA-LRG1-MAG-BSOL-01', 'field_amplitude', -0.3462 * 0.9 * self.data.Framework['CLA-LRG1-MAG-SOL-01']['field_amplitude'])
         if scan==True and type is not None:

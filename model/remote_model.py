@@ -3,7 +3,7 @@ import sys
 import time
 import stat
 
-sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'data'))
+sys.path.append(os.path.abspath(__file__+'/../../'))
 from data import data
 
 class Model(object):
