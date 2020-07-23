@@ -7,7 +7,8 @@ except:
     from PyQt5.QtWidgets import *
 from copy import copy,deepcopy
 from decimal import Decimal
-import run_parameters_parser as yaml_parser
+sys.path.append(os.path.abspath(__file__+'/../../'))
+import database.run_parameters_parser as yaml_parser
 import sys, os
 sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
 sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
