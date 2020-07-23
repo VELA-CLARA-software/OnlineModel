@@ -1,7 +1,7 @@
 import sys, os
 sys.path.append(os.path.abspath(__file__+'/../../'))
-import database.run_parameter_controller as RunParameterController
-import database.post_processing_controller as PostProcessingController
+import controller.run_parameter_controller as RunParameterController
+import controller.post_processing_controller as PostProcessingController
 
 class UnifiedController():
 
