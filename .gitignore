@@ -20,3 +20,5 @@ Main_App.py
 Scans/
 test_yaml/
 DB_Test_Settings/
+_*/
+build/

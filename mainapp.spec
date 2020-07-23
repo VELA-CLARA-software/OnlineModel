@@ -3,8 +3,8 @@
 block_cipher = None
 
 
-a = Analysis(['..\\mainapp.py'],
-             pathex=['..\\', '..\\SimFrame'],
+a = Analysis(['.\\mainapp.py'],
+             pathex=['.\\', '..\\SimFrame'],
              binaries=[],
              datas=[
 				('..\\SimFrame\\SimulationFramework\\*.yaml', 'SimulationFramework'),
@@ -16,7 +16,7 @@ a = Analysis(['..\\mainapp.py'],
 				('..\\SimFrame\\MasterLattice\\Data_Files\\Measured_Main_Solenoid_2019.txt', 'MasterLattice\\Data_Files'),
 				('..\\SimFrame\\MasterLattice\\Data_Files\\Measured_Bucking_Solenoid_2019.txt', 'MasterLattice\\Data_Files'),
 				('..\\SimFrame\\MasterLattice\\Data_Files\\SwissFEL_linac_sols.dat', 'MasterLattice\\Data_Files'),
-				('..\\data\\CLA10-BA1_OM.def', 'MasterLattice\\data'),
+				('.\\data\\CLA10-BA1_OM.def', 'MasterLattice\\data'),
 			],
              hiddenimports=['scipy.special.cython_special', 'munch'],
              hookspath=['.\\hooks'],
