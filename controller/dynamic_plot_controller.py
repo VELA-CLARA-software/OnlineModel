@@ -7,12 +7,11 @@ except:
     from PyQt5.QtWidgets import *
 from copy import copy,deepcopy
 from decimal import Decimal
-sys.path.append(os.path.abspath(__file__+'/../../'))
-import database.run_parameters_parser as yaml_parser
 import sys, os
+sys.path.append(os.path.abspath(__file__+'/../../'))
 sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
 sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
-# from SimulationFramework.Modules.online_model_plotter import onlineModelPlotter
+import database.run_parameters_parser as yaml_parser
 from SimulationFramework.Modules.online_model_twissPlot import twissPlotWidget
 
 class GenericThread(QThread):
