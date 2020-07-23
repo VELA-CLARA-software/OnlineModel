@@ -1,6 +1,7 @@
+import sys
 sys.path.append(os.path.abspath(__file__+'/../../'))
 
-import sys, os
+import os
 import sqlite3
 import uuid
 import database.run_parameters_parser as yaml_parser

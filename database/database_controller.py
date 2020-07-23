@@ -1,3 +1,4 @@
+import sys
 sys.path.append(os.path.abspath(__file__+'/../../'))
 
 import database.run_parameters_parser as yaml_parser
