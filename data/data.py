@@ -4,19 +4,10 @@ import numpy as np
 import ruamel.yaml
 sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
 sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
+sys.path.append(os.path.abspath(__file__+'/../../'))
 import SimulationFramework.Framework as Fw
-import view as view
 import requests, json, scipy.constants, datetime, math, numpy
-# Post-processing dictionary
-directory_post = 'directory_post_line_edit'
-directory_run_post_1 = 'directory_post_combo_box'
-directory_run_post_2 = 'directory_post_combo_box_2'
-directory_run_post_3 = 'directory_post_combo_box_3'
-directory_run_post_4 = 'directory_post_combo_box_4'
-# Summary post-processing dictionary
-directory_summary = 'directory_summary_line_edit'
-summary_save_plot = 'summary_save_plot_check_box'
-summary_output_file = 'summary_output_file_line_edit'
+import data.lattices as lattices
 
 class Data(object):
 
@@ -27,7 +18,7 @@ class Data(object):
         super(Data, self).__init__()
         self.my_name = "data"
         self.parameterDict = collections.OrderedDict()
-        self.lattices = ['INJ', 'CLA-S02', 'CLA-C2V', 'EBT-INJ', 'EBT-BA1']
+        self.lattices = lattices.lattices
         [self.parameterDict.update({l:collections.OrderedDict()}) for l in self.lattices]
         # self.latticeDict = self.parameterDict['lattice']
         self.parameterDict['scan'] = collections.OrderedDict()
@@ -41,7 +32,7 @@ class Data(object):
         self.runsDict = self.parameterDict['runs']
         self.scannableParametersDict = collections.OrderedDict()
         self.Framework = Fw.Framework(directory='.', clean=False, verbose=True)
-        self.Framework.loadSettings('Lattices/CLA10-BA1_OM.def')
+        self.Framework.loadSettings(lattices.lattice_definition)
         self.my_name = "data"
         self.get_data()
         self.initialise_data()
@@ -52,12 +43,12 @@ class Data(object):
     def initialise_data(self):
         # [self.runParameterDict.update({key: value}) for key, value in zip(data_keys, data_v)]
         [[self.parameterDict[l].update({key: value}) for key, value in self.quad_values.items() if l == key[:len(l)]] for l in self.lattices]
-        [self.parameterDict['INJ'].update({key: value}) for key, value in self.rf_values.items()]
+        [self.parameterDict[self.lattices[0]].update({key: value}) for key, value in self.rf_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.laser_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.charge_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.number_of_particles.items()]
         [self.generatorDict.update({key: value}) for key, value in self.cathode.items()]
-        self.parameterDict['INJ']['bsol_tracking'] = {'value': True, 'type': 'simulation'}
+        self.parameterDict[self.lattices[0]]['bsol_tracking'] = {'value': True, 'type': 'simulation'}
         # [self.generatorDict.update({key: value}) for key, value in self.space_charge.items()]
         for l in self.lattices:
             for key, value in self.simulation_parameters.items():

@@ -5,7 +5,7 @@ except:
     from PyQt5.QtCore import *
     from PyQt5.QtGui import *
     from PyQt5.QtWidgets import *
-import run_parameters_parser as yaml_parser
+import database.run_parameters_parser as yaml_parser
 import sys, os
 import time
 import collections

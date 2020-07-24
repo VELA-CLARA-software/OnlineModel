@@ -1,3 +1,6 @@
+import sys, os
+sys.path.append(os.path.abspath(__file__+'/../../'))
+
 import database.run_parameters_parser as yaml_parser
 import database.database_reader as database_reader
 import database.database_writer as database_writer
@@ -5,7 +8,7 @@ import database.database_creator as database_creator
 
 class DatabaseController():
     """Top-level controller for DB operations."""
-    
+
     def __init__(self):
         ### Check/Create database
         self.creator = database_creator.DatabaseCreator()

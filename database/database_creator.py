@@ -3,6 +3,8 @@ import sqlite3
 import uuid
 import collections
 import json
+sys.path.append(os.path.abspath(__file__+'/../../'))
+import data.lattices as lattices
 
 class DatabaseCreator():
 
@@ -14,7 +16,7 @@ class DatabaseCreator():
 
     def create_simulation_database(self, clean=False, tables=None):
         if tables is None:
-            tables = ['generator', 'INJ', 'CLA-S02', 'CLA-C2V', 'EBT-INJ', 'EBT-BA1', 'scan', 'runs']
+            tables = ['generator'] + lattices.lattices + ['runs', 'scan']
         elif not isinstance(tables, (list, tuple)) and isinstance(tables, str):
             tables = [tables]
         else:
