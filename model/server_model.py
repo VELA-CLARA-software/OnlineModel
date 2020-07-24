@@ -122,6 +122,7 @@ class Model(object):
             self.Framework.setSubDirectory(self.directoryname)
             self.modify_framework(scan=False)
             self.Framework.save_changes_file(filename=self.Framework.subdirectory+'/changes.yaml')
+            self.export_parameter_values_to_yaml_file()
             if self.data.runsDict['track']:
                 self.Framework.track(startfile=start_lattice)#, endfile=endLattice)
             else:
