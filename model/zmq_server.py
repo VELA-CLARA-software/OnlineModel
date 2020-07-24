@@ -36,7 +36,7 @@ class modelThread(threading.Thread):
         self.is_in_database = is_in_database
         self.data = Data()
         for k,v in datadict.items():
-            print(k,v)
+            # print(k,v)
             if isinstance(v,dict):
                 setattr(self.data,k,v.copy())
             else:

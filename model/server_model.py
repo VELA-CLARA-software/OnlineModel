@@ -33,7 +33,7 @@ def convert_data_types( export_dict={}, data_dict={}, keyname=None):
 
 def create_yaml_dictionary(data):
     export_dict = dict()
-    print(type(data))
+    # print(type(data))
     data_dicts = ['generator'] + lattices.lattices
     if data['scanDict']['parameter_scan']:
         export_dict = convert_data_types(export_dict, data['scanDict'], 'scan')
@@ -161,8 +161,8 @@ class Model(object):
         [self.update_framework_elements(self.data.parameterDict[l]) for l in self.data.lattices]
         if self.data.parameterDict[lattices.lattices[0]]['bsol_tracking']['value']:
             self.Framework.modifyElement('CLA-LRG1-MAG-BSOL-01', 'field_amplitude', -0.3462 * 0.9 * self.Framework['CLA-LRG1-MAG-SOL-01']['field_amplitude'])
-        if scan==True and type is not None:
-            print(self.data.parameterDict[dictname][pv])
+        # if scan==True and type is not None:
+            # print(self.data.parameterDict[dictname][pv])
         self.Framework.generator.number_of_particles = int(2**(3*int(self.data.generatorDict['number_of_particles']['value'])))
         self.Framework.generator.charge = 1e-9*float(self.data.generatorDict['charge']['value'])
         self.Framework.generator.sig_clock = float(self.data.generatorDict['sig_clock']['value']) / (2354.82)
@@ -177,7 +177,7 @@ class Model(object):
         directory = self.directoryname
         filename = 'settings.yaml'
         if not filename == "":
-            print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
+            # print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
             self.create_subdirectory(directory)
             export_dict = create_yaml_dictionary(self.data)
             yaml_parser.write_parameter_output_file(str(os.path.relpath(directory + '/' + filename)), export_dict)
