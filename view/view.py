@@ -1041,7 +1041,7 @@ class Ui_MainWindow(object):
         self.run_parameters_table.setSizePolicy(sizePolicy)
         self.run_parameters_table.setDragDropOverwriteMode(False)
         self.run_parameters_table.setAlternatingRowColors(True)
-        self.run_parameters_table.setColumnCount(3)
+        self.run_parameters_table.setColumnCount(4)
         self.run_parameters_table.setObjectName("run_parameters_table")
         self.run_parameters_table.setRowCount(0)
         self.run_parameters_table.horizontalHeader().setCascadingSectionResizes(True)

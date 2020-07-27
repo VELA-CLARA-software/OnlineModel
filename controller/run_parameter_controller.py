@@ -213,6 +213,7 @@ class RunParameterController(QObject):
         dir = os.path.basename(v)
         table.setItem(rowPosition, 0, QTableWidgetItem(str(dir)))
         open_folder_button = QPushButton('Open')
+        open_folder_button.setEnabled(False)
         open_folder_button.clicked.connect(lambda : self.open_folder_on_server(dir))
         table.setCellWidget(rowPosition, 1, open_folder_button)
         add_plot_button = QCheckBox('Plot')
