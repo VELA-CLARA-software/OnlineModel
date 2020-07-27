@@ -36,7 +36,7 @@ generator:
   default: clara_400_2ps_Gaussian
   charge: 70e-12
 files:
-  Injector:
+  Gun:
     code: ASTRA
     charge:
       cathode: True
@@ -46,6 +46,17 @@ files:
       particle_definition: 'initial_distribution'
     output:
       zstart: 0
+      end_element: CLA-L01-APER
+  Linac:
+    code: elegant
+    starting_rotation: 0
+    charge:
+      cathode: False
+      space_charge_mode: 3D
+    input:
+      {}
+    output:
+      start_element: CLA-L01-APER
       end_element: CLA-S02-APER-01
   CLA-S02:
     code: elegant

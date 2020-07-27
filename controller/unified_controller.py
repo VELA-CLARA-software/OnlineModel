@@ -19,6 +19,7 @@ class UnifiedController():
             #self.ppc.view.runButton_post.clicked.connect(self.run_ppc_process)
             self.rpc.add_plot_signal.connect(self.dpc.add_twiss_plot)
             self.rpc.remove_plot_signal.connect(self.dpc.remove_twiss_plot)
+            self.dpc.plotcolor.connect(self.rpc.setrunplotcolor)
 
         def run_rpc_process(self):
             self.rpc.disable_run_button()

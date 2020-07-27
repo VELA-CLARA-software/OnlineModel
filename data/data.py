@@ -43,12 +43,17 @@ class Data(object):
     def initialise_data(self):
         # [self.runParameterDict.update({key: value}) for key, value in zip(data_keys, data_v)]
         [[self.parameterDict[l].update({key: value}) for key, value in self.quad_values.items() if l == key[:len(l)]] for l in self.lattices]
-        [self.parameterDict[self.lattices[0]].update({key: value}) for key, value in self.rf_values.items()]
+        [self.parameterDict[self.lattices[0]].update({key: value}) for key, value in self.rf_values.items() if 'LRG' in key]
+        [self.parameterDict[self.lattices[1]].update({key: value}) for key, value in self.rf_values.items() if 'L01' in key]
         [self.generatorDict.update({key: value}) for key, value in self.laser_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.charge_values.items()]
         [self.generatorDict.update({key: value}) for key, value in self.number_of_particles.items()]
         [self.generatorDict.update({key: value}) for key, value in self.cathode.items()]
         self.parameterDict[self.lattices[0]]['bsol_tracking'] = {'value': True, 'type': 'simulation'}
+        # Add linac wakefields parameters
+        if 'Linac' in self.parameterDict:
+            self.parameterDict['Linac']['zwake'] = {'value': True, 'type': 'simulation'}
+            self.parameterDict['Linac']['trwake'] = {'value': True, 'type': 'simulation'}
         # [self.generatorDict.update({key: value}) for key, value in self.space_charge.items()]
         for l in self.lattices:
             for key, value in self.simulation_parameters.items():
@@ -101,6 +106,8 @@ class Data(object):
             self.rf_values[cavity['objectname']].update({'field_amplitude': cavity['field_amplitude']})
             self.rf_values[cavity['objectname']].update({'pv_field_amplitude_alias': "ad1:ch6:power_remote_s.POWER"})
             self.rf_values[cavity['objectname']].update({'pv_phase_alias': "vm:dsp:sp_ph:phase"})
+            # self.rf_values[cavity['objectname']].update({'zwake': True})
+            # self.rf_values[cavity['objectname']].update({'trwake': True})
             for key, value in cavity['sub_elements'].items():
                 if value['type'] == "solenoid":
                     self.rf_values.update({key: collections.OrderedDict()})
