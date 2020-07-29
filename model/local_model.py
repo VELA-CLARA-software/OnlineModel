@@ -49,6 +49,7 @@ class Model(object):
         self.generator_params = ['number_of_particles', 'dist_x', 'dist_y', 'dist_z', 'sig_x', 'sig_y', 'sig_z']
         self.scan_progress = -1
         self.dbcontroller = dbc.DatabaseController()
+        self.directoryname = ''
 
     def run_twiss(self, directory):
         twiss_model = twissData.twissData(directory='test/'+directory, name=directory)
@@ -110,6 +111,7 @@ class Model(object):
                 for e in elements:
                     e.longitudinal_wakefield_enable = zwake
                     e.transverse_wakefield_enable = trwake
+                    e.allow_long_beam = True
 
     def clear_prefixes(self):
         for l in self.data.lattices:
@@ -117,6 +119,7 @@ class Model(object):
 
     def run_script(self):
         success = True
+        self.directoryname = ''
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
         self.yaml = create_yaml_dictionary(self.data)
         # del self.yaml['simulation']['directory']
@@ -152,7 +155,6 @@ class Model(object):
                 else:
                     time.sleep(0.5)
         return success
-                # print(' now saving the settings... ')
 
     def get_directory_name(self):
         return self.directoryname

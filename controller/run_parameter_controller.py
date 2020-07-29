@@ -182,6 +182,8 @@ class RunParameterController(QObject):
         self.abort_scan = False
         self.create_datatree_widget()
         self.populate_run_parameters_table()
+        self.toggle_BSOL_tracking()
+        self.toggle_BSOL_tracking()
 
     def create_datatree_widget(self):
         self.view.yaml_tree_widget = pg.DataTreeWidget()
