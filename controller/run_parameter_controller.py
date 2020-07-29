@@ -182,6 +182,8 @@ class RunParameterController(QObject):
         self.abort_scan = False
         self.create_datatree_widget()
         self.populate_run_parameters_table()
+        self.toggle_BSOL_tracking()
+        self.toggle_BSOL_tracking()
 
     def create_datatree_widget(self):
         self.view.yaml_tree_widget = pg.DataTreeWidget()
@@ -213,12 +215,20 @@ class RunParameterController(QObject):
         dir = os.path.basename(v)
         table.setItem(rowPosition, 0, QTableWidgetItem(str(dir)))
         open_folder_button = QPushButton('Open')
+        open_folder_button.setEnabled(False)
         open_folder_button.clicked.connect(lambda : self.open_folder_on_server(dir))
         table.setCellWidget(rowPosition, 1, open_folder_button)
         add_plot_button = QCheckBox('Plot')
         add_plot_button.stateChanged.connect(lambda x: self.emit_plot_signals(k, v, x))
         table.setCellWidget(rowPosition, 2, add_plot_button)
         table.resizeColumnsToContents()
+
+    def setrunplotcolor(self, row, color):
+        table = self.view.run_parameters_table
+        colorWidget = pg.ColorButton()
+        colorWidget.setEnabled(False)
+        colorWidget.setColor(color)
+        table.setCellWidget(row, 3, colorWidget)
 
     def open_folder_on_server(self, dir):
         remote_dir = self.model.get_absolute_folder_location(dir)
@@ -229,6 +239,8 @@ class RunParameterController(QObject):
             self.add_plot_signal.emit(k,v)
         elif state == Qt.Unchecked:
             self.remove_plot_signal.emit(v)
+            table = self.view.run_parameters_table
+            table.removeCellWidget(k, 3)
 
     def connect_auto_load_settings(self, state):
         if state:
@@ -267,9 +279,9 @@ class RunParameterController(QObject):
 
     def update_macro_particle_combo(self):
         combo = self.view.macro_particle
-        for i in range(2,7):
+        for i in range(4,7):
             combo.addItem(str(2**(3*i)), i)
-        combo.setCurrentIndex(1)
+        combo.setCurrentIndex(0)
 
     def split_accessible_name(self, aname):
         if len((aname.split(':'))) == 3:
@@ -524,8 +536,9 @@ class RunParameterController(QObject):
         self.continue_scan()
 
     def do_scan(self):
-        self.model.run_script()
-        self.export_parameter_values_to_yaml_file(auto=True)
+        success = self.model.run_script()
+        if success:
+            self.export_parameter_values_to_yaml_file(auto=True)
 
     def continue_scan(self):
         if not self.abort_scan and self.scan_no < len(self.scan_range):

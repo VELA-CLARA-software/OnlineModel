@@ -49,6 +49,7 @@ class Model(object):
         self.generator_params = ['number_of_particles', 'dist_x', 'dist_y', 'dist_z', 'sig_x', 'sig_y', 'sig_z']
         self.scan_progress = -1
         self.dbcontroller = dbc.DatabaseController()
+        self.directoryname = ''
 
     def run_twiss(self, directory):
         twiss_model = twissData.twissData(directory='test/'+directory, name=directory)
@@ -99,11 +100,26 @@ class Model(object):
             lattice.lsc_bins = lsc_bins
             lattice.lscDrifts = lsc
 
+    def update_Wakefields(self):
+        npart = int(self.data.parameterDict['generator']['number_of_particles']['value'])
+        for l in self.data.lattices:
+            if 'zwake' in self.data.parameterDict[l]:
+                zwake = self.data.parameterDict[l]['zwake']['value'] if npart > 3 else False
+                trwake = self.data.parameterDict[l]['trwake']['value'] if npart > 3 else False
+                lattice = self.data.Framework[l]
+                elements = lattice.elements.values()
+                for e in elements:
+                    e.longitudinal_wakefield_enable = zwake
+                    e.transverse_wakefield_enable = trwake
+                    e.allow_long_beam = True
+
     def clear_prefixes(self):
         for l in self.data.lattices:
             self.data.Framework[l].prefix = ''
 
     def run_script(self):
+        success = True
+        self.directoryname = ''
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
         self.yaml = create_yaml_dictionary(self.data)
         # del self.yaml['simulation']['directory']
@@ -116,6 +132,7 @@ class Model(object):
             self.update_tracking_codes()
             self.update_CSR()
             self.update_LSC()
+            self.update_Wakefields()
             self.clear_prefixes()
             closest_match, lattices_to_be_saved = self.dbcontroller.reader.find_lattices_that_dont_exist(self.yaml)
             if len(lattices_to_be_saved) > 0:
@@ -130,10 +147,14 @@ class Model(object):
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
                 if self.data.runsDict['track']:
-                    self.data.Framework.track(startfile=start_lattice)#, endfile=endLattice)
+                    try:
+                        self.data.Framework.track(startfile=start_lattice)#, endfile=endLattice)
+                    except:
+                        print('!!!! Error in Tracking - settings not saved !!!!')
+                        success = False
                 else:
                     time.sleep(0.5)
-                # print(' now saving the settings... ')
+        return success
 
     def get_directory_name(self):
         return self.directoryname

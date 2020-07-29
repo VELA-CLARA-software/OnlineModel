@@ -100,16 +100,33 @@ class Model(object):
             lattice.lsc_bins = lsc_bins
             lattice.lscDrifts = lsc
 
+    def update_Wakefields(self):
+        npart = int(self.data.parameterDict['generator']['number_of_particles']['value'])
+        for l in self.data.lattices:
+            if 'zwake' in self.data.parameterDict[l]:
+                if not npart > 3:
+                    self.data.parameterDict[l]['zwake']['value'] = False
+                    self.data.parameterDict[l]['trwake']['value'] = False
+                zwake = self.data.parameterDict[l]['zwake']['value']
+                trwake = self.data.parameterDict[l]['trwake']['value']
+                lattice = self.data.Framework[l]
+                elements = lattice.elements.values()
+                for e in elements:
+                    e.longitudinal_wakefield_enable = zwake
+                    e.transverse_wakefield_enable = trwake
+
     def clear_prefixes(self):
         for l in self.lattices:
             self.Framework[l].prefix = ''
 
     def run_script(self):
+        success = True
         print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
         self.yaml = create_yaml_dictionary(self.data)
         self.update_tracking_codes()
         self.update_CSR()
         self.update_LSC()
+        self.update_Wakefields()
         self.clear_prefixes()
         closest_match, lattices_to_be_saved = self.dbcontroller.reader.find_lattices_that_dont_exist(self.yaml)
         if len(lattices_to_be_saved) > 0:
@@ -122,12 +139,18 @@ class Model(object):
             self.Framework.setSubDirectory(self.directoryname)
             self.modify_framework(scan=False)
             self.Framework.save_changes_file(filename=self.Framework.subdirectory+'/changes.yaml')
-            self.export_parameter_values_to_yaml_file()
             if self.data.runsDict['track']:
-                self.Framework.track(startfile=start_lattice)#, endfile=endLattice)
+                try:
+                    self.data.Framework.track(startfile=start_lattice)#, endfile=endLattice)
+                except:
+                    print('!!!! Error in Tracking - settings not saved !!!!')
+                    success = False
             else:
                 time.sleep(0.5)
         self.Framework.progress = 100
+        if success:
+            self.export_parameter_values_to_yaml_file()
+        return success
             # print(' now saving the settings... ')
 
     ##### Find Starting Filename based on z-position ####

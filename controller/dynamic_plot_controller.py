@@ -38,6 +38,8 @@ class GenericThread(QThread):
 
 class DynamicPlotController(QObject):
 
+    plotcolor = pyqtSignal(int, QColor)
+
     def __init__(self, app, view, model):
         super(DynamicPlotController, self).__init__()
         self.my_name = 'controller'
@@ -55,7 +57,8 @@ class DynamicPlotController(QObject):
         # self.omp.addTwissDirectory([{'directory': dir, 'sections': 'All'}], name=id)
         print('Requesting Twiss - ', dir)
         twissdata = self.model.run_twiss(dir)
-        self.omp.addtwissDataObject(dataobject=twissdata, name=dir)
+        color, style = self.omp.addtwissDataObject(dataobject=twissdata, name=dir)
+        self.plotcolor.emit(id, color)
 
     def remove_twiss_plot(self, dir):
         print('Removing twiss plot: ', dir)
