@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\astra_comparison_gui_tabs.ui'
+# Form implementation generated from reading ui file 'astra_comparison_gui_tabs.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.0
 #
@@ -1294,7 +1294,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.main_tab_widget, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1117, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1117, 17))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -1622,3 +1622,13 @@ class Ui_MainWindow(object):
         self.actionAuto_load_Settings.setText(_translate("MainWindow", "Auto-load Settings"))
         self.actionClean_Directory.setText(_translate("MainWindow", "Clean Directory"))
 from pyqtgraph import PlotWidget
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
