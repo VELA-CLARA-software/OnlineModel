@@ -1,14 +1,13 @@
 import sys, os
 sys.path.append(os.path.abspath(__file__+'/../../'))
 import controller.run_parameter_controller as RunParameterController
-import controller.post_processing_controller as PostProcessingController
+
 
 class UnifiedController():
 
-        def __init__(self, m_RunParameterController, m_DynamicPlotController):#, m_PostProcessingController):
+        def __init__(self, m_RunParameterController, m_DynamicPlotController):
             self.rpc = m_RunParameterController
             self.dpc = m_DynamicPlotController
-            #self.ppc = m_PostProcessingController
             #self.rpc.enable_run_button()
             self.rpc.view.actionImport_YAML.triggered.connect(self.rpc.import_parameter_values_from_yaml_file)
             self.rpc.view.actionExport_YAML.triggered.connect(self.rpc.export_parameter_values_to_yaml_file)
@@ -16,7 +15,6 @@ class UnifiedController():
             self.rpc.view.actionAuto_load_Settings.toggled.connect(self.rpc.connect_auto_load_settings)
             #self.rpc.view.runButton.clicked.connect(self.rpc.run_astra)
             #self.rpc.view.runButton.clicked.connect(self.run_rpc_process)
-            #self.ppc.view.runButton_post.clicked.connect(self.run_ppc_process)
             self.rpc.add_plot_signal.connect(self.dpc.add_twiss_plot)
             self.rpc.remove_plot_signal.connect(self.dpc.remove_twiss_plot)
             self.dpc.plotcolor.connect(self.rpc.setrunplotcolor)
@@ -26,9 +24,3 @@ class UnifiedController():
             self.rpc.run_thread(self.rpc.app_sequence)
             self.rpc.thread.start()
 
-        # def run_ppc_process(self):
-            # self.ppc.disable_run_postproc_button()
-            # self.ppc.app_sequence_post()
-            # self.ppc.enable_run_postproc_button()
-            # #self.ppc.run_thread(self.ppc.app_sequence_post)
-            # #self.ppc.thread.start()

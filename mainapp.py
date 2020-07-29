@@ -14,7 +14,7 @@ sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'c
 sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'view'))
 sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'database'))
 
-from controller import unified_controller, run_parameter_controller, post_processing_controller, dynamic_plot_controller
+from controller import unified_controller, run_parameter_controller, dynamic_plot_controller
 from view import view
 from model import remote_model as rmodel
 from model import local_model as lmodel
@@ -45,9 +45,7 @@ class MainApp(QObject):
         self.RunParameterController = run_parameter_controller.RunParameterController(app, self.view, self.model)
         self.DynamicPlotController = dynamic_plot_controller.DynamicPlotController(app, self.view, self.model)
         # self.DatabaseController = database_controller.DatabaseController(self.socket)
-        #self.PostProcessingController = post_processing_controller.PostProcessingController(app, self.view, self.model)
         self.UnifiedController = unified_controller.UnifiedController(self.RunParameterController, self.DynamicPlotController)
-        #                                                              self.PostProcessingController)
         self.MainWindow.show()
 
     def initialise_zeromq(self):
