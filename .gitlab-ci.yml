@@ -4,7 +4,7 @@ stages:
 
 list_tools:
   stage: list_tools
-  script: "which python"
+  script: "which python3"
 
 check_server:
   stage: check_server
