@@ -18,7 +18,6 @@ from controller import unified_controller, run_parameter_controller, dynamic_plo
 from view import view
 from model import remote_model as rmodel
 from model import local_model as lmodel
-from database import database_controller
 import argparse
 
 parser = argparse.ArgumentParser(description='Add Sets.')
@@ -42,10 +41,12 @@ class MainApp(QObject):
             self.model = lmodel.Model()
         self.MainWindow = QMainWindow()
         self.view.setupUi(self.MainWindow)
+        self.DatabaseController = self.model.dbcontroller
         self.RunParameterController = run_parameter_controller.RunParameterController(app, self.view, self.model)
         self.DynamicPlotController = dynamic_plot_controller.DynamicPlotController(app, self.view, self.model)
         # self.DatabaseController = database_controller.DatabaseController(self.socket)
-        self.UnifiedController = unified_controller.UnifiedController(self.RunParameterController, self.DynamicPlotController)
+        #self.PostProcessingController = post_processing_controller.PostProcessingController(app, self.view, self.model)
+        self.UnifiedController = unified_controller.UnifiedController(self.RunParameterController, self.DynamicPlotController, self.DatabaseController)
         self.MainWindow.show()
 
     def initialise_zeromq(self):

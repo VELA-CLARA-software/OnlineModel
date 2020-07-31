@@ -201,6 +201,21 @@ class DatabaseReader():
         else:
             return null_result
 
+    def get_run_id_for_lattice(self, run_id, t):
+            table_idx = self.table_name_list.index(t)
+            if self.run_id_settings_dict[run_id]['runs']['prefix'] is not None:
+                start_lattice_idx = self.table_name_list.index(self.run_id_settings_dict[run_id]['runs']['start_lattice'])
+                if  table_idx < start_lattice_idx:
+                    return self.get_run_id_for_lattice(self.run_id_settings_dict[run_id]['runs']['prefix'], t)
+            return run_id
+
+    def get_run_id_for_each_lattice(self, run_id):
+        """For each lattice, find the corresponding run_id taking into account prefix runs"""
+        result = {}
+        for t in self.table_name_list:
+            result[t] = self.get_run_id_for_lattice(run_id, t)
+        return result
+
     def get_settings_dict_to_check(self, settings_to_save):
         """Create a lattice dictionary from the input settings."""
         settings_to_check = {}

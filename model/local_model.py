@@ -10,7 +10,7 @@ import uuid
 sys.path.append(os.path.abspath(__file__+'/../../'))
 from data import data
 import controller.run_parameters_parser as yaml_parser
-import database.database_controller as dbc
+import controller.database_controller as dbc
 import model.twissData as twissData
 import data.lattices as lattices
 

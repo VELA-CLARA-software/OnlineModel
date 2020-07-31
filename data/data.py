@@ -1,7 +1,7 @@
 import collections
 import os, sys
 import numpy as np
-import ruamel.yaml
+import ruamel.yaml as yaml
 sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
 sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
 sys.path.append(os.path.abspath(__file__+'/../../'))
@@ -17,10 +17,11 @@ class Data(object):
     def __init__(self):
         super(Data, self).__init__()
         self.my_name = "data"
+        self.screenDict = collections.OrderedDict()
         self.parameterDict = collections.OrderedDict()
         self.lattices = lattices.lattices
         [self.parameterDict.update({l:collections.OrderedDict()}) for l in self.lattices]
-        # self.latticeDict = self.parameterDict['lattice']
+        [self.screenDict.update({l:collections.OrderedDict()}) for l in self.lattices]
         self.parameterDict['scan'] = collections.OrderedDict()
         self.scanDict = self.parameterDict['scan']
         self.scanDict['parameter_scan'] = False
@@ -36,12 +37,18 @@ class Data(object):
         self.my_name = "data"
         self.get_data()
         self.initialise_data()
+        yaml.add_representer(collections.OrderedDict, yaml.representer.SafeRepresenter.represent_dict)
+        with open('./screen_positions.yaml', 'w') as output_file:
+            yaml.dump(self.screenDict, output_file, default_flow_style=False)
 
     def get_framework(self):
         return self.Framework
 
     def initialise_data(self):
         # [self.runParameterDict.update({key: value}) for key, value in zip(data_keys, data_v)]
+        [[self.screenDict[l].update({key: value}) for key, value in self.screen_values.items() if l == key[:len(l)]] for l in self.lattices]
+        [self.screenDict['Gun'].update({key: value}) for key, value in self.screen_values.items() if 'CLA-S01' == key[:len('CLA-S01')]]
+        [self.screenDict['Linac'].update({key: value}) for key, value in self.screen_values.items() if 'CLA-L01' == key[:len('CLA-L01')]]
         [[self.parameterDict[l].update({key: value}) for key, value in self.quad_values.items() if l == key[:len(l)]] for l in self.lattices]
         [self.parameterDict[self.lattices[0]].update({key: value}) for key, value in self.rf_values.items() if 'LRG' in key]
         [self.parameterDict[self.lattices[1]].update({key: value}) for key, value in self.rf_values.items() if 'L01' in key]
@@ -75,6 +82,7 @@ class Data(object):
     def get_data(self):
         self.scan_values = collections.OrderedDict()
         self.scan_parameter = collections.OrderedDict()
+        self.screen_values = collections.OrderedDict()
         self.quad_values = collections.OrderedDict()
         self.rf_values = collections.OrderedDict()
         self.dipole_values = collections.OrderedDict()
@@ -91,6 +99,10 @@ class Data(object):
         self.simulation_parameters = collections.OrderedDict()
         # self.tracking_code.update({'tracking_code': collections.OrderedDict()})
 
+        for screen in self.Framework.getElementType('screen'):
+            self.screen_values.update({screen['objectname']: collections.OrderedDict()})
+            self.screen_values[screen['objectname']].update({'type': screen['objecttype']})
+            self.screen_values[screen['objectname']].update({'position': float(screen.middle[2])})
         for quad in self.Framework.getElementType('quadrupole'):
             self.quad_values.update({quad['objectname']: collections.OrderedDict()})
             self.quad_values[quad['objectname']].update({'type': quad['objecttype']})
