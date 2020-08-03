@@ -99,7 +99,7 @@ class Data(object):
         self.simulation_parameters = collections.OrderedDict()
         # self.tracking_code.update({'tracking_code': collections.OrderedDict()})
 
-        for screen in self.Framework.getElementType('screen'):
+        for screen in self.Framework.getElementType(['screen', 'watch_point', 'monitor', 'beam_arrival_monitor', 'marker']):
             name = screen['objectname'].replace('-W','')
             self.screen_values.update({name: collections.OrderedDict()})
             self.screen_values[name].update({'type': screen['objecttype']})
