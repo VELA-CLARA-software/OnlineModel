@@ -49,6 +49,9 @@
        <number>0</number>
       </property>
       <property name="tabsClosable">
+       <bool>false</bool>
+      </property>
+      <property name="movable">
        <bool>true</bool>
       </property>
       <widget class="QWidget" name="scan_tab">
@@ -2813,7 +2816,7 @@
             <bool>true</bool>
            </property>
            <property name="columnCount">
-            <number>5</number>
+            <number>3</number>
            </property>
            <attribute name="horizontalHeaderCascadingSectionResizes">
             <bool>true</bool>
@@ -2830,8 +2833,6 @@
            <attribute name="verticalHeaderStretchLastSection">
             <bool>false</bool>
            </attribute>
-           <column/>
-           <column/>
            <column/>
            <column/>
            <column/>

@@ -13,7 +13,7 @@ sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
 sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
 import database.run_parameters_parser as yaml_parser
 from SimulationFramework.Modules.online_model_twissPlot import twissPlotWidget
-from SimulationFramework.Modules.online_model_plotter import onlineModelPlotterWidget
+from SimulationFramework.Modules.online_model_plotter_run_id import onlineModelPlotterWidget
 
 class GenericThread(QThread):
     signal = pyqtSignal()
@@ -49,23 +49,11 @@ class DynamicPlotController(QObject):
         self.view = view
         # self.view.main_tab_widget.removeTab(3)
         self.omp = twissPlotWidget()
+        self.ompbeam = onlineModelPlotterWidget(self.model.data.screenDict, directory='./test/')
         # self.view.post_tab = self.omp
         self.view.main_tab_widget.addTab(self.omp, "Twiss Plots")
-        tabbar = self.view.main_tab_widget.tabBar()
-        tabbar.setTabButton(4, QTabBar.RightSide, None)
-        tabbar.tabCloseRequested.connect(self.closePlotTab)
+        self.view.main_tab_widget.addTab(self.ompbeam, "Beam Plots")
         self.omplotterWidgets = {}
-
-    def closePlotTab(self, i):
-        dir = self.view.main_tab_widget.tabText(i)
-        print('Closing Tab - ', dir)
-        self.view.main_tab_widget.widget(i).deleteLater()
-        self.view.main_tab_widget.tabBar().removeTab(i)
-
-    def open_plotter_window(self, id, dir):
-        print('Analysing Folder - ', dir)
-        self.omplotterWidgets[dir] = onlineModelPlotterWidget(directory='test/'+dir)
-        self.view.main_tab_widget.addTab(self.omplotterWidgets[dir], dir)
 
     def add_twiss_plot(self, id, dir):
         # dir = dir.replace('/mnt/','\\\\').replace('/','\\')+'\\'
@@ -74,8 +62,10 @@ class DynamicPlotController(QObject):
         print('Requesting Twiss - ', dir)
         twissdata = self.model.run_twiss(dir)
         color, style = self.omp.addtwissDataObject(dataobject=twissdata, name=dir)
+        self.ompbeam.addRunIDToListWidget(dir, self.model.dbcontroller.find_run_id_for_each_lattice(dir) ,color)
         self.plotcolor.emit(id, color)
 
     def remove_twiss_plot(self, dir):
         print('Removing twiss plot: ', dir)
         self.omp.removeCurve(dir)
+        self.ompbeam.removeRunIDFromListWidget(dir)

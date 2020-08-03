@@ -100,9 +100,10 @@ class Data(object):
         # self.tracking_code.update({'tracking_code': collections.OrderedDict()})
 
         for screen in self.Framework.getElementType('screen'):
-            self.screen_values.update({screen['objectname']: collections.OrderedDict()})
-            self.screen_values[screen['objectname']].update({'type': screen['objecttype']})
-            self.screen_values[screen['objectname']].update({'position': float(screen.middle[2])})
+            name = screen['objectname'].replace('-W','')
+            self.screen_values.update({name: collections.OrderedDict()})
+            self.screen_values[name].update({'type': screen['objecttype']})
+            self.screen_values[name].update({'position': float(screen.middle[2])})
         for quad in self.Framework.getElementType('quadrupole'):
             self.quad_values.update({quad['objectname']: collections.OrderedDict()})
             self.quad_values[quad['objectname']].update({'type': quad['objecttype']})

@@ -147,9 +147,6 @@ class RunParameterController(QObject):
         self.app = app
         self.model = model
         self.view = view
-        tabbar = self.view.main_tab_widget.tabBar()
-        for i in range(4):
-            tabbar.setTabButton(i, QTabBar.RightSide, None)
         self.create_user_tag_combo_box()
         self.runParameterLayouts = [
                                self.view.s02_parameter_groupbox,
@@ -222,17 +219,13 @@ class RunParameterController(QObject):
         open_folder_button = QPushButton('Open')
         open_folder_button.setEnabled(False)
         open_folder_button.clicked.connect(lambda : self.open_folder_on_server(dir))
-        delete_run_button = QPushButton('Delete!')
-        delete_run_button.setEnabled(True)
-        delete_run_button.clicked.connect(lambda : self.delete_run_id(dir))
-        table.setCellWidget(rowPosition, 1, delete_run_button)
+        # delete_run_button = QPushButton('Delete!')
+        # delete_run_button.setEnabled(True)
+        # delete_run_button.clicked.connect(lambda : self.delete_run_id(dir))
+        # table.setCellWidget(rowPosition, 1, delete_run_button)
         add_plot_button = QCheckBox('Plot')
         add_plot_button.stateChanged.connect(lambda x: self.emit_plot_signals(k, v, x))
-        table.setCellWidget(rowPosition, 2, add_plot_button)
-        plot_window_button = QPushButton('Analyse')
-        plot_window_button.setEnabled(True)
-        plot_window_button.clicked.connect(lambda : self.add_plot_window_signal.emit(k,v))
-        table.setCellWidget(rowPosition, 4, plot_window_button)
+        table.setCellWidget(rowPosition, 1, add_plot_button)
         table.resizeColumnsToContents()
 
     def delete_run_id(self, run_id):
@@ -244,7 +237,7 @@ class RunParameterController(QObject):
         colorWidget = pg.ColorButton()
         colorWidget.setEnabled(False)
         colorWidget.setColor(color)
-        table.setCellWidget(row, 3, colorWidget)
+        table.setCellWidget(row, 2, colorWidget)
 
     def open_folder_on_server(self, dir):
         remote_dir = self.model.get_absolute_folder_location(dir)
@@ -256,7 +249,7 @@ class RunParameterController(QObject):
         elif state == Qt.Unchecked:
             self.remove_plot_signal.emit(v)
             table = self.view.run_parameters_table
-            table.removeCellWidget(k, 3)
+            table.removeCellWidget(k, 2)
 
     def connect_auto_load_settings(self, state):
         if state:

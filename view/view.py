@@ -31,7 +31,8 @@ class Ui_MainWindow(object):
 "    font-weight: bold;\n"
 "}")
         self.main_tab_widget.setTabShape(QtWidgets.QTabWidget.Rounded)
-        self.main_tab_widget.setTabsClosable(True)
+        self.main_tab_widget.setTabsClosable(False)
+        self.main_tab_widget.setMovable(True)
         self.main_tab_widget.setObjectName("main_tab_widget")
         self.scan_tab = QtWidgets.QWidget()
         self.scan_tab.setObjectName("scan_tab")
@@ -1037,7 +1038,7 @@ class Ui_MainWindow(object):
         self.run_parameters_table.setSizePolicy(sizePolicy)
         self.run_parameters_table.setDragDropOverwriteMode(False)
         self.run_parameters_table.setAlternatingRowColors(True)
-        self.run_parameters_table.setColumnCount(5)
+        self.run_parameters_table.setColumnCount(3)
         self.run_parameters_table.setObjectName("run_parameters_table")
         self.run_parameters_table.setRowCount(0)
         self.run_parameters_table.horizontalHeader().setCascadingSectionResizes(True)

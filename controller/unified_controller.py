@@ -21,8 +21,6 @@ class UnifiedController():
             self.rpc.remove_plot_signal.connect(self.dpc.remove_twiss_plot)
             # Returns a color from the plot controller to the run controller
             self.dpc.plotcolor.connect(self.rpc.setrunplotcolor)
-            # Connects signal from the run controller to open a plot window to the plot controller
-            self.rpc.add_plot_window_signal.connect(self.dpc.open_plotter_window)
             # Connects a signal from the run controller to the database controller to delete an entry from the database
             self.rpc.delete_run_id_signal.connect(self.dbc.delete_run_id_from_database)
 
