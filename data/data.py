@@ -37,9 +37,9 @@ class Data(object):
         self.my_name = "data"
         self.get_data()
         self.initialise_data()
-        yaml.add_representer(collections.OrderedDict, yaml.representer.SafeRepresenter.represent_dict)
-        with open('./screen_positions.yaml', 'w') as output_file:
-            yaml.dump(self.screenDict, output_file, default_flow_style=False)
+        # yaml.add_representer(collections.OrderedDict, yaml.representer.SafeRepresenter.represent_dict)
+        # with open('./screen_positions.yaml', 'w') as output_file:
+        #     yaml.dump(self.screenDict, output_file, default_flow_style=False)
 
     def get_framework(self):
         return self.Framework

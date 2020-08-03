@@ -48,10 +48,10 @@ class DynamicPlotController(QObject):
         self.model = model
         self.view = view
         # self.view.main_tab_widget.removeTab(3)
-        self.omp = twissPlotWidget()
+        # self.omp = twissPlotWidget()
         self.ompbeam = onlineModelPlotterWidget(self.model.data.screenDict, directory='./test/')
         # self.view.post_tab = self.omp
-        self.view.main_tab_widget.addTab(self.omp, "Twiss Plots")
+        # self.view.main_tab_widget.addTab(self.omp, "Twiss Plots")
         self.view.main_tab_widget.addTab(self.ompbeam, "Beam Plots")
         self.omplotterWidgets = {}
 
@@ -61,11 +61,11 @@ class DynamicPlotController(QObject):
         # self.omp.addTwissDirectory([{'directory': dir, 'sections': 'All'}], name=id)
         print('Requesting Twiss - ', dir)
         twissdata = self.model.run_twiss(dir)
-        color, style = self.omp.addtwissDataObject(dataobject=twissdata, name=dir)
-        self.ompbeam.addRunIDToListWidget(dir, self.model.dbcontroller.find_run_id_for_each_lattice(dir) ,color)
+        # color, style = self.omp.addtwissDataObject(dataobject=twissdata, name=dir)
+        color = self.ompbeam.addRunIDToListWidget(dir, self.model.dbcontroller.find_run_id_for_each_lattice(dir))
         self.plotcolor.emit(id, color)
 
     def remove_twiss_plot(self, dir):
         print('Removing twiss plot: ', dir)
-        self.omp.removeCurve(dir)
+        # self.omp.removeCurve(dir)
         self.ompbeam.removeRunIDFromListWidget(dir)
