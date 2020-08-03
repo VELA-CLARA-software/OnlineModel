@@ -182,6 +182,8 @@ class RunParameterController(QObject):
         self.view.directory.textChanged[str].emit(self.view.directory.text())
         # self.view.run_parameters_table.cellClicked.connect(self.show_row_settings)
         self.abort_scan = False
+        self.run_plots = []
+        self.run_plot_colors = {}
         self.create_datatree_widget()
         self.populate_run_parameters_table()
         self.toggle_BSOL_tracking()
@@ -224,6 +226,9 @@ class RunParameterController(QObject):
         # delete_run_button.clicked.connect(lambda : self.delete_run_id(dir))
         # table.setCellWidget(rowPosition, 1, delete_run_button)
         add_plot_button = QCheckBox('Plot')
+        if dir in self.run_plots:
+            add_plot_button.setChecked(True)
+            self.setrunplotcolor(rowPosition, self.run_plot_colors[dir])
         add_plot_button.stateChanged.connect(lambda x: self.emit_plot_signals(k, v, x))
         table.setCellWidget(rowPosition, 1, add_plot_button)
         table.resizeColumnsToContents()
@@ -238,6 +243,8 @@ class RunParameterController(QObject):
         colorWidget.setEnabled(False)
         colorWidget.setColor(color)
         table.setCellWidget(row, 2, colorWidget)
+        run_id = table.item(row,0).text()
+        self.run_plot_colors[run_id] = color
 
     def open_folder_on_server(self, dir):
         remote_dir = self.model.get_absolute_folder_location(dir)
@@ -246,8 +253,10 @@ class RunParameterController(QObject):
     def emit_plot_signals(self, k, v, state):
         if state == Qt.Checked:
             self.add_plot_signal.emit(k,v)
+            self.run_plots.append(v)
         elif state == Qt.Unchecked:
             self.remove_plot_signal.emit(v)
+            self.run_plots.remove(v)
             table = self.view.run_parameters_table
             table.removeCellWidget(k, 2)
 

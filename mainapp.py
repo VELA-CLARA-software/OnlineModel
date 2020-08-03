@@ -14,7 +14,7 @@ sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'c
 sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'view'))
 sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'database'))
 
-from controller import unified_controller, run_parameter_controller, dynamic_plot_controller
+from controller import unified_controller, run_parameter_controller, dynamic_plot_controller, database_controller
 from view import view
 from model import remote_model as rmodel
 from model import local_model as lmodel
@@ -33,15 +33,16 @@ class MainApp(QObject):
         self.app = app
         self.view = view.Ui_MainWindow()
         use_server = self.initialise_zeromq()
+        self.DatabaseController = database_controller.DatabaseController()
         if use_server is not False:
             print('Using REMOTE Model')
             self.model = rmodel.Model(self.socket)
         else:
             print('Using LOCAL Model')
             self.model = lmodel.Model()
+            self.model.dbcontroller = self.DatabaseController
         self.MainWindow = QMainWindow()
         self.view.setupUi(self.MainWindow)
-        self.DatabaseController = self.model.dbcontroller
         self.RunParameterController = run_parameter_controller.RunParameterController(app, self.view, self.model)
         self.DynamicPlotController = dynamic_plot_controller.DynamicPlotController(app, self.view, self.model)
         # self.DatabaseController = database_controller.DatabaseController(self.socket)
