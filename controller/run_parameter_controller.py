@@ -90,7 +90,6 @@ class GenericThread(QThread):
     def __init__(self, function, *args, **kwargs):
         super(GenericThread, self).__init__()
         self._stopped = False
-        self.existent = 'existent file'
         self.function = function
         self.args = args
         self.kwargs = kwargs
@@ -184,6 +183,7 @@ class RunParameterController(QObject):
         self.abort_scan = False
         self.run_plots = []
         self.run_plot_colors = {}
+        self.tracking_success = False
         self.create_datatree_widget()
         self.populate_run_parameters_table()
         self.toggle_BSOL_tracking()
@@ -554,8 +554,9 @@ class RunParameterController(QObject):
         self.continue_scan()
 
     def do_scan(self):
-        success = self.model.run_script()
-        if success:
+        self.tracking_success = False
+        self.tracking_success = self.model.run_script()
+        if self.tracking_success:
             self.export_parameter_values_to_yaml_file(auto=True)
 
     def continue_scan(self):
@@ -608,8 +609,9 @@ class RunParameterController(QObject):
         return
 
     def save_settings_to_database(self):
-        self.model.save_settings_to_database(self.model.yaml, self.model.directoryname)
-        self.update_runs_widget()
+        if self.tracking_success:
+            self.model.save_settings_to_database(self.model.yaml, self.model.directoryname)
+            self.update_runs_widget()
 
     def update_directory_widget(self):
         dirname = self.model.get_directory_name()
