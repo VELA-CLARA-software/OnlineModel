@@ -52,14 +52,13 @@ class DynamicPlotController(QObject):
         self.ompbeam = onlineModelPlotterWidget(self.model.data.screenDict, directory='./test/')
         # self.view.post_tab = self.omp
         # self.view.main_tab_widget.addTab(self.omp, "Twiss Plots")
-        self.view.main_tab_widget.addTab(self.ompbeam, "Beam Plots")
+        self.view.main_tab_widget.addTab(self.ompbeam, "Plots")
         self.omplotterWidgets = {}
 
     def add_twiss_plot(self, id, dir):
         # dir = dir.replace('/mnt/','\\\\').replace('/','\\')+'\\'
         # print('adding twiss plot: ', dir)
         # self.omp.addTwissDirectory([{'directory': dir, 'sections': 'All'}], name=id)
-        print('Requesting Twiss - ', dir)
         twissdata = self.model.run_twiss(dir)
         # color, style = self.omp.addtwissDataObject(dataobject=twissdata, name=dir)
         color = self.ompbeam.addRunIDToListWidget(dir, self.model.dbcontroller.find_run_id_for_each_lattice(dir))
