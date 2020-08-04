@@ -90,7 +90,6 @@ class GenericThread(QThread):
     def __init__(self, function, *args, **kwargs):
         super(GenericThread, self).__init__()
         self._stopped = False
-        self.existent = 'existent file'
         self.function = function
         self.args = args
         self.kwargs = kwargs
@@ -136,6 +135,8 @@ class RunParameterController(QObject):
 
     add_plot_signal = pyqtSignal(int, str)
     remove_plot_signal = pyqtSignal(str)
+    delete_run_id_signal = pyqtSignal(str)
+    add_plot_window_signal = pyqtSignal(int, str)
 
     tags = ['BA1', 'User Experiment', 'Front End', 'Emittance', 'Energy Spread', 'Commissioning']
 
@@ -180,6 +181,9 @@ class RunParameterController(QObject):
         self.view.directory.textChanged[str].emit(self.view.directory.text())
         # self.view.run_parameters_table.cellClicked.connect(self.show_row_settings)
         self.abort_scan = False
+        self.run_plots = []
+        self.run_plot_colors = {}
+        self.tracking_success = False
         self.create_datatree_widget()
         self.populate_run_parameters_table()
         self.toggle_BSOL_tracking()
@@ -217,18 +221,30 @@ class RunParameterController(QObject):
         open_folder_button = QPushButton('Open')
         open_folder_button.setEnabled(False)
         open_folder_button.clicked.connect(lambda : self.open_folder_on_server(dir))
-        table.setCellWidget(rowPosition, 1, open_folder_button)
+        # delete_run_button = QPushButton('Delete!')
+        # delete_run_button.setEnabled(True)
+        # delete_run_button.clicked.connect(lambda : self.delete_run_id(dir))
+        # table.setCellWidget(rowPosition, 1, delete_run_button)
         add_plot_button = QCheckBox('Plot')
+        if dir in self.run_plots:
+            add_plot_button.setChecked(True)
+            self.setrunplotcolor(rowPosition, self.run_plot_colors[dir])
         add_plot_button.stateChanged.connect(lambda x: self.emit_plot_signals(k, v, x))
-        table.setCellWidget(rowPosition, 2, add_plot_button)
+        table.setCellWidget(rowPosition, 1, add_plot_button)
         table.resizeColumnsToContents()
+
+    def delete_run_id(self, run_id):
+        self.delete_run_id_signal.emit(run_id)
+        self.populate_run_parameters_table()
 
     def setrunplotcolor(self, row, color):
         table = self.view.run_parameters_table
         colorWidget = pg.ColorButton()
         colorWidget.setEnabled(False)
         colorWidget.setColor(color)
-        table.setCellWidget(row, 3, colorWidget)
+        table.setCellWidget(row, 2, colorWidget)
+        run_id = table.item(row,0).text()
+        self.run_plot_colors[run_id] = color
 
     def open_folder_on_server(self, dir):
         remote_dir = self.model.get_absolute_folder_location(dir)
@@ -237,10 +253,12 @@ class RunParameterController(QObject):
     def emit_plot_signals(self, k, v, state):
         if state == Qt.Checked:
             self.add_plot_signal.emit(k,v)
+            self.run_plots.append(v)
         elif state == Qt.Unchecked:
             self.remove_plot_signal.emit(v)
+            self.run_plots.remove(v)
             table = self.view.run_parameters_table
-            table.removeCellWidget(k, 3)
+            table.removeCellWidget(k, 2)
 
     def connect_auto_load_settings(self, state):
         if state:
@@ -536,8 +554,9 @@ class RunParameterController(QObject):
         self.continue_scan()
 
     def do_scan(self):
-        success = self.model.run_script()
-        if success:
+        self.tracking_success = False
+        self.tracking_success = self.model.run_script()
+        if self.tracking_success:
             self.export_parameter_values_to_yaml_file(auto=True)
 
     def continue_scan(self):
@@ -563,9 +582,24 @@ class RunParameterController(QObject):
             self.update_widgets_with_values(self.scan_parameter, self.scan_basevalue)
             self.update_directory_widget()
 
+    def check_scan_parameters(self):
+        try:
+            scan_start = float(self.model.data.scanDict['parameter_scan_from_value'])
+            scan_end = float(self.model.data.scanDict['parameter_scan_to_value'])
+            scan_step_size = float(self.model.data.scanDict['parameter_scan_step_size'])
+            scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
+            if len(scan_range) > 0:
+                return True
+            return False
+        except ValueError:
+            return False
+
     def app_sequence(self):
         if self.model.data.scanDict['parameter_scan']:
-            self.setup_scan()
+            if self.check_scan_parameters():
+                self.setup_scan()
+            else:
+                print('Error in scan parameters - aborting!')
         else:
             self.thread = GenericThread(self.do_scan)
             self.thread.finished.connect(self.enable_run_button)
@@ -575,8 +609,9 @@ class RunParameterController(QObject):
         return
 
     def save_settings_to_database(self):
-        self.model.save_settings_to_database(self.model.yaml, self.model.directoryname)
-        self.update_runs_widget()
+        if self.tracking_success:
+            self.model.save_settings_to_database(self.model.yaml, self.model.directoryname)
+            self.update_runs_widget()
 
     def update_directory_widget(self):
         dirname = self.model.get_directory_name()

@@ -10,7 +10,7 @@ import uuid
 sys.path.append(os.path.abspath(__file__+'/../../'))
 from data import data
 import controller.run_parameters_parser as yaml_parser
-import database.database_controller as dbc
+# import controller.database_controller as dbc
 import model.twissData as twissData
 import data.lattices as lattices
 
@@ -48,7 +48,7 @@ class Model(object):
         self.data = data.Data()
         self.generator_params = ['number_of_particles', 'dist_x', 'dist_y', 'dist_z', 'sig_x', 'sig_y', 'sig_z']
         self.scan_progress = -1
-        self.dbcontroller = dbc.DatabaseController()
+        # self.dbcontroller = dbc.DatabaseController()
         self.directoryname = ''
 
     def run_twiss(self, directory):
@@ -149,8 +149,9 @@ class Model(object):
                 if self.data.runsDict['track']:
                     try:
                         self.data.Framework.track(startfile=start_lattice)#, endfile=endLattice)
-                    except:
+                    except Exception as e:
                         print('!!!! Error in Tracking - settings not saved !!!!')
+                        print(e)
                         success = False
                 else:
                     time.sleep(0.5)
