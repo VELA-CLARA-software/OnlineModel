@@ -24,6 +24,7 @@ class UnifiedController():
             # Connects a signal from the run controller to the database controller to delete an entry from the database
             self.rpc.delete_run_id_signal.connect(self.dbc.delete_run_id_from_database)
 
+            self.rpc.run_id_clicked.connect(self.dpc.curveClicked)
 
         def run_rpc_process(self):
             self.rpc.disable_run_button()

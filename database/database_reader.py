@@ -119,11 +119,11 @@ class DatabaseReader():
         run_id = ''
         yaml_settings = self.prepare_dict_for_checking(yaml_settings)
         # Compare each lattice to the input yaml file and return true if they match
-        for run_id, db_settings in self.lattice_id_settings_dict.items():
-            if yaml_settings == db_settings:
-                found_in_db = True
-                run_id_for_settings = run_id
-                return found_in_db, run_id
+        # for run_id, db_settings in self.lattice_id_settings_dict.items():
+        #     if yaml_settings == db_settings:
+        #         found_in_db = True
+        #         run_id_for_settings = run_id
+        #         return found_in_db, run_id
         # If they didn't match, it may be because it is not a full run, so find the nearest match using the prefix runs
         found_run_id, lattices = self.find_lattices_that_dont_exist(yaml_settings)
         # If there was a full match the function returns [run_id, None]
@@ -213,6 +213,7 @@ class DatabaseReader():
         """For each lattice, find the corresponding run_id taking into account prefix runs"""
         result = {}
         for t in self.table_name_list:
+            print('table name = ', t)
             result[t] = self.get_run_id_for_lattice(run_id, t)
         return result
 

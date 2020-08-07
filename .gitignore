@@ -22,5 +22,5 @@ test_yaml/
 DB_Test_Settings/
 _*/
 build/
-test/
+*test*/
 SimulationDatabase.db

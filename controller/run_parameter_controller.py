@@ -6,11 +6,13 @@ except:
     from PyQt5.QtGui import *
     from PyQt5.QtWidgets import *
 import database.run_parameters_parser as yaml_parser
+from model.local_model import create_yaml_dictionary
 import sys, os
 import time
 import collections
 import numpy as np
 import pyqtgraph as pg
+from deepdiff import DeepDiff
 
 class CheckableComboBox(QComboBox):
     # once there is a checkState set, it is rendered
@@ -137,8 +139,11 @@ class RunParameterController(QObject):
     remove_plot_signal = pyqtSignal(str)
     delete_run_id_signal = pyqtSignal(str)
     add_plot_window_signal = pyqtSignal(int, str)
+    run_id_clicked = pyqtSignal(str)
 
     tags = ['BA1', 'User Experiment', 'Front End', 'Emittance', 'Energy Spread', 'Commissioning']
+
+    run_table_columns = {'run_id': 1, 'load_run_button': 0, 'plot_checkbox': 2, 'plot_color': 3}
 
     def __init__(self, app, view, model):
         super(RunParameterController, self).__init__()
@@ -188,20 +193,25 @@ class RunParameterController(QObject):
         self.populate_run_parameters_table()
         self.toggle_BSOL_tracking()
         self.toggle_BSOL_tracking()
+        self.view.track_checkBox.setVisible(False)
 
     def create_datatree_widget(self):
-        self.view.yaml_tree_widget = pg.DataTreeWidget()
-        layout = self.view.run_splitter
-        layout.addWidget(self.view.yaml_tree_widget)
+        # self.view.yaml_tree_widget = pg.DataTreeWidget()
+        # layout = self.view.run_splitter
+        # layout.addWidget(self.view.yaml_tree_widget)
         table = self.view.run_parameters_table
         table.cellClicked.connect(self.show_yaml_in_datatree)
         table.resizeColumnsToContents()
 
     def show_yaml_in_datatree(self, row, col):
         table = self.view.run_parameters_table
-        runno = table.item(row,0).text()
+        runno = table.item(row, self.run_table_columns['run_id']).text()
         data = self.model.import_yaml(runno)
-        self.view.yaml_tree_widget.setData(data)
+        guidata = create_yaml_dictionary(self.model.data)
+        ddiff = DeepDiff(data, guidata, ignore_order=True, exclude_paths={"root['runs']"})
+        print(ddiff)
+        self.view.yaml_tree_widget.setData(ddiff)
+        self.run_id_clicked.emit(runno)
 
     def populate_run_parameters_table(self):
         table = self.view.run_parameters_table
@@ -217,20 +227,21 @@ class RunParameterController(QObject):
         table.insertRow(rowPosition)
         # table.setItem(rowPosition, 0, QTableWidgetItem(str(int(k))))
         dir = os.path.basename(v)
-        table.setItem(rowPosition, 0, QTableWidgetItem(str(dir)))
+        table.setItem(rowPosition, self.run_table_columns['run_id'], QTableWidgetItem(str(dir)))
         open_folder_button = QPushButton('Open')
         open_folder_button.setEnabled(False)
         open_folder_button.clicked.connect(lambda : self.open_folder_on_server(dir))
-        # delete_run_button = QPushButton('Delete!')
-        # delete_run_button.setEnabled(True)
-        # delete_run_button.clicked.connect(lambda : self.delete_run_id(dir))
-        # table.setCellWidget(rowPosition, 1, delete_run_button)
+        load_run_button = QPushButton('Load')
+        load_run_button.setEnabled(True)
+        load_run_button.setMaximumSize(50,50)
+        load_run_button.clicked.connect(lambda : self.load_yaml_from_db(dir))
+        table.setCellWidget(rowPosition, self.run_table_columns['load_run_button'], load_run_button)
         add_plot_button = QCheckBox('Plot')
         if dir in self.run_plots:
             add_plot_button.setChecked(True)
             self.setrunplotcolor(rowPosition, self.run_plot_colors[dir])
         add_plot_button.stateChanged.connect(lambda x: self.emit_plot_signals(k, v, x))
-        table.setCellWidget(rowPosition, 1, add_plot_button)
+        table.setCellWidget(rowPosition, self.run_table_columns['plot_checkbox'], add_plot_button)
         table.resizeColumnsToContents()
 
     def delete_run_id(self, run_id):
@@ -242,8 +253,8 @@ class RunParameterController(QObject):
         colorWidget = pg.ColorButton()
         colorWidget.setEnabled(False)
         colorWidget.setColor(color)
-        table.setCellWidget(row, 2, colorWidget)
-        run_id = table.item(row,0).text()
+        table.setCellWidget(row, self.run_table_columns['plot_color'], colorWidget)
+        run_id = table.item(row, self.run_table_columns['run_id']).text()
         self.run_plot_colors[run_id] = color
 
     def open_folder_on_server(self, dir):
@@ -258,7 +269,7 @@ class RunParameterController(QObject):
             self.remove_plot_signal.emit(v)
             self.run_plots.remove(v)
             table = self.view.run_parameters_table
-            table.removeCellWidget(k, 2)
+            table.removeCellWidget(k, self.run_table_columns['plot_color'])
 
     def connect_auto_load_settings(self, state):
         if state:
@@ -459,10 +470,17 @@ class RunParameterController(QObject):
         filename = str(filename)
         if not filename == '' and not filename is None and (filename[-4:].lower() == '.yml' or filename[-5:].lower() == '.yaml'):
             loaded_parameter_dict = yaml_parser.parse_parameter_input_file(filename)
-            for (parameter, value) in loaded_parameter_dict.items():
-                    self.update_widgets_with_values(parameter, value)
+            self.update_widgets_from_yaml_dict(loaded_parameter_dict)
         else:
             print('Failed to import, please provide a filename')
+
+    def load_yaml_from_db(self, run_id):
+        loaded_parameter_dict = self.model.import_yaml(run_id)
+        self.update_widgets_from_yaml_dict(loaded_parameter_dict)
+
+    def update_widgets_from_yaml_dict(self, loaded_parameter_dict):
+        for (parameter, value) in loaded_parameter_dict.items():
+                self.update_widgets_with_values(parameter, value)
 
     def export_parameter_values_to_yaml_file(self, auto=False):
         self.model.export_parameter_values_to_yaml_file(auto=auto)

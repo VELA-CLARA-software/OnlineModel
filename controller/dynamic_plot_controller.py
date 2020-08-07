@@ -1,19 +1,11 @@
-try:
-    from PyQt4.QtCore import *
-    from PyQt4.QtGui import *
-except:
-    from PyQt5.QtCore import *
-    from PyQt5.QtGui import *
-    from PyQt5.QtWidgets import *
-from copy import copy,deepcopy
-from decimal import Decimal
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 import sys, os
 sys.path.append(os.path.abspath(__file__+'/../../'))
-sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
-sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
 import database.run_parameters_parser as yaml_parser
-from SimulationFramework.Modules.online_model_twissPlot import twissPlotWidget
-from SimulationFramework.Modules.online_model_plotter_run_id import onlineModelPlotterWidget
+from plotting.online_model_twissPlot import twissPlotWidget
+from plotting.online_model_plotter_run_id import onlineModelPlotterWidget
 
 class GenericThread(QThread):
     signal = pyqtSignal()
@@ -52,8 +44,16 @@ class DynamicPlotController(QObject):
         self.ompbeam = onlineModelPlotterWidget(self.model.data.screenDict, directory='./test/')
         # self.view.post_tab = self.omp
         # self.view.main_tab_widget.addTab(self.omp, "Twiss Plots")
-        self.view.main_tab_widget.addTab(self.ompbeam, "Plots")
-        self.omplotterWidgets = {}
+        self.view.plots_yaml_tab.insertTab(0, self.ompbeam, "Plots")
+        self.view.plots_yaml_tab.setCurrentIndex(0)
+        self.clickedCurve = None
+
+    def curveClicked(self, name):
+        print('Clicked:', name)
+        if self.clickedCurve is not None:
+            self.ompbeam.curveClicked(self.clickedCurve)
+        self.clickedCurve = name
+        self.ompbeam.curveClicked(self.clickedCurve)
 
     def add_twiss_plot(self, id, dir):
         # dir = dir.replace('/mnt/','\\\\').replace('/','\\')+'\\'

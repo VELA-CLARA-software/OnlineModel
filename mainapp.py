@@ -1,14 +1,10 @@
 import sys
 import os
 import zmq
-try:
-    from PyQt4.QtCore import *
-    from PyQt4.QtGui import *
-except:
-    from PyQt5.QtCore import *
-    from PyQt5.QtGui import *
-    from PyQt5.QtWidgets import *
-
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from pyqtgraph import DataTreeWidget
 sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'model'))
 sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'controller'))
 sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'view'))
@@ -18,6 +14,7 @@ from controller import unified_controller, run_parameter_controller, dynamic_plo
 from view import view
 from model import remote_model as rmodel
 from model import local_model as lmodel
+from detachable_tab_widget import DetachableTabWidget
 import argparse
 
 parser = argparse.ArgumentParser(description='Add Sets.')
