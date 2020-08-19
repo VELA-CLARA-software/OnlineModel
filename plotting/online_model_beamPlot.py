@@ -10,7 +10,7 @@ except:
     from PyQt5.QtWidgets import *
 import pyqtgraph as pg
 import numpy as np
-sys.path.append(os.path.abspath(os.path.realpath(__file__)+'/../../../'))
+sys.path.append(os.path.abspath(os.path.realpath(__file__)+'/../../../SimFrame'))
 from SimulationFramework.Modules.read_beam_file import beam as rbfBeam
 sys.path.append(os.path.realpath(__file__)+'/../../../../')
 
@@ -65,7 +65,12 @@ class beamPlotWidget(QWidget):
         self.beamPlotWidget = QWidget()
         self.beamPlotLayout = QVBoxLayout()
         self.beamPlotWidget.setLayout(self.beamPlotLayout)
-        self.beamPlotPlotWidget = pg.PlotWidget()
+
+        self.beamPlotLayouts = pg.GraphicsLayoutWidget()
+        self.beamPlotPlotWidget = self.beamPlotLayouts.addPlot(row=0, col=0, rowspan=3, colspan=3)
+        # self.beamPlotPlotBottomWidget = self.beamPlotLayouts.addPlot(row=3, col=0, rowspan=1, colspan=3)
+        # self.beamPlotPlotRightWidget = self.beamPlotLayouts.addPlot(row=0, col=3, rowspan=3, colspan=1)
+
 
         self.beamPlotAxisWidget = QWidget()
         self.beamPlotAxisWidget.setMaximumHeight(100)
@@ -98,7 +103,7 @@ class beamPlotWidget(QWidget):
         self.beamPlotYAxisNormalise.stateChanged.connect(self.updateBeamPlot)
 
         self.beamPlotLayout.addWidget(self.beamPlotAxisWidget)
-        self.beamPlotLayout.addWidget(self.beamPlotPlotWidget)
+        self.beamPlotLayout.addWidget(self.beamPlotLayouts)
 
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)

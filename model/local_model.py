@@ -195,13 +195,47 @@ class Model(object):
             self.data.Framework.modifyElement('CLA-LRG1-MAG-BSOL-01', 'field_amplitude', -0.3462 * 0.9 * self.data.Framework['CLA-LRG1-MAG-SOL-01']['field_amplitude'])
         if scan==True and type is not None:
             print(self.data.parameterDict[dictname][pv])
+        self.update_laser_properties()
+
+    def update_laser_properties(self):
+        self.data.Framework.change_generator(str(self.data.generatorDict['tracking_code']['value']))
         self.data.Framework.generator.number_of_particles = int(2**(3*int(self.data.generatorDict['number_of_particles']['value'])))
-        # In ASTRA we need to be in nC
-        self.data.Framework.generator.charge = 1e-9*float(self.data.generatorDict['charge']['value'])
-        # In ASTRA we need to be in RMS nano-seconds - here we convert from FWHM and divide by 1000 from pico-seconds
-        self.data.Framework.generator.sig_clock = float(self.data.generatorDict['sig_clock']['value']) / (2354.82)
-        self.data.Framework.generator.sig_x = self.data.generatorDict['spot_size']['value']
-        self.data.Framework.generator.sig_y = self.data.generatorDict['spot_size']['value']
+        # Convert to nC
+        self.data.Framework.generator.charge = 1e-12*float(self.data.generatorDict['charge']['value'])
+        ### LONGITUDINAL ###
+        if str(self.data.generatorDict['longitudinal_distribution']['value']) == "Plateau":
+            # print('longitudinal plateau')
+            self.data.Framework.generator.distribution_type_z = "p"
+            self.data.Framework.generator.plateau_rise_time = self.data.generatorDict['plateau_rise_time']['value'] * 1e-12
+            self.data.Framework.generator.plateau_bunch_length = self.data.generatorDict['sig_clock']['value'] * 1e-12
+        elif str(self.data.generatorDict['longitudinal_distribution']['value']) == "Gaussian":
+            # print('longitudinal gaussian')
+            # We need to be in RMS seconds - here we convert from FWHM and divide by 1e12 from pico-seconds
+            self.data.Framework.generator.distribution_type_z = "g"
+            self.data.Framework.generator.sigma_t = float(self.data.generatorDict['sig_clock']['value']) / (2.35482) * 1e-12
+            self.data.Framework.generator.guassian_cutoff_z = int(self.data.generatorDict['longitudinal_cutoff']['value'])
+        elif str(self.data.generatorDict['longitudinal_distribution']['value']) == "Uniform":
+            # print('longitudinal uniform')
+            self.data.Framework.generator.distribution_type_z = "p"
+            self.data.Framework.generator.plateau_rise_time = 0
+            self.data.Framework.generator.plateau_bunch_length = self.data.generatorDict['sig_clock']['value'] * 1e-12
+        ### TRANSVERSE ###
+        if str(self.data.generatorDict['transverse_distribution']['value']) == "Gaussian":
+            self.data.Framework.generator.distribution_type_x = "2DGaussian"
+            self.data.Framework.generator.distribution_type_y = "2DGaussian"
+            self.data.Framework.generator.guassian_cutoff_x = int(self.data.generatorDict['transverse_cutoff']['value'])
+            self.data.Framework.generator.guassian_cutoff_y = int(self.data.generatorDict['transverse_cutoff']['value'])
+        elif str(self.data.generatorDict['transverse_distribution']['value']) == "Uniform":
+            # If we are in uniform or plateau we need to set the correct ASTRA parameter
+            self.data.Framework.generator.lx = self.data.generatorDict['spot_size']['value'] * 1e-3
+            self.data.Framework.generator.ly = self.data.generatorDict['spot_size']['value'] * 1e-3
+        self.data.Framework.generator.sigma_x = self.data.generatorDict['spot_size']['value'] * 1e-3
+        self.data.Framework.generator.sigma_y = self.data.generatorDict['spot_size']['value'] * 1e-3
+        ### Thermal Emittance in radians ###
+        self.data.Framework.generator.thermal_emittance = self.data.generatorDict['thermal_emittance']['value'] * 1e-3
+        ### Offsets in X and Y ###
+        self.data.Framework.generator.offset_x = self.data.generatorDict['offset_x']['value'] * 1e-3
+        self.data.Framework.generator.offset_y = self.data.generatorDict['offset_y']['value'] * 1e-3
 
     def create_random_directory_name(self):
         dirname = str(uuid.uuid4())
