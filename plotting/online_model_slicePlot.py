@@ -138,14 +138,14 @@ class slicePlotWidget(multiPlotWidget):
 
     def changeSliceLengths(self):
         ''' change the time slice length for all beam objects '''
-        for d in self.beams:
+        for d in self.beams.keys():
             self.changeSliceLength(d)
         # self.updateMultiAxisPlot()
 
     def changeSliceLength(self, name):
         ''' change the time slice length for a beam data object and update the plot '''
         beam = self.beams[name]
-        beam.slices = self.slicePlotSliceWidthWidget.value()
+        beam.set_slices(self.slicePlotSliceWidthWidget.value())
         beam.bin_time()
         for n, param in enumerate(self.plotParams):
             if not param == 'next_row':

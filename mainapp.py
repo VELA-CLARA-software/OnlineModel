@@ -5,6 +5,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from pyqtgraph import DataTreeWidget
+QApplication.setAttribute(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
 sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'model'))
 sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'controller'))
 sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'view'))

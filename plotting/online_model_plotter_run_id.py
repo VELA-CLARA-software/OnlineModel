@@ -67,7 +67,12 @@ class onlineModelPlotterWidget(QWidget):
                 ['sigma_y', '&sigma;<sub>y</sub> [mm]', 1e3],
                 ['eta_x', '&eta;<sub>x</sub> [mm]', 1e3],
                 ['eta_xp', '&eta;<sub>x</sub>\' [mm]', 1e3],
-                ['cp_eV', 'cp [MeV]', 1e-6]
+                ['cp_eV', 'cp [MeV/c]', 1e-6],
+                ['sigma_cp_eV', '&sigma;<sub>cp</sub> [keV/c]', 1e-3],
+                ['sigma_z', '&sigma;<sub>z</sub> [mm]', 1e3],
+                ['sigma_t', '&sigma;<sub>t</sub> [fs]', 1e15],
+                ['enx', '&epsilon;<sub>x,n</sub> [mm-mrad]', 1e6],
+                ['eny', '&epsilon;<sub>y,n</sub> [mm-mrad]', 1e6],
                 ]
 
     def __init__(self, screenpositions, parent = None, directory='.'):
