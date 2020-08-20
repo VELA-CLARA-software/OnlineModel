@@ -50,6 +50,7 @@ class slicePlotWidget(multiPlotWidget):
     def __init__(self, **kwargs):
         super(slicePlotWidget, self).__init__(**kwargs)
         self.beams = {}
+        self.set_horizontal_axis_label('t','ps')
         self.slicePlotSliceWidthWidget = QSpinBox()
         self.slicePlotSliceWidthWidget.setMaximum(500)
         self.slicePlotSliceWidthWidget.setValue(100)

@@ -59,6 +59,8 @@ class twissPlotWidget(multiPlotWidget):
     def __init__(self, **kwargs):
         super(twissPlotWidget, self).__init__(xmin=0, **kwargs)
         self.twissDataObjects = {}
+        self.set_horizontal_axis_label('s','m')
+
 
     def addTwissDirectory(self, directory, id, color=None):
         '''

@@ -213,7 +213,6 @@ class DatabaseReader():
         """For each lattice, find the corresponding run_id taking into account prefix runs"""
         result = {}
         for t in self.table_name_list:
-            print('table name = ', t)
             result[t] = self.get_run_id_for_lattice(run_id, t)
         return result
 

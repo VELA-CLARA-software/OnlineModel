@@ -452,8 +452,10 @@ class RunParameterController(QObject):
                         widget.setChecked(False)
                 elif type(widget) is QComboBox:
                     index = widget.findText(value)
+                    # print('combo:',widget.objectName(),'value = ', value, 'index = ', index)
                     if index == -1:
                         index = widget.findData(value)
+                        # print('  data index = ', index)
                     widget.setCurrentIndex(index)
                 elif isinstance(widget, CheckableComboBox):
                     widget.setTagStates(value)
