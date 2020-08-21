@@ -209,7 +209,7 @@ class RunParameterController(QObject):
         data = self.model.import_yaml(runno)
         guidata = create_yaml_dictionary(self.model.data)
         ddiff = DeepDiff(data, guidata, ignore_order=True, exclude_paths={"root['runs']"})
-        print(ddiff)
+        # print(ddiff)
         self.view.yaml_tree_widget.setData(ddiff)
         self.run_id_clicked.emit(runno)
 
@@ -218,7 +218,7 @@ class RunParameterController(QObject):
         table.clearContents()
         table.setRowCount(0)
         dirnames = self.model.get_all_directory_names()
-        for k,v in enumerate(dirnames):
+        for k,v in enumerate(reversed(dirnames)):
             self.add_run_table_row(k, v)
 
     def add_run_table_row(self, k, v, row=None):

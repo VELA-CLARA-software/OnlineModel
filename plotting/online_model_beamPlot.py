@@ -66,11 +66,28 @@ class beamPlotWidget(QWidget):
         self.beamPlotLayout = QVBoxLayout()
         self.beamPlotWidget.setLayout(self.beamPlotLayout)
 
-        self.beamPlotLayouts = pg.GraphicsLayoutWidget()
-        self.beamPlotPlotWidget = self.beamPlotLayouts.addPlot(row=0, col=0, rowspan=3, colspan=3)
-        # self.beamPlotPlotBottomWidget = self.beamPlotLayouts.addPlot(row=3, col=0, rowspan=1, colspan=3)
-        # self.beamPlotPlotRightWidget = self.beamPlotLayouts.addPlot(row=0, col=3, rowspan=3, colspan=1)
+        self.mainBeamPlotLayout = pg.GraphicsLayoutWidget()
+        self.mainBeamPlotWidget = self.mainBeamPlotLayout.addPlot()
+        self.mainBeamPlotWidget.getAxis('bottom').setStyle(showValues=False)
+        self.mainBeamPlotWidget.getAxis('left').setStyle(showValues=False)
+        self.linkAxis = self.mainBeamPlotWidget.vb
+        self.bottomBeamPlotLayout = pg.GraphicsLayoutWidget()
+        self.bottomBeamPlotWidget = self.bottomBeamPlotLayout.addPlot()
+        self.bottomBeamPlotWidget.setXLink(self.linkAxis)
+        self.rightBeamPlotLayout = pg.GraphicsLayoutWidget()
+        self.rightBeamPlotWidget = self.rightBeamPlotLayout.addPlot()
+        self.rightBeamPlotWidget.setYLink(self.linkAxis)
 
+        self.pointSize = 3
+        self.pointSizeWidget = QSpinBox()
+        self.pointSizeWidget.setMaximum(10)
+        self.pointSizeWidget.setMinimum(1)
+        self.pointSizeWidget.setValue(self.pointSize)
+        self.pointSizeWidget.setSingleStep(1)
+        self.pointSizeWidget.setSuffix(" px")
+        self.pointSizeWidget.setMaximumWidth(150)
+        # self.multiaxisPlotAxisLayout.addWidget(self.pointSizeWidget)
+        self.pointSizeWidget.valueChanged.connect(self.changePointSize)
 
         self.beamPlotAxisWidget = QWidget()
         self.beamPlotAxisWidget.setMaximumHeight(100)
@@ -103,7 +120,15 @@ class beamPlotWidget(QWidget):
         self.beamPlotYAxisNormalise.stateChanged.connect(self.updateBeamPlot)
 
         self.beamPlotLayout.addWidget(self.beamPlotAxisWidget)
-        self.beamPlotLayout.addWidget(self.beamPlotLayouts)
+        self.beamPlotAllLayout = QGridLayout()
+        self.beamPlotAllLayout.addWidget(self.mainBeamPlotLayout,0,1)
+        self.beamPlotAllLayout.addWidget(self.rightBeamPlotLayout,0,0)
+        self.beamPlotAllLayout.addWidget(self.bottomBeamPlotLayout,1,1)
+        self.beamPlotAllLayout.setColumnStretch(0, 1)
+        self.beamPlotAllLayout.setColumnStretch(1, 6)
+        self.beamPlotAllLayout.setRowStretch(0, 4)
+        self.beamPlotAllLayout.setRowStretch(1, 1)
+        self.beamPlotLayout.addLayout(self.beamPlotAllLayout)
 
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
@@ -112,6 +137,9 @@ class beamPlotWidget(QWidget):
         ''' used for style cycling '''
         self.plotColor = 0
         self.curves = {}
+        self.bottomcurves = {}
+        self.rightcurves = {}
+        self.curve_colors = {}
         self.shadowCurves = []
 
     def addbeamDataFiles(self, dicts):
@@ -128,12 +156,17 @@ class beamPlotWidget(QWidget):
                 color = self.colors[self.plotColor % len(self.colors)]
                 self.plotColor += 1
             pen = pg.mkBrush(color=color)
-
-            self.curves[id] = self.beamPlotPlotWidget.plot([], pen=None,
-                                                                symbolBrush=pen, symbolSize=5, symbolPen=None)
+            self.curve_colors[id] = pg.mkColor(color)
+            self.curves[id] = self.mainBeamPlotWidget.plot([], pen=None,
+                                                                symbolBrush=pen, symbolSize=self.pointSize, symbolPen=None)
             self.curves[id].sigClicked.connect(lambda: self.curveClicked(id))
         self.updateBeamPlot()
         return color
+
+    def add_projected_curves(self, id):
+        self.bottomcurves[id] = self.bottomBeamPlotWidget.plot([])
+        self.rightcurves[id] = self.rightBeamPlotWidget.plot([])
+        self.rightcurves[id].rotate(90)
 
     def addbeamDataFile(self, directory, filename, color=None, id=None):
         ''' addbeamDataFile - read the data file and add a plotItem to the relevant self.curves '''
@@ -153,25 +186,48 @@ class beamPlotWidget(QWidget):
     def updateBeamPlot(self):
         xdict = self.beamParams[str(self.beamPlotXAxisCombo.currentText())]
         ydict = self.beamParams[str(self.beamPlotYAxisCombo.currentText())]
-        for d in self.curves:
-            x = getattr(self.beams[d], str(self.beamPlotXAxisCombo.currentText()))
+        self.rightBeamPlotWidget.clear()
+        self.bottomBeamPlotWidget.clear()
+        for id in self.curves:
+            self.add_projected_curves(id)
+            x = getattr(self.beams[id], str(self.beamPlotXAxisCombo.currentText()))
             if self.beamPlotXAxisNormalise.isChecked():
                 x = x - np.mean(x)
-            y = getattr(self.beams[d], str(self.beamPlotYAxisCombo.currentText()))
+            y = getattr(self.beams[id], str(self.beamPlotYAxisCombo.currentText()))
             if self.beamPlotYAxisNormalise.isChecked():
                 y = y - np.mean(y)
-            self.curves[d].setData(x=x, y=y)
-        self.beamPlotPlotWidget.setLabel('left', text=ydict['name'], units=ydict['units'])
-        self.beamPlotPlotWidget.setLabel('bottom', text=xdict['name'], units=xdict['units'])
+            self.curves[id].setData(x=x, y=y, symbolSize=self.pointSize)
+
+            color = self.curve_colors[id]
+            color.setAlpha(100)
+            histy, histx = self.projection(y)
+            self.rightcurves[id].setData(x=histx, y=histy, stepMode=True, fillLevel=0, brush=color)
+            histy, histx = self.projection(x)
+            self.bottomcurves[id].setData(x=histx, y=histy, stepMode=True, fillLevel=0, brush=color)
+        # self.mainBeamPlotWidget.setLabel('left', text=ydict['name'], units=ydict['units'])
+        # self.mainBeamPlotWidget.setLabel('bottom', text=xdict['name'], units=xdict['units'])
+        self.rightBeamPlotWidget.setLabel('left', text=ydict['name'], units=ydict['units'])
+        self.bottomBeamPlotWidget.setLabel('bottom', text=xdict['name'], units=xdict['units'])
         self.updateCurveHighlights()
+
+    def projection(self, data):
+        x,y = np.histogram(data, bins='doane')
+        x = [0] + list(x) + [0]
+        y = [2*y[0] - y[1]] + list(y) + [2*y[-1] - y[-2]]
+        return x,y
 
     def removePlot(self, id):
         ''' finds all beam plots based on a directory name, and removes them '''
         if id in self.shadowCurves:
             self.shadowCurves.remove(id)
         if id in self.curves:
-            self.beamPlotPlotWidget.removeItem(self.curves[id])
+            self.mainBeamPlotWidget.removeItem(self.curves[id])
         self.updateCurveHighlights()
+
+    def changePointSize(self, size):
+        self.pointSize = int(size)
+        for d in self.curves.values():
+            d.scatter.setSize(int(size))
 
     def curveClicked(self, name):
         if name in self.shadowCurves:
@@ -224,7 +280,7 @@ class beamPlotWidget(QWidget):
         curve.setSymbolBrush(pen)
 
     def clear(self):
-        self.beamPlotPlotWidget.clear()
+        self.mainBeamPlotWidget.clear()
         self.plotColor = 0
         self.curves = {}
         self.shadowCurves = []

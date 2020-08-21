@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1117</width>
-    <height>669</height>
+    <width>1098</width>
+    <height>667</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -2219,36 +2219,7 @@
                 </property>
                </widget>
               </item>
-              <item row="2" column="4">
-               <widget class="QCheckBox" name="track_checkBox">
-                <property name="enabled">
-                 <bool>false</bool>
-                </property>
-                <property name="accessibleName">
-                 <string>runs:track</string>
-                </property>
-                <property name="accessibleDescription">
-                 <string/>
-                </property>
-                <property name="text">
-                 <string>Track?</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QPushButton" name="loadSettingsButton">
-                <property name="accessibleName">
-                 <string>loadSettingsButton</string>
-                </property>
-                <property name="text">
-                 <string>Load Settings</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="2">
+              <item row="2" column="0" colspan="5">
                <widget class="QProgressBar" name="progressBar">
                 <property name="accessibleName">
                  <string>progressBar</string>
@@ -3530,7 +3501,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1117</width>
+     <width>1098</width>
      <height>21</height>
     </rect>
    </property>

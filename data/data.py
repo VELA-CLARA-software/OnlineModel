@@ -49,6 +49,9 @@ class Data(object):
         [[self.screenDict[l].update({key: value}) for key, value in self.screen_values.items() if l == key[:len(l)]] for l in self.lattices]
         [self.screenDict['Gun'].update({key: value}) for key, value in self.screen_values.items() if 'CLA-S01' == key[:len('CLA-S01')]]
         [self.screenDict['Linac'].update({key: value}) for key, value in self.screen_values.items() if 'CLA-L01' == key[:len('CLA-L01')]]
+        self.screenDict['Gun'].update({'Laser': {'type': 'screen', 'position': 0.0}})
+        # print (self.screenDict)
+        # exit()
         [[self.parameterDict[l].update({key: value}) for key, value in self.quad_values.items() if l == key[:len(l)]] for l in self.lattices]
         [self.parameterDict[self.lattices[0]].update({key: value}) for key, value in self.rf_values.items() if 'LRG' in key]
         [self.parameterDict[self.lattices[1]].update({key: value}) for key, value in self.rf_values.items() if 'L01' in key]

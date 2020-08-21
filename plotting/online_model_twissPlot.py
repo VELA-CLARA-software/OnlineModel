@@ -45,13 +45,14 @@ class twissPlotWidget(multiPlotWidget):
                    {'label': 'Momentum', 'name': 'cp', 'quantity': 'cp_eV', 'range': [0,50e6], 'units': 'eV/c', 'ymin': 0},
                    'next_row',
                    {'label': 'Momentum Spread', 'name': '&sigma;<sub>cp</sub>', 'quantity': 'sigma_cp_eV', 'range': [0,1e6], 'units': 'eV/c', 'ymin': 0},
-                   {'label': 'Bunch Length', 'name': '&sigma;<sub>z</sub>', 'quantity': 'sigma_z', 'range': [0,5e-3], 'units': 'm', 'ymin': 0},
-                   {'label': 'Horizontal Emittance (normalised)', 'name': '&epsilon;<sub>n,x</sub>', 'quantity': 'enx', 'range': [0.,1.5e-6], 'units': 'm-rad', 'ymin': 0},
+                   {'label': 'Bunch Length z', 'name': '&sigma;<sub>z</sub>', 'quantity': 'sigma_z', 'range': [0,5e-3], 'units': 'm', 'ymin': 0},
+                   {'label': 'Bunch Length t', 'name': '&sigma;<sub>t</sub>', 'quantity': 'sigma_t', 'range': [0,5e-12], 'units': 's', 'ymin': 0},
                    'next_row',
+                   {'label': 'Horizontal Emittance (normalised)', 'name': '&epsilon;<sub>n,x</sub>', 'quantity': 'enx', 'range': [0.,1.5e-6], 'units': 'm-rad', 'ymin': 0},
                    {'label': 'Vertical Emittance (normalised)', 'name': '&epsilon;<sub>n,y</sub>', 'quantity': 'eny', 'range':  [0.,1.5e-6], 'units': 'm-rad', 'ymin': 0},
                    {'label': 'Horizontal Beta Function', 'name': '&beta;<sub>x</sub>', 'quantity': 'beta_x', 'range': [0,200], 'units': 'm', 'ymin': 0},
-                   {'label': 'Vertical Beta Function', 'name': '&beta;<sub>y</sub>', 'quantity': 'beta_y', 'range': [0,200], 'units': 'm', 'ymin': 0},
                    'next_row',
+                   {'label': 'Vertical Beta Function', 'name': '&beta;<sub>y</sub>', 'quantity': 'beta_y', 'range': [0,200], 'units': 'm', 'ymin': 0},
                    {'label': 'Horizontal Dispersion', 'name': '&eta;<sub>x</sub>', 'quantity': 'eta_x', 'range':  [-500e-3,500e-3], 'units': 'm'},
                    {'label': 'Horizontal Dispersion Prime', 'name': '&eta;<sub>x</sub>\'', 'quantity': 'eta_xp', 'range':  [-1,1], 'units': 'm'},
                   ]
@@ -88,6 +89,7 @@ class twissPlotWidget(multiPlotWidget):
         ''' assignes a reference name if none is given '''
         id = directory[-1]['directory'] if id is None else id
         self.addtwissDataObject(twiss, id, color=color)
+        return twiss, id, color
 
     def addtwissDataObject(self, dataobject, id, color=None):
         '''
@@ -148,6 +150,31 @@ class twissPlotWidget(multiPlotWidget):
         ''' reset=False stops the previously loaded data from being overwritten'''
         twiss.read_elegant_twiss_files(elegantfiles, reset=reset)
         return twiss
+
+class beamTwissPlotWidget(twissPlotWidget):
+    # Layout oder for the individual Tiwss plot items
+
+    plotParams = [
+                   {'label': 'Horizontal Beam Size', 'name': '&sigma;<sub>x</sub>', 'quantity': 'sigma_x', 'range': [0,3e-3], 'units': 'm', 'ymin': 0},
+                   {'label': 'Vertical Beam Size', 'name': '&sigma;<sub>y</sub>', 'quantity': 'sigma_y', 'range': [0,3e-3], 'units': 'm', 'ymin': 0},
+                   {'label': 'Momentum', 'name': 'cp', 'quantity': 'cp_eV', 'range': [0,50e6], 'units': 'eV/c', 'ymin': 0},
+                   'next_row',
+                   {'label': 'Momentum Spread', 'name': '&sigma;<sub>cp</sub>', 'quantity': 'sigma_cp_eV', 'range': [0,1e6], 'units': 'eV/c', 'ymin': 0},
+                   {'label': 'Bunch Length z', 'name': '&sigma;<sub>z</sub>', 'quantity': 'sigma_z', 'range': [0,5e-3], 'units': 'm', 'ymin': 0},
+                   {'label': 'Bunch Length t', 'name': '&sigma;<sub>z</sub>', 'quantity': 'sigma_t', 'range': [0,5e-12], 'units': 's', 'ymin': 0},
+                   'next_row',
+                   {'label': 'Horizontal Emittance (corrected)', 'name': '&epsilon;<sub>n,x</sub>', 'quantity': 'ecnx', 'range': [0.,1.5e-6], 'units': 'm-rad', 'ymin': 0},
+                   {'label': 'Vertical Emittance (corrected)', 'name': '&epsilon;<sub>n,y</sub>', 'quantity': 'ecny', 'range':  [0.,1.5e-6], 'units': 'm-rad', 'ymin': 0},
+                   {'label': 'Horizontal Beta Function', 'name': '&beta;<sub>x</sub>', 'quantity': 'beta_x_beam', 'range': [0,200], 'units': 'm', 'ymin': 0},
+                   'next_row',
+                   {'label': 'Vertical Beta Function', 'name': '&beta;<sub>y</sub>', 'quantity': 'beta_y_beam', 'range': [0,200], 'units': 'm', 'ymin': 0},
+                   {'label': 'Horizontal Dispersion', 'name': '&eta;<sub>x</sub>', 'quantity': 'eta_x_beam', 'range':  [-500e-3,500e-3], 'units': 'm'},
+                   {'label': 'Horizontal Dispersion Prime', 'name': '&eta;<sub>x</sub>\'', 'quantity': 'eta_xp_beam', 'range':  [-1,1], 'units': 'm'},
+                  ]
+
+    def __init__(self, **kwargs):
+        super(beamTwissPlotWidget, self).__init__(**kwargs)
+
 
 pg.setConfigOptions(antialias=True)
 pg.setConfigOption('background', 'w')

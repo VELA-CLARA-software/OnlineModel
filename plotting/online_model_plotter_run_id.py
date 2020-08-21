@@ -5,7 +5,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import pyqtgraph as pg
 sys.path.append(os.path.abspath(os.path.realpath(__file__)+'/../'))
-from plotting.online_model_twissPlot import twissPlotWidget
+from plotting.online_model_twissPlot import twissPlotWidget, beamTwissPlotWidget
 from plotting.online_model_slicePlot import slicePlotWidget
 from plotting.online_model_beamPlot import beamPlotWidget
 
@@ -63,16 +63,24 @@ class onlineModelPlotterWidget(QWidget):
                 ['alpha_x', '&alpha;<sub>x</sub>', 1],
                 ['beta_y', '&beta;<sub>y</sub> [m]', 1],
                 ['alpha_y', '&alpha;<sub>y</sub>', 1],
+                ['beta_x_beam', '&beta;<sub>x,beam</sub> [m]', 1],
+                ['alpha_x_beam', '&alpha;<sub>x,beam</sub>', 1],
+                ['beta_y_beam', '&beta;<sub>y,beam</sub> [m]', 1],
+                ['alpha_y_beam', '&alpha;<sub>y,beam</sub>', 1],
                 ['sigma_x', '&sigma;<sub>x</sub> [mm]', 1e3],
                 ['sigma_y', '&sigma;<sub>y</sub> [mm]', 1e3],
                 ['eta_x', '&eta;<sub>x</sub> [mm]', 1e3],
                 ['eta_xp', '&eta;<sub>x</sub>\' [mm]', 1e3],
+                ['eta_x_beam', '&eta;<sub>x,beam</sub> [mm]', 1e3],
+                ['eta_xp_beam', '&eta;<sub>x,beam</sub>\' [mm]', 1e3],
                 ['cp_eV', 'cp [MeV/c]', 1e-6],
                 ['sigma_cp_eV', '&sigma;<sub>cp</sub> [keV/c]', 1e-3],
                 ['sigma_z', '&sigma;<sub>z</sub> [mm]', 1e3],
                 ['sigma_t', '&sigma;<sub>t</sub> [fs]', 1e15],
                 ['enx', '&epsilon;<sub>x,n</sub> [mm-mrad]', 1e6],
                 ['eny', '&epsilon;<sub>y,n</sub> [mm-mrad]', 1e6],
+                ['ecnx', '&epsilon;<sub>x,n,c</sub> [mm-mrad]', 1e6],
+                ['ecny', '&epsilon;<sub>y,n,c</sub> [mm-mrad]', 1e6],
                 ]
 
     def __init__(self, screenpositions, parent = None, directory='.'):
@@ -85,6 +93,7 @@ class onlineModelPlotterWidget(QWidget):
         self.tabWidget = QTabWidget()
 
         self.twissPlotWidget = twissPlotWidget()
+        self.beamTwissPlotWidget = beamTwissPlotWidget()
         self.slicePlotWidget = slicePlotWidget(ymin=0)
         self.beamPlotWidget = beamPlotWidget()
         self.twissTableWidget = QTableWidget()
@@ -111,16 +120,26 @@ class onlineModelPlotterWidget(QWidget):
         self.sliceLayout.addWidget(self.slicePlotWidget.slicePlotSliceWidthWidget)
         self.sliceWidget.setMaximumWidth(150)
 
+        self.pointSizeWidget = QGroupBox()
+        self.pointSizeWidget.setVisible(False)
+        self.pointSizeLayout = QHBoxLayout()
+        self.pointSizeWidget.setLayout(self.pointSizeLayout)
+        self.pointSizeLayout.addWidget(self.beamPlotWidget.pointSizeWidget)
+        self.pointSizeWidget.setMaximumWidth(150)
+
         self.folderBeamWidget = QWidget()
         self.folderBeamLayout = QHBoxLayout()
         self.folderBeamLayout.setAlignment(Qt.AlignLeft);
         self.folderBeamWidget.setLayout(self.folderBeamLayout)
         self.folderBeamLayout.addWidget(self.beamWidget)
         self.folderBeamLayout.addWidget(self.sliceWidget)
+        self.folderBeamLayout.addWidget(self.pointSizeWidget)
+
         self.plotType = 'Twiss'
-        self.tabWidget.addTab(self.twissPlotWidget,'Twiss Plots')
-        self.tabWidget.addTab(self.beamPlotWidget,'Beam Plots')
-        self.tabWidget.addTab(self.slicePlotWidget,'Slice Beam Plots')
+        self.tabWidget.addTab(self.twissPlotWidget,'Lattice Twiss')
+        self.tabWidget.addTab(self.beamTwissPlotWidget,'Beam Twiss')
+        self.tabWidget.addTab(self.beamPlotWidget,'Scatter Plots')
+        self.tabWidget.addTab(self.slicePlotWidget,'Slice Properties')
         self.tabWidget.addTab(self.twissTableWidget,'Twiss Table')
 
 
@@ -138,9 +157,11 @@ class onlineModelPlotterWidget(QWidget):
     def connect_plot_signals(self):
         # When either subplot highlights a plot, connect it to the other plot and the listWidget
         self.twissPlotWidget.highlightCurveSignal.connect(self.subplotHighlighted)
+        self.beamTwissPlotWidget.highlightCurveSignal.connect(self.subplotHighlighted)
         self.slicePlotWidget.highlightCurveSignal.connect(self.subplotHighlighted)
         self.beamPlotWidget.highlightCurveSignal.connect(self.subplotHighlighted)
         self.twissPlotWidget.unHighlightCurveSignal.connect(self.subplotUnHighlighted)
+        self.beamTwissPlotWidget.unHighlightCurveSignal.connect(self.subplotUnHighlighted)
         self.slicePlotWidget.unHighlightCurveSignal.connect(self.subplotUnHighlighted)
         self.beamPlotWidget.unHighlightCurveSignal.connect(self.subplotUnHighlighted)
 
@@ -166,19 +187,23 @@ class onlineModelPlotterWidget(QWidget):
     def removeRunIDFromListWidget(self, run_id):
         del self.run_id_prefixes[run_id]
         self.twissPlotWidget.removeCurve(run_id)
+        self.beamTwissPlotWidget.removeCurve(run_id)
         self.slicePlotWidget.removeCurve(run_id)
         self.beamPlotWidget.removePlot(run_id)
         self.loadTwissTable()
 
     def changeTab(self, i):
-        if self.tabWidget.tabText(i) == 'Beam Plots':
+        if self.tabWidget.tabText(i) == 'Scatter Plots':
             self.plotType = 'Beam'
+            self.pointSizeWidget.setVisible(True)
             self.sliceWidget.setVisible(False)
-        elif self.tabWidget.tabText(i) == 'Slice Beam Plots':
+        elif self.tabWidget.tabText(i) == 'Slice Properties':
             self.plotType = 'Slice'
+            self.pointSizeWidget.setVisible(False)
             self.sliceWidget.setVisible(True)
         else:
             self.plotType = 'Twiss'
+            self.pointSizeWidget.setVisible(False)
             self.sliceWidget.setVisible(False)
 
     def changeDirectory(self, directory=None, id=None):
@@ -210,7 +235,8 @@ class onlineModelPlotterWidget(QWidget):
         twissList = []
         for s, d in prefixes.items():
             twissList.append({'directory': 'test/'+d, 'sections': [s]})
-        self.twissPlotWidget.addTwissDirectory(twissList, id=id, color=self.run_id_color[id])
+        twiss, id, color = self.twissPlotWidget.addTwissDirectory(twissList, id=id, color=self.run_id_color[id])
+        self.beamTwissPlotWidget.addtwissDataObject(twiss, id, color=color)
 
     def label_widget(self, text=''):
         label = QLabel(text)
