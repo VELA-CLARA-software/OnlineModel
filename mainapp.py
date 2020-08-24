@@ -19,7 +19,7 @@ from detachable_tab_widget import DetachableTabWidget
 import argparse
 
 parser = argparse.ArgumentParser(description='Add Sets.')
-parser.add_argument('-s', '--server', default='apclara2.dl.ac.uk', type=str)
+parser.add_argument('-s', '--server', default=None, type=str)
 parser.add_argument('-p', '--port', default='8192', type=str)
 args = parser.parse_args()
 
@@ -49,15 +49,18 @@ class MainApp(QObject):
         self.MainWindow.show()
 
     def initialise_zeromq(self):
-        context = zmq.Context()
-        self.socket = context.socket(zmq.REQ)
-        self.socket.setsockopt(zmq.LINGER, 1)
-        print('Connecting to server at ',args.server,':',args.port)
-        self.socket.connect("tcp://"+args.server+":"+args.port+"")
-        print('sending hello!')
-        self.socket.send_pyobj('hello')
-        print('waiting for response!')
-        return self.zmq_timeout_pyobj()
+        if args.server is not None:
+            context = zmq.Context()
+            self.socket = context.socket(zmq.REQ)
+            self.socket.setsockopt(zmq.LINGER, 1)
+            print('Connecting to server at ',args.server,':',args.port)
+            self.socket.connect("tcp://"+args.server+":"+args.port+"")
+            print('sending hello!')
+            self.socket.send_pyobj('hello')
+            print('waiting for response!')
+            return self.zmq_timeout_pyobj()
+        else:
+            return False
             # raise IOError("Timeout processing auth request")
 
     def zmq_timeout_pyobj(self):

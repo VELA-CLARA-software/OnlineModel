@@ -118,6 +118,7 @@ class onlineModelPlotterWidget(QWidget):
         self.sliceLayout = QHBoxLayout()
         self.sliceWidget.setLayout(self.sliceLayout)
         self.sliceLayout.addWidget(self.slicePlotWidget.slicePlotSliceWidthWidget)
+        self.slicePlotWidget.slicePlotSliceWidthWidget.valueChanged.connect(self.beamPlotWidget.set_histogram_bins)
         self.sliceWidget.setMaximumWidth(150)
 
         self.pointSizeWidget = QGroupBox()
@@ -196,7 +197,7 @@ class onlineModelPlotterWidget(QWidget):
         if self.tabWidget.tabText(i) == 'Scatter Plots':
             self.plotType = 'Beam'
             self.pointSizeWidget.setVisible(True)
-            self.sliceWidget.setVisible(False)
+            self.sliceWidget.setVisible(True)
         elif self.tabWidget.tabText(i) == 'Slice Properties':
             self.plotType = 'Slice'
             self.pointSizeWidget.setVisible(False)

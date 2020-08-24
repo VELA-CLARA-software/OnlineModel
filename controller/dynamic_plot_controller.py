@@ -49,12 +49,11 @@ class DynamicPlotController(QObject):
         self.clickedCurve = None
 
     def curveClicked(self, name):
-        pass
         # print('Clicked:', name)
         # if self.clickedCurve is not None:
         #     self.ompbeam.curveClicked(self.clickedCurve)
         # self.clickedCurve = name
-        # self.ompbeam.curveClicked(self.clickedCurve)
+        self.ompbeam.curveClicked(name)
 
     def add_twiss_plot(self, id, dir):
         # dir = dir.replace('/mnt/','\\\\').replace('/','\\')+'\\'

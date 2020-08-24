@@ -201,6 +201,7 @@ class RunParameterController(QObject):
         # layout.addWidget(self.view.yaml_tree_widget)
         table = self.view.run_parameters_table
         table.cellClicked.connect(self.show_yaml_in_datatree)
+        table.cellDoubleClicked.connect(self.emit_run_id_clicked_signal)
         table.resizeColumnsToContents()
 
     def show_yaml_in_datatree(self, row, col):
@@ -211,10 +212,17 @@ class RunParameterController(QObject):
         ddiff = DeepDiff(data, guidata, ignore_order=True, exclude_paths={"root['runs']"})
         # print(ddiff)
         self.view.yaml_tree_widget.setData(ddiff)
-        self.run_id_clicked.emit(runno)
+        # self.run_id_clicked.emit(runno)
+
+    def emit_run_id_clicked_signal(self, row, col):
+        table = self.view.run_parameters_table
+        runno = table.item(row, self.run_table_columns['run_id']).text()
+        # print('clicked run_id = ', runno)
+        self.run_id_clicked.emit(str(runno))
 
     def populate_run_parameters_table(self):
         table = self.view.run_parameters_table
+        table.setEditTriggers(QTableWidget.NoEditTriggers)
         table.clearContents()
         table.setRowCount(0)
         dirnames = self.model.get_all_directory_names()

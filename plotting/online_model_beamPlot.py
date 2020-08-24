@@ -67,16 +67,35 @@ class beamPlotWidget(QWidget):
         self.beamPlotWidget.setLayout(self.beamPlotLayout)
 
         self.mainBeamPlotLayout = pg.GraphicsLayoutWidget()
-        self.mainBeamPlotWidget = self.mainBeamPlotLayout.addPlot()
+        self.mainBeamPlotWidget = self.mainBeamPlotLayout.addPlot(row=0,col=1)
         self.mainBeamPlotWidget.getAxis('bottom').setStyle(showValues=False)
         self.mainBeamPlotWidget.getAxis('left').setStyle(showValues=False)
+        self.mainBeamPlotWidget.showAxis('right')
+        self.mainBeamPlotWidget.showAxis('top')
+        self.mainBeamPlotWidget.getAxis('right').setStyle(showValues=False)
+        self.mainBeamPlotWidget.getAxis('top').setStyle(showValues=False)
+        self.mainBeamPlotWidget.sigRangeChanged.connect(lambda:self.updateBeamPlot(updatebeam=False, updateprojections=True))
         self.linkAxis = self.mainBeamPlotWidget.vb
         self.bottomBeamPlotLayout = pg.GraphicsLayoutWidget()
-        self.bottomBeamPlotWidget = self.bottomBeamPlotLayout.addPlot()
+        self.bottomBeamPlotWidget = self.mainBeamPlotLayout.addPlot(row=1,col=1)
         self.bottomBeamPlotWidget.setXLink(self.linkAxis)
+        self.bottomBeamPlotWidget.setLimits(yMin=0)
+        self.bottomBeamPlotWidget.invertY(True)
+        self.bottomBeamPlotWidget.getAxis('left').setStyle(showValues=False)
+        self.bottomBeamPlotWidget.showAxis('right')
+        self.bottomBeamPlotWidget.getAxis('right').setStyle(showValues=False)
         self.rightBeamPlotLayout = pg.GraphicsLayoutWidget()
-        self.rightBeamPlotWidget = self.rightBeamPlotLayout.addPlot()
+        self.rightBeamPlotWidget = self.mainBeamPlotLayout.addPlot(row=0,col=0)
         self.rightBeamPlotWidget.setYLink(self.linkAxis)
+        self.rightBeamPlotWidget.setLimits(xMin=0)
+        self.rightBeamPlotWidget.invertX(True)
+        self.rightBeamPlotWidget.getAxis('bottom').setStyle(showValues=False)
+        self.rightBeamPlotWidget.showAxis('top')
+        self.rightBeamPlotWidget.getAxis('top').setStyle(showValues=False)
+        self.mainBeamPlotLayout.ci.layout.setColumnStretchFactor(0, 1)
+        self.mainBeamPlotLayout.ci.layout.setColumnStretchFactor(1, 6)
+        self.mainBeamPlotLayout.ci.layout.setRowStretchFactor(0, 4)
+        self.mainBeamPlotLayout.ci.layout.setRowStretchFactor(1, 1)
 
         self.pointSize = 3
         self.pointSizeWidget = QSpinBox()
@@ -119,16 +138,7 @@ class beamPlotWidget(QWidget):
         self.beamPlotXAxisNormalise.stateChanged.connect(self.updateBeamPlot)
         self.beamPlotYAxisNormalise.stateChanged.connect(self.updateBeamPlot)
 
-        self.beamPlotLayout.addWidget(self.beamPlotAxisWidget)
-        self.beamPlotAllLayout = QGridLayout()
-        self.beamPlotAllLayout.addWidget(self.mainBeamPlotLayout,0,1)
-        self.beamPlotAllLayout.addWidget(self.rightBeamPlotLayout,0,0)
-        self.beamPlotAllLayout.addWidget(self.bottomBeamPlotLayout,1,1)
-        self.beamPlotAllLayout.setColumnStretch(0, 1)
-        self.beamPlotAllLayout.setColumnStretch(1, 6)
-        self.beamPlotAllLayout.setRowStretch(0, 4)
-        self.beamPlotAllLayout.setRowStretch(1, 1)
-        self.beamPlotLayout.addLayout(self.beamPlotAllLayout)
+        self.beamPlotLayout.addWidget(self.mainBeamPlotLayout)
 
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
@@ -140,7 +150,9 @@ class beamPlotWidget(QWidget):
         self.bottomcurves = {}
         self.rightcurves = {}
         self.curve_colors = {}
+        self.fillAlpha = {}
         self.shadowCurves = []
+        self._histogram_bins = 20
 
     def addbeamDataFiles(self, dicts):
         for d in dicts:
@@ -160,11 +172,12 @@ class beamPlotWidget(QWidget):
             self.curves[id] = self.mainBeamPlotWidget.plot([], pen=None,
                                                                 symbolBrush=pen, symbolSize=self.pointSize, symbolPen=None)
             self.curves[id].sigClicked.connect(lambda: self.curveClicked(id))
-        self.updateBeamPlot()
+        self.updateBeamPlot(updatebeam=True, updateprojections=True)
         return color
 
     def add_projected_curves(self, id):
         self.bottomcurves[id] = self.bottomBeamPlotWidget.plot([])
+        self.bottomcurves[id].rotate(180)
         self.rightcurves[id] = self.rightBeamPlotWidget.plot([])
         self.rightcurves[id].rotate(90)
 
@@ -183,38 +196,60 @@ class beamPlotWidget(QWidget):
             return color
         return None
 
-    def updateBeamPlot(self):
+    def updateBeamPlot(self, updatebeam=True, updateprojections=True, updateCurveHighlights=True):
         xdict = self.beamParams[str(self.beamPlotXAxisCombo.currentText())]
         ydict = self.beamParams[str(self.beamPlotYAxisCombo.currentText())]
-        self.rightBeamPlotWidget.clear()
-        self.bottomBeamPlotWidget.clear()
+        if updateprojections:
+            self.rightBeamPlotWidget.clear()
+            self.bottomBeamPlotWidget.clear()
         for id in self.curves:
-            self.add_projected_curves(id)
             x = getattr(self.beams[id], str(self.beamPlotXAxisCombo.currentText()))
             if self.beamPlotXAxisNormalise.isChecked():
                 x = x - np.mean(x)
             y = getattr(self.beams[id], str(self.beamPlotYAxisCombo.currentText()))
             if self.beamPlotYAxisNormalise.isChecked():
                 y = y - np.mean(y)
-            self.curves[id].setData(x=x, y=y, symbolSize=self.pointSize)
+            if updatebeam:
+                self.curves[id].setData(x=x, y=y, symbolSize=self.pointSize)
 
-            color = self.curve_colors[id]
-            color.setAlpha(100)
-            histy, histx = self.projection(y)
-            self.rightcurves[id].setData(x=histx, y=histy, stepMode=True, fillLevel=0, brush=color)
-            histy, histx = self.projection(x)
-            self.bottomcurves[id].setData(x=histx, y=histy, stepMode=True, fillLevel=0, brush=color)
-        # self.mainBeamPlotWidget.setLabel('left', text=ydict['name'], units=ydict['units'])
-        # self.mainBeamPlotWidget.setLabel('bottom', text=xdict['name'], units=xdict['units'])
+            if updateprojections:
+                self.add_projected_curves(id)
+                color = self.curve_colors[id]
+                if id in self.fillAlpha:
+                    color.setAlpha(self.fillAlpha[id])
+                else:
+                    color.setAlpha(100)
+                xrange, yrange = self.mainBeamPlotWidget.vb.viewRange()
+                if len(x) > 0 and len(y) > 0:
+                    xy = zip(x,y)
+                    xynew = [a for a in xy if a[0] >= xrange[0] and a[0] <= xrange[1] and a[1] >= yrange[0] and a[1] <= yrange[1]]
+                    # ynew = [yy for yy in y if yy >= yrange[0] and yy <= yrange[1]]
+                    xnew, ynew = zip(*xynew)
+                    histy, histx = self.projection(ynew, xmult=-1, ymult=1, range=yrange)
+                    self.rightcurves[id].setData(x=histx, y=histy, stepMode=True, fillLevel=0, brush=color)
+                    # self.rightcurves[id].setData(x=histx, y=histy, stepMode=True, pen=color)
+                    histy, histx = self.projection(xnew, xmult=-1, ymult=-1, range=xrange)
+                    self.bottomcurves[id].setData(x=histx, y=histy, stepMode=True, fillLevel=0, brush=color)
+                    # self.bottomcurves[id].setData(x=histx, y=histy, stepMode=True, pen=color)
         self.rightBeamPlotWidget.setLabel('left', text=ydict['name'], units=ydict['units'])
         self.bottomBeamPlotWidget.setLabel('bottom', text=xdict['name'], units=xdict['units'])
-        self.updateCurveHighlights()
+        self.rightBeamPlotWidget.enableAutoRange(x=True)
+        self.bottomBeamPlotWidget.enableAutoRange(y=True)
+        if updateCurveHighlights:
+            self.updateCurveHighlights()
 
-    def projection(self, data):
-        x,y = np.histogram(data, bins='doane')
-        x = [0] + list(x) + [0]
-        y = [2*y[0] - y[1]] + list(y) + [2*y[-1] - y[-2]]
-        return x,y
+    def projection(self, data, xmult=1, ymult=1, range=None):
+        # range[0] = range[0] if range[0] > min(data) else min(data)
+        # range[1] = range[1] if range[1] < max(data) else max(data)
+        # range[1] = range[1] if range [1] > range[0] else range[0] + 1e-6
+        x,y = np.histogram(data, bins=self._histogram_bins, range=None)
+        x = np.array([0] + list(x) + [0]) / len(data)
+        y = np.array([2*y[0] - y[1]] + list(y) + [2*y[-1] - y[-2]])
+        return xmult*x, ymult*y
+
+    def set_histogram_bins(self, bins):
+        self._histogram_bins = bins
+        self.updateBeamPlot(updatebeam=False, updateprojections=True)
 
     def removePlot(self, id):
         ''' finds all beam plots based on a directory name, and removes them '''
@@ -258,9 +293,12 @@ class beamPlotWidget(QWidget):
     def updateCurveHighlights(self):
         for n in self.curves.keys():
             if n in self.shadowCurves or not len(self.shadowCurves) > 0:
-                self.setPenAlpha(n, 255, 3)
+                self.setPenAlpha(self.curves, n, 255, 3)
+                self.setFillAlpha(n, 100)
             else:
-                self.setPenAlpha(n, 10, 3)
+                self.setPenAlpha(self.curves, n, 10, 3)
+                self.setFillAlpha(n, 30)
+        self.updateBeamPlot(updatebeam=False, updateprojections=True, updateCurveHighlights=False)
 
     def addShadowPen(self, name):
         # curve = self.curves[name]
@@ -271,13 +309,16 @@ class beamPlotWidget(QWidget):
         if name in self.shadowCurves:
             self.shadowCurves.remove(name)
 
-    def setPenAlpha(self, name, alpha=255, width=3):
-        curve = self.curves[name]
+    def setPenAlpha(self, curves, name, alpha=255, width=3):
+        curve = curves[name]
         pen = curve.opts['symbolBrush']
         pencolor = pen.color()
         pencolor.setAlpha(alpha)
         pen = pg.mkBrush(color=pencolor, width=width, style=pen.style())
         curve.setSymbolBrush(pen)
+
+    def setFillAlpha(self, name, alpha=255):
+        self.fillAlpha[name] = alpha
 
     def clear(self):
         self.mainBeamPlotWidget.clear()

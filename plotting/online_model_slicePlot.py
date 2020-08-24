@@ -53,7 +53,7 @@ class slicePlotWidget(multiPlotWidget):
         self.set_horizontal_axis_label('t','ps')
         self.slicePlotSliceWidthWidget = QSpinBox()
         self.slicePlotSliceWidthWidget.setMaximum(500)
-        self.slicePlotSliceWidthWidget.setValue(100)
+        self.slicePlotSliceWidthWidget.setValue(25)
         self.slicePlotSliceWidthWidget.setSingleStep(10)
         self.slicePlotSliceWidthWidget.setSuffix(" slices")
         self.slicePlotSliceWidthWidget.setSpecialValueText('Automatic')
