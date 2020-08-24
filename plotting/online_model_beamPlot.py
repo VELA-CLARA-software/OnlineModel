@@ -142,6 +142,7 @@ class beamPlotWidget(QWidget):
 
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
+        self.layout.addWidget(self.beamPlotAxisWidget)
         self.layout.addWidget(self.beamPlotWidget)
 
         ''' used for style cycling '''
