@@ -146,15 +146,12 @@ class Model(object):
                 self.data.Framework.setSubDirectory('test/'+self.directoryname)
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
-                if self.data.runsDict['track']:
-                    try:
-                        self.data.Framework.track(startfile=start_lattice)#, endfile=endLattice)
-                    except Exception as e:
-                        print('!!!! Error in Tracking - settings not saved !!!!')
-                        print(e)
-                        success = False
-                else:
-                    time.sleep(0.5)
+                try:
+                    self.data.Framework.track(startfile=start_lattice)#, endfile=endLattice)
+                except Exception as e:
+                    print('!!!! Error in Tracking - settings not saved !!!!')
+                    print(e)
+                    success = False
         return success
 
     def get_directory_name(self):

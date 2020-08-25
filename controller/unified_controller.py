@@ -13,7 +13,8 @@ class UnifiedController():
             self.rpc.view.actionImport_YAML.triggered.connect(self.rpc.import_parameter_values_from_yaml_file)
             self.rpc.view.actionExport_YAML.triggered.connect(self.rpc.export_parameter_values_to_yaml_file)
             self.rpc.view.actionRead_from_EPICS.triggered.connect(self.rpc.read_from_epics)
-            self.rpc.view.actionAuto_load_Settings.toggled.connect(self.rpc.connect_auto_load_settings)
+            self.rpc.view.actionRead_from_DBURT.triggered.connect(self.rpc.read_from_DBURT)
+            # self.rpc.view.actionAuto_load_Settings.toggled.connect(self.rpc.connect_auto_load_settings)
 
             # Connects signal from the run controller to add a plot to the plot controller
             self.rpc.add_plot_signal.connect(self.dpc.add_twiss_plot)

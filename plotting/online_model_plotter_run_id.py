@@ -169,7 +169,7 @@ class onlineModelPlotterWidget(QWidget):
     def loadBeamDataFile(self, directory, beamFileName, color, id):
         if os.path.isfile(directory+'/'+beamFileName):
             self.beamPlotWidget.addbeamDataFile(directory, beamFileName, id=id, color=color)
-            self.slicePlotWidget.addsliceDataFile(directory+'/'+beamFileName, id=id, color=color)
+            self.slicePlotWidget.addsliceDataObject(self.beamPlotWidget.beams[id], id=id, color=color)
 
     def addRunIDToListWidget(self, run_id, prefixes, color=None):
         self.run_id_prefixes[run_id] = prefixes
@@ -305,6 +305,7 @@ class onlineModelPlotterWidget(QWidget):
         if name in self.run_id_prefixes and not name in self.shadowCurves:
             self.shadowCurves.append(name)
         self.twissPlotWidget.highlightPlot(name)
+        self.beamTwissPlotWidget.highlightPlot(name)
         self.slicePlotWidget.highlightPlot(name)
         self.beamPlotWidget.highlightPlot(name)
 
@@ -312,6 +313,7 @@ class onlineModelPlotterWidget(QWidget):
         if name in self.run_id_prefixes and name in self.shadowCurves:
             self.shadowCurves.remove(name)
         self.twissPlotWidget.unHighlightPlot(name)
+        self.beamTwissPlotWidget.unHighlightPlot(name)
         self.slicePlotWidget.unHighlightPlot(name)
         self.beamPlotWidget.unHighlightPlot(name)
 

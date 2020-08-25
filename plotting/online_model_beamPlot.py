@@ -74,7 +74,7 @@ class beamPlotWidget(QWidget):
         self.mainBeamPlotWidget.showAxis('top')
         self.mainBeamPlotWidget.getAxis('right').setStyle(showValues=False)
         self.mainBeamPlotWidget.getAxis('top').setStyle(showValues=False)
-        self.mainBeamPlotWidget.sigRangeChanged.connect(lambda:self.updateBeamPlot(updatebeam=False, updateprojections=True))
+        self.mainBeamPlotWidget.sigRangeChanged.connect(lambda:self.updateBeamPlot(updatebeam=False, updateprojections=True, updateCurveHighlights=False))
         self.linkAxis = self.mainBeamPlotWidget.vb
         self.bottomBeamPlotLayout = pg.GraphicsLayoutWidget()
         self.bottomBeamPlotWidget = self.mainBeamPlotLayout.addPlot(row=1,col=1)
@@ -133,10 +133,10 @@ class beamPlotWidget(QWidget):
         self.beamPlotYAxisNormalise = QCheckBox('Normalise')
         self.beamPlotYAxisNormalise.setChecked(True)
         self.horizontalLayout.addWidget(self.beamPlotYAxisNormalise)
-        self.beamPlotXAxisCombo.currentIndexChanged.connect(self.updateBeamPlot)
-        self.beamPlotYAxisCombo.currentIndexChanged.connect(self.updateBeamPlot)
-        self.beamPlotXAxisNormalise.stateChanged.connect(self.updateBeamPlot)
-        self.beamPlotYAxisNormalise.stateChanged.connect(self.updateBeamPlot)
+        self.beamPlotXAxisCombo.currentIndexChanged.connect(lambda:self.updateBeamPlot(updatebeam=True, updateprojections=True, updateCurveHighlights=False))
+        self.beamPlotYAxisCombo.currentIndexChanged.connect(lambda:self.updateBeamPlot(updatebeam=True, updateprojections=True, updateCurveHighlights=False))
+        self.beamPlotXAxisNormalise.stateChanged.connect(lambda:self.updateBeamPlot(updatebeam=True, updateprojections=True, updateCurveHighlights=False))
+        self.beamPlotYAxisNormalise.stateChanged.connect(lambda:self.updateBeamPlot(updatebeam=True, updateprojections=True, updateCurveHighlights=False))
 
         self.beamPlotLayout.addWidget(self.mainBeamPlotLayout)
 
@@ -173,6 +173,7 @@ class beamPlotWidget(QWidget):
             self.curves[id] = self.mainBeamPlotWidget.plot([], pen=None,
                                                                 symbolBrush=pen, symbolSize=self.pointSize, symbolPen=None)
             self.curves[id].sigClicked.connect(lambda: self.curveClicked(id))
+            self.add_projected_curves(id)
         self.updateBeamPlot(updatebeam=True, updateprojections=True)
         return color
 
@@ -200,9 +201,9 @@ class beamPlotWidget(QWidget):
     def updateBeamPlot(self, updatebeam=True, updateprojections=True, updateCurveHighlights=True):
         xdict = self.beamParams[str(self.beamPlotXAxisCombo.currentText())]
         ydict = self.beamParams[str(self.beamPlotYAxisCombo.currentText())]
-        if updateprojections:
-            self.rightBeamPlotWidget.clear()
-            self.bottomBeamPlotWidget.clear()
+        # if updateprojections:
+        #     self.rightBeamPlotWidget.clear()
+        #     self.bottomBeamPlotWidget.clear()
         for id in self.curves:
             x = getattr(self.beams[id], str(self.beamPlotXAxisCombo.currentText()))
             if self.beamPlotXAxisNormalise.isChecked():
@@ -214,7 +215,7 @@ class beamPlotWidget(QWidget):
                 self.curves[id].setData(x=x, y=y, symbolSize=self.pointSize)
 
             if updateprojections:
-                self.add_projected_curves(id)
+                # self.add_projected_curves(id)
                 color = self.curve_colors[id]
                 if id in self.fillAlpha:
                     color.setAlpha(self.fillAlpha[id])
@@ -250,7 +251,7 @@ class beamPlotWidget(QWidget):
 
     def set_histogram_bins(self, bins):
         self._histogram_bins = bins
-        self.updateBeamPlot(updatebeam=False, updateprojections=True)
+        self.updateBeamPlot(updatebeam=False, updateprojections=True, updateCurveHighlights=False)
 
     def removePlot(self, id):
         ''' finds all beam plots based on a directory name, and removes them '''
@@ -258,6 +259,13 @@ class beamPlotWidget(QWidget):
             self.shadowCurves.remove(id)
         if id in self.curves:
             self.mainBeamPlotWidget.removeItem(self.curves[id])
+            del self.curves[id]
+        if id in self.bottomcurves:
+            self.bottomBeamPlotWidget.removeItem(self.bottomcurves[id])
+            del self.bottomcurves[id]
+        if id in self.rightcurves:
+            self.rightBeamPlotWidget.removeItem(self.rightcurves[id])
+            del self.rightcurves[id]
         self.updateCurveHighlights()
 
     def changePointSize(self, size):
@@ -295,10 +303,12 @@ class beamPlotWidget(QWidget):
         for n in self.curves.keys():
             if n in self.shadowCurves or not len(self.shadowCurves) > 0:
                 self.setPenAlpha(self.curves, n, 255, 3)
-                self.setFillAlpha(n, 100)
+                self.setFillAlpha(self.bottomcurves, n, 100)
+                self.setFillAlpha(self.rightcurves, n, 100)
             else:
                 self.setPenAlpha(self.curves, n, 10, 3)
-                self.setFillAlpha(n, 30)
+                self.setFillAlpha(self.bottomcurves, n, 30)
+                self.setFillAlpha(self.rightcurves, n, 30)
         self.updateBeamPlot(updatebeam=False, updateprojections=True, updateCurveHighlights=False)
 
     def addShadowPen(self, name):
@@ -315,16 +325,20 @@ class beamPlotWidget(QWidget):
         pen = curve.opts['symbolBrush']
         pencolor = pen.color()
         pencolor.setAlpha(alpha)
-        pen = pg.mkBrush(color=pencolor, width=width, style=pen.style())
-        curve.setSymbolBrush(pen)
+        # pen = pg.mkBrush(color=pencolor, width=width, style=pen.style())
+        curve.setSymbolBrush(color=pencolor, width=width, style=pen.style())
 
-    def setFillAlpha(self, name, alpha=255):
+    def setFillAlpha(self, curves, name, alpha=255):
         self.fillAlpha[name] = alpha
 
     def clear(self):
         self.mainBeamPlotWidget.clear()
+        self.bottomBeamPlotWidget.clear()
+        self.rightBeamPlotWidget.clear()
         self.plotColor = 0
         self.curves = {}
+        self.bottomcurves = {}
+        self.rightcurves = {}
         self.shadowCurves = []
         self.beams = {}
 

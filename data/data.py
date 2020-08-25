@@ -1,5 +1,6 @@
 import collections
 import os, sys
+import re
 import numpy as np
 import ruamel.yaml as yaml
 sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
@@ -8,6 +9,7 @@ sys.path.append(os.path.abspath(__file__+'/../../'))
 import SimulationFramework.Framework as Fw
 import requests, json, scipy.constants, datetime, math, numpy
 import data.lattices as lattices
+from data.DBURT_parser import DBURT_Parser
 
 class Data(object):
 
@@ -17,6 +19,7 @@ class Data(object):
     def __init__(self):
         super(Data, self).__init__()
         self.my_name = "data"
+        self.parser = DBURT_Parser()
         self.screenDict = collections.OrderedDict()
         self.parameterDict = collections.OrderedDict()
         self.lattices = lattices.lattices
@@ -50,8 +53,6 @@ class Data(object):
         [self.screenDict['Gun'].update({key: value}) for key, value in self.screen_values.items() if 'CLA-S01' == key[:len('CLA-S01')]]
         [self.screenDict['Linac'].update({key: value}) for key, value in self.screen_values.items() if 'CLA-L01' == key[:len('CLA-L01')]]
         self.screenDict['Gun'].update({'Laser': {'type': 'screen', 'position': 0.0}})
-        # print (self.screenDict)
-        # exit()
         [[self.parameterDict[l].update({key: value}) for key, value in self.quad_values.items() if l == key[:len(l)]] for l in self.lattices]
         [self.parameterDict[self.lattices[0]].update({key: value}) for key, value in self.rf_values.items() if 'LRG' in key]
         [self.parameterDict[self.lattices[1]].update({key: value}) for key, value in self.rf_values.items() if 'L01' in key]
@@ -64,7 +65,6 @@ class Data(object):
         if 'Linac' in self.parameterDict:
             self.parameterDict['Linac']['zwake'] = {'value': True, 'type': 'simulation'}
             self.parameterDict['Linac']['trwake'] = {'value': True, 'type': 'simulation'}
-        # [self.generatorDict.update({key: value}) for key, value in self.space_charge.items()]
         for l in self.lattices:
             for key, value in self.simulation_parameters.items():
                 self.parameterDict[l][key] = collections.OrderedDict()
@@ -100,7 +100,6 @@ class Data(object):
         self.astra_run_number = collections.OrderedDict()
         self.tracking_code = collections.OrderedDict()
         self.simulation_parameters = collections.OrderedDict()
-        # self.tracking_code.update({'tracking_code': collections.OrderedDict()})
 
         for screen in self.Framework.getElementType(['screen', 'watch_point', 'monitor', 'beam_arrival_monitor', 'marker']):
             name = screen['objectname'].replace('-W','')
@@ -122,8 +121,6 @@ class Data(object):
             self.rf_values[cavity['objectname']].update({'field_amplitude': cavity['field_amplitude']})
             self.rf_values[cavity['objectname']].update({'pv_field_amplitude_alias': "ad1:ch6:power_remote_s.POWER"})
             self.rf_values[cavity['objectname']].update({'pv_phase_alias': "vm:dsp:sp_ph:phase"})
-            # self.rf_values[cavity['objectname']].update({'zwake': True})
-            # self.rf_values[cavity['objectname']].update({'trwake': True})
             for key, value in cavity['sub_elements'].items():
                 if value['type'] == "solenoid":
                     self.rf_values.update({key: collections.OrderedDict()})
@@ -145,9 +142,6 @@ class Data(object):
         self.space_charge.update({'space_charge': collections.OrderedDict()})
         self.space_charge['space_charge'].update({'type': 'generator'})
         self.space_charge['space_charge'].update({'value': False})
-        # self.astra_run_number.update({'astra_run_number': collections.OrderedDict()})
-        # self.astra_run_number['astra_run_number'].update({'type': 'generator'})
-        # self.astra_run_number['astra_run_number'].update({'astra_run_number': 101})
         self.laser_values.update({'transverse_distribution': collections.OrderedDict()})
         self.laser_values['transverse_distribution'].update({'type': 'generator'})
         self.laser_values['transverse_distribution'].update({'value': self.Framework.generator['distribution_type_x']})
@@ -163,9 +157,6 @@ class Data(object):
         self.laser_values.update({'sig_x': collections.OrderedDict()})
         self.laser_values['sig_x'].update({'type': 'generator'})
         self.laser_values['sig_x'].update({'value': self.Framework.generator['sigma_x']})
-        # self.laser_values.update({'sig_y': collections.OrderedDict()})
-        # self.laser_values['sig_y'].update({'type': 'generator'})
-        # self.laser_values['sig_y'].update({'value': self.Framework.generator['sigma_y']})
         self.laser_values.update({'spot_size': collections.OrderedDict()})
         self.laser_values['spot_size'].update({'type': 'generator'})
         self.laser_values['spot_size'].update({'value': self.Framework.generator['sigma_x']})
@@ -187,14 +178,7 @@ class Data(object):
         self.laser_values.update({'tracking_code': collections.OrderedDict()})
         self.laser_values['tracking_code'].update({'type': 'generator'})
         self.laser_values['tracking_code'].update({'value': 'ASTRA'})
-        # self.tracking_code.update({'tracking_code':  collections.OrderedDict(), 'csr':  collections.OrderedDict(), 'csr_bins':  collections.OrderedDict(),
-        #     'lsc':  collections.OrderedDict(), 'lsc_bins':  collections.OrderedDict(),
-        # })
         self.simulation_parameters = {'tracking_code': 'elegant', 'csr': True, 'csr_bins': 200, 'lsc': True, 'lsc_bins': 200}
-        # for k,v in simulation_parameters_names.items():
-        #     self.simulation_parameters.update({k: collections.OrderedDict()})
-        #     self.simulation_parameters[k].update({'type': 'simulation'})
-        #     self.simulation_parameters[k].update({'value': v})
 
     def get_pv_alias(self, dict, name, param=None, rf_type=None):
         if dict[name]['type'] == 'quadrupole':
@@ -256,7 +240,79 @@ class Data(object):
         total_energy_gain = gun_energy_gain + l01_energy_gain + fudge
         return total_energy_gain
 
-    def read_values_from_epics(self, dict, time_from=None, time_to=None, lattice=False):
+    def generate_magnet_name(self, name):
+        name_number = re.compile(r'(?P<name>[a-zA-Z]+)(?P<number>\d+)')
+        name_nonumber = re.compile(r'(?P<name>[a-zA-Z]+)')
+        split = name.split('-')
+        if split[0] == 'INJ':
+            lattice = 'EBT-INJ'
+        elif split[0] == 'BA1':
+            lattice = 'EBT-BA1'
+        else:
+            lattice = 'CLA-' + split[0]
+        match = name_number.search(split[1])
+        if match:
+            name, number = match.group('name'), match.group('number').zfill(2)
+            if 'QUAD' in name:
+                return lattice, lattice + '-MAG-QUAD-' + number
+            elif 'SOL' in name:
+                return lattice, lattice + '-MAG-SOL-' + number
+        if split[0] == 'LRG':
+            match = name_nonumber.search(split[1])
+            if match and match.group('name'):
+                name = match.group('name')
+                lattice = 'CLA-LRG1'
+                if 'SOL' == name:
+                    return 'Gun', lattice + '-MAG-SOL-01'
+                elif 'BSOL' == name:
+                    return 'Gun', lattice + '-MAG-BSOL-01'
+        return None, None
+
+    def read_values_from_DBURT(self, dburt):
+        data = self.parser.parse_DBURT(dburt)
+        magnetdata = {}
+        speed_of_light = scipy.constants.speed_of_light / 1e6
+        for key, mag in data['magnets'].items():
+            mag['lattice'], mag['fullname'] = self.generate_magnet_name(mag['name'])
+            if mag['lattice'] == 'CLA-L01':
+                mag['lattice'] = 'Linac'
+            if mag['lattice'] == 'Linac' or mag['lattice'] == 'Gun':
+                self.total_energy_gain = 5
+            else:
+                self.total_energy_gain = 35
+            if mag['fullname'] in self.quad_values:
+                value = self.quad_values[mag['fullname']]
+            elif mag['fullname'] in self.rf_values:
+                value = self.rf_values[mag['fullname']]
+            else:
+                value = {'type': None}
+            mag['value'] = value
+            # print('fullname = ', self.generate_magnet_name(mag['name']))
+        # for key, mag in data['magnets'].items():
+            # value = mag['values']
+            if value['type'] == 'quadrupole':
+                quad_pv_alias = key + ":" + value['pv_suffix_alias']
+                current = float(mag['setI'])
+                coeffs = numpy.append(value['field_integral_coefficients'][:-1],
+                                      value['field_integral_coefficients'][-1])
+                int_strength = numpy.polyval(coeffs, current)
+                effect = speed_of_light * int_strength / self.total_energy_gain
+                # self.update_widgets_with_values("lattice:" + key + ":k1l", effect / value['magnetic_length'])
+                value['k1l'] = effect / value['magnetic_length']
+            elif value['type'] == 'solenoid':
+                sol_pv_alias = key + ":" + value['pv_suffix_alias']
+                current = float(mag['setI'])
+                sign = numpy.copysign(1, current)
+                coeffs = numpy.append(value['field_integral_coefficients'][-4:-1] * int(sign),
+                                      value['field_integral_coefficients'][-1])
+                int_strength = numpy.polyval(coeffs, current)
+                effect = int_strength / value['magnetic_length']
+                value['field_amplitude'] = float(effect / value['magnetic_length'])
+            magnetdata[mag['name']] = mag
+        # print(magnetdata)
+        return magnetdata
+
+    def read_values_from_epics(self, dict, time_from=None, time_to=None):
         self.total_energy_gain = self.get_energy_gain(time_from, time_to)
         speed_of_light = scipy.constants.speed_of_light / 1e6
         for key, value in dict.items():
@@ -267,7 +323,6 @@ class Data(object):
                                       value['field_integral_coefficients'][-1])
                 int_strength = numpy.polyval(coeffs, current)
                 effect = speed_of_light * int_strength / self.total_energy_gain
-                # self.update_widgets_with_values("lattice:" + key + ":k1l", effect / value['magnetic_length'])
                 value['k1l'] = effect / value['magnetic_length']
             elif value['type'] == 'solenoid':
                 sol_pv_alias = key + ":" + value['pv_suffix_alias']

@@ -181,10 +181,8 @@ class RunParameterController(QObject):
         self.view.parameter_scan.stateChanged.connect(lambda: self.toggle_scan_parameters_state(self.view.parameter_scan))
         self.view.bsol_track_checkBox.stateChanged.connect(self.toggle_BSOL_tracking)
         self.view.runButton.clicked.connect(self.run_astra)
-        self.view.loadSettingsButton.clicked.connect(self.load_settings_from_directory)
-        self.view.directory.textChanged[str].connect(self.check_load_settings_button)
         self.view.directory.textChanged[str].emit(self.view.directory.text())
-        # self.view.run_parameters_table.cellClicked.connect(self.show_row_settings)
+        self.view.clearPlotsButton.clicked.connect(self.clear_all_plots)
         self.abort_scan = False
         self.run_plots = []
         self.run_plot_colors = {}
@@ -193,7 +191,6 @@ class RunParameterController(QObject):
         self.populate_run_parameters_table()
         self.toggle_BSOL_tracking()
         self.toggle_BSOL_tracking()
-        self.view.track_checkBox.setVisible(False)
 
     def create_datatree_widget(self):
         # self.view.yaml_tree_widget = pg.DataTreeWidget()
@@ -265,6 +262,22 @@ class RunParameterController(QObject):
         run_id = table.item(row, self.run_table_columns['run_id']).text()
         self.run_plot_colors[run_id] = color
 
+    def enable_plot_on_id(self, id):
+        table = self.view.run_parameters_table
+        items = table.findItems(id, Qt.MatchExactly)
+        for item in items:
+            row = item.row()
+            checkbox = table.cellWidget(row, self.run_table_columns['plot_checkbox'])
+            checkbox.setCheckState(Qt.Checked)
+        # self.run_plot_colors[run_id] = color
+
+    def clear_all_plots(self):
+        table = self.view.run_parameters_table
+        for row in range(0,table.rowCount()):
+            checkbox = table.cellWidget(row, self.run_table_columns['plot_checkbox'])
+            checkbox.setCheckState(Qt.Unchecked)
+        # self.run_plot_colors[run_id] = color
+
     def open_folder_on_server(self, dir):
         remote_dir = self.model.get_absolute_folder_location(dir)
         os.startfile(remote_dir)
@@ -278,25 +291,6 @@ class RunParameterController(QObject):
             self.run_plots.remove(v)
             table = self.view.run_parameters_table
             table.removeCellWidget(k, self.run_table_columns['plot_color'])
-
-    def connect_auto_load_settings(self, state):
-        if state:
-            self.view.directory.textChanged[str].connect(self.load_settings_from_directory)
-        else:
-            try:
-                self.view.directory.textChanged[str].disconnect(self.load_settings_from_directory)
-            except:
-                pass
-
-    def check_load_settings_button(self, text):
-        if os.path.isfile(text + '/settings.yaml'):
-            self.view.loadSettingsButton.setEnabled(True)
-        else:
-            self.view.loadSettingsButton.setEnabled(False)
-
-    def load_settings_from_directory(self):
-        if os.path.isfile(self.model.data.parameterDict['runs']['directory'] + '/settings.yaml'):
-            self.import_parameter_values_from_yaml_file(self.model.data.parameterDict['runs']['directory'] + '/settings.yaml')
 
     def toggle_BSOL_tracking(self):
         widget = self.view.bsol_track_checkBox
@@ -323,9 +317,14 @@ class RunParameterController(QObject):
     def split_accessible_name(self, aname):
         if len((aname.split(':'))) == 3:
             dictname, pv, param = map(str, aname.split(':'))
-        else:
+        elif len((aname.split(':'))) == 2:
             param = None
             dictname, pv = map(str, aname.split(':'))
+        else:
+            print('Problem with name:', aname)
+            param = None
+            dictname = None
+            pv = None
         return dictname, pv, param
 
     def get_widget_value(self, widget):
@@ -524,7 +523,7 @@ class RunParameterController(QObject):
 
     def read_from_epics(self, time_from=None, time_to=None):
         for l in self.model.data.lattices:
-            self.model.data.read_values_from_epics(self.model.data.parameterDict[l], lattice=True)
+            self.model.data.read_values_from_epics(self.model.data.parameterDict[l])
             for key, value in self.model.data.parameterDict[l].items():
                 if value['type'] == "quadrupole":
                     self.update_widgets_with_values(l + ':' + key + ':k1l', value['k1l'])
@@ -533,12 +532,28 @@ class RunParameterController(QObject):
                 if value['type'] == "cavity":
                     self.update_widgets_with_values(l + ':' + key + ':phase', value['phase'])
                     self.update_widgets_with_values(l + ':' + key + ':field_amplitude', value['field_amplitude'])
-        self.model.data.read_values_from_epics(self.model.data.parameterDict['generator'], lattice=False)
+        self.model.data.read_values_from_epics(self.model.data.parameterDict['generator'])
         for key, value in self.model.data.parameterDict['generator'].items():
             if key == "charge":
                 self.update_widgets_with_values('generator:' + key + ':value', value['value'])
-            # self.update_widget_from_dict(key)
+        return
 
+    def read_from_DBURT(self, DBURT=None):
+        if DBURT is None or DBURT is False:
+            DBURT = "//fed.cclrc.ac.uk/Org/NLab/ASTeC/Projects/VELA/Snapshots/DBURT/CLARA_2_BA1_BA2_2020-03-09-1602_5.5MeV Beam Transport.dburt"
+        print('reading DBURT ', DBURT)
+        data = self.model.data.read_values_from_DBURT(DBURT)
+        for key, magnet in data.items():
+            value = magnet['value']
+            if value['type'] == "quadrupole":
+                print(magnet['lattice'] + ':' + magnet['fullname'] + ':k1l', value['k1l'])
+                self.update_widgets_with_values(magnet['lattice'] + ':' + magnet['fullname'] + ':k1l', value['k1l'])
+            if value['type'] == "solenoid":
+                print(magnet['lattice'] + ':' + magnet['fullname'] + ':field_amplitude', value['field_amplitude'])
+                self.update_widgets_with_values(magnet['lattice'] + ':' + magnet['fullname'] + ':field_amplitude', value['field_amplitude'])
+            if value['type'] == "cavity":
+                self.update_widgets_with_values(magnet['fullname'] + ':phase', value['phase'])
+                self.update_widgets_with_values(magnet['fullname'] + ':field_amplitude', value['field_amplitude'])
         return
 
     def abort_ongoing_scan(self):
@@ -592,9 +607,9 @@ class RunParameterController(QObject):
             self.view.progressBar.setValue(self.scan_no+1)
             self.scan_progress = self.scan_no+1
             current_scan_value = round(self.scan_range[self.scan_no], 5)
-            print('Scanning['+str(self.scan_no)+']: Setting ', self.scan_parameter, ' to ', current_scan_value, ' - ACTUAL Value = ', self.get_widget_value(self.get_object_by_accessible_name(self.scan_parameter)))
             self.update_widgets_with_values(self.scan_parameter, current_scan_value)
             self.model.data.scanDict['value'] = self.get_widget_value(self.get_object_by_accessible_name(self.scan_parameter))
+            print('Scanning['+str(self.scan_no)+']: Setting ', self.scan_parameter, ' to ', current_scan_value, ' - ACTUAL Value = ', self.get_widget_value(self.get_object_by_accessible_name(self.scan_parameter)))
             dictname, pv, param = self.split_accessible_name(self.scan_parameter)
             # subdir = (self.scan_basedir + '/' + pv + '_' + str(current_scan_value)).replace('//','/')
             self.update_widgets_with_values('runs:directory', self.scan_basedir)
@@ -632,24 +647,26 @@ class RunParameterController(QObject):
             self.thread = GenericThread(self.do_scan)
             self.thread.finished.connect(self.enable_run_button)
             self.thread.finished.connect(self.update_directory_widget)
-            self.thread.finished.connect(self.save_settings_to_database)
+            self.thread.finished.connect(lambda:self.save_settings_to_database(self.view.autoPlotCheckbox.isChecked()))
             self.thread.start()
         return
 
-    def save_settings_to_database(self):
+    def save_settings_to_database(self, plot=False):
         if self.tracking_success:
             self.model.save_settings_to_database(self.model.yaml, self.model.directoryname)
-            self.update_runs_widget()
+            self.update_runs_widget(plot=plot, id=self.model.directoryname)
 
     def update_directory_widget(self):
         dirname = self.model.get_directory_name()
         self.update_widgets_with_values('runs:directory', dirname)
 
-    def update_runs_widget(self):
+    def update_runs_widget(self, plot=False, id=None):
         dirname = self.model.get_directory_name()
         # settings = self.model.import_yaml_from_server()
         # print('Adding row - ', str(self.model.run_number), dirname)
         self.populate_run_parameters_table()
+        if plot:
+            self.enable_plot_on_id(id)
 
     def reset_progress_bar_timer(self):
         self.timer = QTimer()
