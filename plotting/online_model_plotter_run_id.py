@@ -5,7 +5,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import pyqtgraph as pg
 sys.path.append(os.path.abspath(os.path.realpath(__file__)+'/../'))
-from plotting.online_model_twissPlot import twissPlotWidget, beamTwissPlotWidget
+from plotting.online_model_twissPlot import globalTwissPlotWidget, latticeTwissPlotWidget, beamTwissPlotWidget
 from plotting.online_model_slicePlot import slicePlotWidget
 from plotting.online_model_beamPlot import beamPlotWidget
 
@@ -92,7 +92,8 @@ class onlineModelPlotterWidget(QWidget):
 
         self.tabWidget = QTabWidget()
 
-        self.twissPlotWidget = twissPlotWidget()
+        self.globalTwissPlotWidget = globalTwissPlotWidget()
+        self.latticeTwissPlotWidget = latticeTwissPlotWidget()
         self.beamTwissPlotWidget = beamTwissPlotWidget()
         self.slicePlotWidget = slicePlotWidget(ymin=0)
         self.beamPlotWidget = beamPlotWidget()
@@ -137,7 +138,8 @@ class onlineModelPlotterWidget(QWidget):
         self.folderBeamLayout.addWidget(self.pointSizeWidget)
 
         self.plotType = 'Twiss'
-        self.tabWidget.addTab(self.twissPlotWidget,'Lattice Twiss')
+        self.tabWidget.addTab(self.globalTwissPlotWidget,'Beam Sigmas')
+        self.tabWidget.addTab(self.latticeTwissPlotWidget,'Lattice Twiss')
         self.tabWidget.addTab(self.beamTwissPlotWidget,'Beam Twiss')
         self.tabWidget.addTab(self.beamPlotWidget,'Scatter Plots')
         self.tabWidget.addTab(self.slicePlotWidget,'Slice Properties')
@@ -157,11 +159,13 @@ class onlineModelPlotterWidget(QWidget):
 
     def connect_plot_signals(self):
         # When either subplot highlights a plot, connect it to the other plot and the listWidget
-        self.twissPlotWidget.highlightCurveSignal.connect(self.subplotHighlighted)
+        self.globalTwissPlotWidget.highlightCurveSignal.connect(self.subplotHighlighted)
+        self.latticeTwissPlotWidget.highlightCurveSignal.connect(self.subplotHighlighted)
         self.beamTwissPlotWidget.highlightCurveSignal.connect(self.subplotHighlighted)
         self.slicePlotWidget.highlightCurveSignal.connect(self.subplotHighlighted)
         self.beamPlotWidget.highlightCurveSignal.connect(self.subplotHighlighted)
-        self.twissPlotWidget.unHighlightCurveSignal.connect(self.subplotUnHighlighted)
+        self.globalTwissPlotWidget.unHighlightCurveSignal.connect(self.subplotUnHighlighted)
+        self.latticeTwissPlotWidget.unHighlightCurveSignal.connect(self.subplotUnHighlighted)
         self.beamTwissPlotWidget.unHighlightCurveSignal.connect(self.subplotUnHighlighted)
         self.slicePlotWidget.unHighlightCurveSignal.connect(self.subplotUnHighlighted)
         self.beamPlotWidget.unHighlightCurveSignal.connect(self.subplotUnHighlighted)
@@ -187,7 +191,8 @@ class onlineModelPlotterWidget(QWidget):
 
     def removeRunIDFromListWidget(self, run_id):
         del self.run_id_prefixes[run_id]
-        self.twissPlotWidget.removeCurve(run_id)
+        self.globalTwissPlotWidget.removeCurve(run_id)
+        self.latticeTwissPlotWidget.removeCurve(run_id)
         self.beamTwissPlotWidget.removeCurve(run_id)
         self.slicePlotWidget.removeCurve(run_id)
         self.beamPlotWidget.removePlot(run_id)
@@ -236,7 +241,8 @@ class onlineModelPlotterWidget(QWidget):
         twissList = []
         for s, d in prefixes.items():
             twissList.append({'directory': 'test/'+d, 'sections': [s]})
-        twiss, id, color = self.twissPlotWidget.addTwissDirectory(twissList, id=id, color=self.run_id_color[id])
+        twiss, id, color = self.globalTwissPlotWidget.addTwissDirectory(twissList, id=id, color=self.run_id_color[id])
+        self.latticeTwissPlotWidget.addtwissDataObject(twiss, id, color=color)
         self.beamTwissPlotWidget.addtwissDataObject(twiss, id, color=color)
 
     def label_widget(self, text=''):
@@ -259,7 +265,7 @@ class onlineModelPlotterWidget(QWidget):
         for row, twiss in enumerate(self.twissFunctions):
             self.twissTableWidget.setCellWidget(row, 0, self.label_widget(twiss[1]))
         for col, run_id in enumerate(self.run_id_prefixes):
-            twissData = self.twissPlotWidget.twissDataObjects[run_id]
+            twissData = self.globalTwissPlotWidget.twissDataObjects[run_id]
             for row, twiss in enumerate(self.twissFunctions):
                 if twiss[0] == 'run_id':
                     colorWidget = pg.ColorButton()
@@ -304,7 +310,8 @@ class onlineModelPlotterWidget(QWidget):
     def highlightPlot(self, name):
         if name in self.run_id_prefixes and not name in self.shadowCurves:
             self.shadowCurves.append(name)
-        self.twissPlotWidget.highlightPlot(name)
+        self.globalTwissPlotWidget.highlightPlot(name)
+        self.latticeTwissPlotWidget.highlightPlot(name)
         self.beamTwissPlotWidget.highlightPlot(name)
         self.slicePlotWidget.highlightPlot(name)
         self.beamPlotWidget.highlightPlot(name)
@@ -312,7 +319,8 @@ class onlineModelPlotterWidget(QWidget):
     def unHighlightPlot(self, name):
         if name in self.run_id_prefixes and name in self.shadowCurves:
             self.shadowCurves.remove(name)
-        self.twissPlotWidget.unHighlightPlot(name)
+        self.globalTwissPlotWidget.unHighlightPlot(name)
+        self.latticeTwissPlotWidget.unHighlightPlot(name)
         self.beamTwissPlotWidget.unHighlightPlot(name)
         self.slicePlotWidget.unHighlightPlot(name)
         self.beamPlotWidget.unHighlightPlot(name)
