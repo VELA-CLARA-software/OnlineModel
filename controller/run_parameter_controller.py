@@ -420,9 +420,10 @@ class RunParameterController(QObject):
         return scannableParameterDict
 
     def populate_scan_combo_box(self):
-        scanParameterComboBox = self.view.parameter
+        scanParameterComboBoxes = [self.view.parameter_1, self.view.parameter_2, self.view.parameter_3]
         for (parameterDisplayStr, parameter) in self.model.data.scannableParametersDict.items():
-            scanParameterComboBox.addItem(parameterDisplayStr, parameter)
+            for scpcb in scanParameterComboBoxes:
+                scpcb.addItem(parameterDisplayStr, parameter)
 
     def update_widget_from_dict(self, aname):
         widget = self.get_object_by_accessible_name(aname)
@@ -579,16 +580,49 @@ class RunParameterController(QObject):
         else:
             self.finished_tracking = True
 
+    def generate_scan_range(self, dimension=1):
+        do_scan = self.model.data.scanDict['parameter' + str(dimension) + '_scan']
+        scan_start = float(self.model.data.scanDict['parameter' + str(dimension) + '_scan_from_value'])
+        scan_end = float(self.model.data.scanDict['parameter' + str(dimension) + '_scan_to_value'])
+        scan_step_size = float(self.model.data.scanDict['parameter' + str(dimension) + '_scan_step_size'])
+        parameter = self.model.data.scanDict['parameter' + str(dimension)]
+        return do_scan, scan_start, scan_end+scan_step_size, scan_step_size, parameter
+
+    def generate_scan_dictionary(self):
+        scan1 = self.generate_scan_range(1)
+        scan2 = self.generate_scan_range(2)
+        scan3 = self.generate_scan_range(3)
+        do_scan_list = [scan1[0], scan2[0], scan3[0]]
+        ndims = np.sum(do_scan_list)
+        scancombineddata = [scan1, scan2, scan3]
+        if ndims == 1:
+            pos = do_scan_list.index(True)
+            scan_data = scancombineddata[pos]
+            grid = np.mgrid[scan_data[1]:scan_data[2]:scan_data[3]].reshape(1,-1).T
+            params = [scan_data[4]]
+        elif ndims == 2:
+            pos = [n for a,n in do_scan_list if a is True]
+            scan_data1 = scancombineddata[pos[0]]
+            scan_data2 = scancombineddata[pos[1]]
+            grid = np.mgrid[scan_data1[1]:scan_data1[2]:scan_data1[3], scan_data2[1]:scan_data2[2]:scan_data2[3]].reshape(2,-1).T
+            params = [scan_data1[4], scan_data2[4]]
+        elif ndims == 3:
+            grid = np.mgrid[scan1[1]:scan1[2]:scan1[3], scan2[1]:scan2[2]:scan2[3], scan3[1]:scan3[2]:scan3[3]].reshape(3,-1).T
+            params = [scan1[4], scan2[4], scan3[4]]
+        allparams = np.array([params for i in range(len(grid))]).T
+        finalgrid = np.array([allparam.T,xy]).T
+
+
     def setup_scan(self):
         try:
-            scan_start = float(self.model.data.scanDict['parameter_scan_from_value'])
-            scan_end = float(self.model.data.scanDict['parameter_scan_to_value'])
-            scan_step_size = float(self.model.data.scanDict['parameter_scan_step_size'])
+            scan_start = float(self.model.data.scanDict['parameter1_scan_from_value'])
+            scan_end = float(self.model.data.scanDict['parameter1_scan_to_value'])
+            scan_step_size = float(self.model.data.scanDict['parameter1_scan_step_size'])
             scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
             self.view.progressBar.setRange(0,len(scan_range+1))
         except ValueError:
             print("Enter a numerical value to conduct a scan")
-        self.scan_parameter = self.model.data.scanDict['parameter']
+        self.scan_parameter = self.model.data.scanDict['parameter1']
         self.scan_basedir = str(self.model.data.parameterDict['runs']['directory'])
         self.scan_basevalue = self.get_widget_value(self.get_object_by_accessible_name(self.scan_parameter))
         dictname, pv, param = self.split_accessible_name(self.scan_parameter)
@@ -613,8 +647,9 @@ class RunParameterController(QObject):
             dictname, pv, param = self.split_accessible_name(self.scan_parameter)
             # subdir = (self.scan_basedir + '/' + pv + '_' + str(current_scan_value)).replace('//','/')
             self.update_widgets_with_values('runs:directory', self.scan_basedir)
+
             self.thread = GenericThread(self.do_scan)
-            self.thread.finished.connect(self.save_settings_to_database)
+            self.thread.finished.connect(lambda:self.save_settings_to_database(self.view.autoPlotCheckbox.isChecked()))
             self.thread.finished.connect(self.continue_scan)
             self.thread.start()
             self.scan_no += 1
