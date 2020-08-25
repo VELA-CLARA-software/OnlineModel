@@ -60,7 +60,7 @@ class twissPlotWidget(multiPlotWidget):
     def __init__(self, **kwargs):
         super(twissPlotWidget, self).__init__(xmin=0, **kwargs)
         self.twissDataObjects = {}
-        self.set_horizontal_axis_label('s','m')
+        # self.set_horizontal_axis_label('s','m')
 
 
     def addTwissDirectory(self, directory, id, color=None):
@@ -161,12 +161,12 @@ class globalTwissPlotWidget(twissPlotWidget):
                   {'label': 'Momentum', 'name': 'cp', 'quantity': 'cp_eV', 'range': [0,50e6], 'units': 'eV/c', 'ymin': 0},
                   {'label': 'Momentum Spread', 'name': '&sigma;<sub>cp</sub>', 'quantity': 'sigma_cp_eV', 'range': [0,1e6], 'units': 'eV/c', 'ymin': 0},
                   'next_row',
-                  {'label': 'Bunch Length z', 'name': '&sigma;<sub>z</sub>', 'quantity': 'sigma_z', 'range': [0,5e-3], 'units': 'm', 'ymin': 0},
-                  {'label': 'Bunch Length t', 'name': '&sigma;<sub>t</sub>', 'quantity': 'sigma_t', 'range': [0,5e-12], 'units': 's', 'ymin': 0},
+                  {'label': 'Bunch Length z', 'name': '&sigma;<sub>z</sub>', 'quantity': 'sigma_z', 'range': [0,5e-3], 'units': 'm', 'ymin': 0, 'xlabel': 's (m)'},
+                  {'label': 'Bunch Length t', 'name': '&sigma;<sub>t</sub>', 'quantity': 'sigma_t', 'range': [0,5e-12], 'units': 's', 'ymin': 0, 'xlabel': 's (m)'},
                   ]
 
     def __init__(self, **kwargs):
-        super(globalTwissPlotWidget, self).__init__(**kwargs)
+        super(globalTwissPlotWidget, self).__init__(setTitles=False,**kwargs)
 
 
 class latticeTwissPlotWidget(twissPlotWidget):
@@ -179,12 +179,12 @@ class latticeTwissPlotWidget(twissPlotWidget):
                 {'label': 'Horizontal Beta Function', 'name': '&beta;<sub>x</sub>', 'quantity': 'beta_x', 'range': [0,200], 'units': 'm', 'ymin': 0},
                 {'label': 'Vertical Beta Function', 'name': '&beta;<sub>y</sub>', 'quantity': 'beta_y', 'range': [0,200], 'units': 'm', 'ymin': 0},
                 'next_row',
-                {'label': 'Horizontal Dispersion', 'name': '&eta;<sub>x</sub>', 'quantity': 'eta_x', 'range':  [-500e-3,500e-3], 'units': 'm'},
-                {'label': 'Horizontal Dispersion Prime', 'name': '&eta;<sub>x</sub>\'', 'quantity': 'eta_xp', 'range':  [-1,1], 'units': 'm'},
+                {'label': 'Horizontal Dispersion', 'name': '&eta;<sub>x</sub>', 'quantity': 'eta_x', 'range':  [-500e-3,500e-3], 'units': 'm', 'xlabel': 's (m)'},
+                {'label': 'Horizontal Dispersion Prime', 'name': '&eta;<sub>x</sub>\'', 'quantity': 'eta_xp', 'range':  [-1,1], 'units': 'm', 'xlabel': 's (m)'},
                   ]
 
     def __init__(self, **kwargs):
-        super(latticeTwissPlotWidget, self).__init__(**kwargs)
+        super(latticeTwissPlotWidget, self).__init__(setTitles=False,**kwargs)
 
 
 class beamTwissPlotWidget(twissPlotWidget):
@@ -197,12 +197,12 @@ class beamTwissPlotWidget(twissPlotWidget):
                    {'label': 'Horizontal Beta Function', 'name': '&beta;<sub>x</sub>', 'quantity': 'beta_x_beam', 'range': [0,200], 'units': 'm', 'ymin': 0},
                    {'label': 'Vertical Beta Function', 'name': '&beta;<sub>y</sub>', 'quantity': 'beta_y_beam', 'range': [0,200], 'units': 'm', 'ymin': 0},
                    'next_row',
-                   {'label': 'Horizontal Dispersion', 'name': '&eta;<sub>x</sub>', 'quantity': 'eta_x_beam', 'range':  [-500e-3,500e-3], 'units': 'm'},
-                   {'label': 'Horizontal Dispersion Prime', 'name': '&eta;<sub>x</sub>\'', 'quantity': 'eta_xp_beam', 'range':  [-1,1], 'units': 'm'},
+                   {'label': 'Horizontal Dispersion', 'name': '&eta;<sub>x</sub>', 'quantity': 'eta_x_beam', 'range':  [-500e-3,500e-3], 'units': 'm', 'xlabel': 's (m)'},
+                   {'label': 'Horizontal Dispersion Prime', 'name': '&eta;<sub>x</sub>\'', 'quantity': 'eta_xp_beam', 'range':  [-1,1], 'units': 'm', 'xlabel': 's (m)'},
                   ]
 
     def __init__(self, **kwargs):
-        super(beamTwissPlotWidget, self).__init__(**kwargs)
+        super(beamTwissPlotWidget, self).__init__(setTitles=False,**kwargs)
 
 
 pg.setConfigOptions(antialias=True)
