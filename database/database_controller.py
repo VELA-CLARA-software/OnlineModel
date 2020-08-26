@@ -76,7 +76,7 @@ class DatabaseController():
                 self.save_scan_information(run_id, **settings_to_save['scan'])
 
     def get_all_run_ids(self):
-        return self.reader.run_id_settings_dict.keys()
+        return self.reader.get_all_run_ids()
 
     def save_scan_information(self, *args, **kwargs):
         self.writer.save_entry_to_scan_table(*args, **kwargs)

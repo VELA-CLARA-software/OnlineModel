@@ -614,7 +614,7 @@ class RunParameterController(QObject):
             # subdir = (self.scan_basedir + '/' + pv + '_' + str(current_scan_value)).replace('//','/')
             self.update_widgets_with_values('runs:directory', self.scan_basedir)
             self.thread = GenericThread(self.do_scan)
-            self.thread.finished.connect(self.save_settings_to_database)
+            self.thread.finished.connect(lambda:self.save_settings_to_database(self.view.autoPlotCheckbox.isChecked()))
             self.thread.finished.connect(self.continue_scan)
             self.thread.start()
             self.scan_no += 1
