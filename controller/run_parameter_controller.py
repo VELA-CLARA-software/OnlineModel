@@ -191,6 +191,13 @@ class RunParameterController(QObject):
         self.populate_run_parameters_table()
         self.toggle_BSOL_tracking()
         self.toggle_BSOL_tracking()
+        self.set_run_table_column_headers_visibility(True)
+
+    def set_run_table_column_headers_visibility(self, visible):
+        # header_label_list = ["Load", "Run ID", "Plot", "Legend"]
+        # self.view.run_parameters_table.setRowCount(len(header_label_list))
+        # self.view.run_parameters_table.setHorizontalHeaderLabels(header_label_list)
+        self.view.run_parameters_table.horizontalHeader().setVisible(visible)
 
     def create_datatree_widget(self):
         # self.view.yaml_tree_widget = pg.DataTreeWidget()

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file '.\astra_comparison_gui_tabs_Linac.ui'
+# Form implementation generated from reading ui file 'astra_comparison_gui_tabs_Linac.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.0
 #
@@ -1256,13 +1256,21 @@ class Ui_MainWindow(object):
         self.run_parameters_table.setMaximumSize(QtCore.QSize(380, 16777215))
         self.run_parameters_table.setDragDropOverwriteMode(False)
         self.run_parameters_table.setAlternatingRowColors(True)
+        self.run_parameters_table.setRowCount(0)
         self.run_parameters_table.setColumnCount(4)
         self.run_parameters_table.setObjectName("run_parameters_table")
-        self.run_parameters_table.setRowCount(0)
+        item = QtWidgets.QTableWidgetItem()
+        self.run_parameters_table.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.run_parameters_table.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.run_parameters_table.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.run_parameters_table.setHorizontalHeaderItem(3, item)
         self.run_parameters_table.horizontalHeader().setVisible(False)
         self.run_parameters_table.horizontalHeader().setCascadingSectionResizes(True)
         self.run_parameters_table.horizontalHeader().setSortIndicatorShown(True)
-        self.run_parameters_table.horizontalHeader().setStretchLastSection(False)
+        self.run_parameters_table.horizontalHeader().setStretchLastSection(True)
         self.run_parameters_table.verticalHeader().setVisible(False)
         self.run_parameters_table.verticalHeader().setSortIndicatorShown(False)
         self.run_parameters_table.verticalHeader().setStretchLastSection(False)
@@ -1467,7 +1475,7 @@ class Ui_MainWindow(object):
         self.gridLayout.addWidget(self.main_tab_widget, 2, 1, 2, 2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1102, 21))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1102, 17))
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
@@ -1498,7 +1506,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuSettings.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.main_tab_widget.setCurrentIndex(0)
+        self.main_tab_widget.setCurrentIndex(1)
         self.tabWidget_4.setCurrentIndex(0)
         self.comboBox_3.setCurrentIndex(1)
         self.tabWidget_2.setCurrentIndex(0)
@@ -1822,6 +1830,14 @@ class Ui_MainWindow(object):
         self.main_tab_widget.setTabText(self.main_tab_widget.indexOf(self.scan_tab), _translate("MainWindow", "Scan"))
         self.run_parameters_table.setAccessibleName(_translate("MainWindow", "run_data:table"))
         self.run_parameters_table.setSortingEnabled(True)
+        item = self.run_parameters_table.horizontalHeaderItem(0)
+        item.setText(_translate("MainWindow", "Load"))
+        item = self.run_parameters_table.horizontalHeaderItem(1)
+        item.setText(_translate("MainWindow", "Run ID"))
+        item = self.run_parameters_table.horizontalHeaderItem(2)
+        item.setText(_translate("MainWindow", "Plot"))
+        item = self.run_parameters_table.horizontalHeaderItem(3)
+        item.setText(_translate("MainWindow", "Legend"))
         self.clearPlotsButton.setText(_translate("MainWindow", "Clear All Plots"))
         self.plots_yaml_tab.setTabText(self.plots_yaml_tab.indexOf(self.yaml_tab), _translate("MainWindow", "YAML"))
         self.main_tab_widget.setTabText(self.main_tab_widget.indexOf(self.run_Tab), _translate("MainWindow", "Runs"))
@@ -1847,3 +1863,13 @@ class Ui_MainWindow(object):
         self.actionRead_from_DBURT.setText(_translate("MainWindow", "Read from DBURT"))
 from detachable_tab_widget import DetachableTabWidget
 from pyqtgraph import DataTreeWidget, PlotWidget
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())
