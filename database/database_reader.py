@@ -241,6 +241,9 @@ class DatabaseReader():
         is_in_db, run_id = self.compare_entries(yaml_settings)
         return run_id
 
+    def get_all_run_ids(self):
+        return self.reader.run_id_settings_dict.keys()
+
 if __name__ == '__main__':
     db_reader = DatabaseReader()
     db_writer = database_writer.DatabaseWriter()

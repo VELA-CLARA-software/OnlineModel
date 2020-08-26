@@ -233,8 +233,8 @@ class beamPlotWidget(QWidget):
                     histy, histx = self.projection(xnew, xmult=-1, ymult=-1, range=xrange)
                     self.bottomcurves[id].setData(x=histx, y=histy, stepMode=True, fillLevel=0, brush=color)
                     # self.bottomcurves[id].setData(x=histx, y=histy, stepMode=True, pen=color)
-        self.rightBeamPlotWidget.setLabel('left', text=ydict['name'], units=ydict['units'])
-        self.bottomBeamPlotWidget.setLabel('bottom', text=xdict['name'], units=xdict['units'])
+        self.rightBeamPlotWidget.setLabel('left', text=ydict['name'], units=ydict['units'], **{'font-size': '12pt', 'font-family': 'Arial'})
+        self.bottomBeamPlotWidget.setLabel('bottom', text=xdict['name'], units=xdict['units'], **{'font-size': '12pt', 'font-family': 'Arial'})
         self.rightBeamPlotWidget.enableAutoRange(x=True)
         self.bottomBeamPlotWidget.enableAutoRange(y=True)
         if updateCurveHighlights:

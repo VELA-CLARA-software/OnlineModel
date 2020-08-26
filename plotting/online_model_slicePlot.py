@@ -43,14 +43,14 @@ class slicePlotWidget(multiPlotWidget):
         {'label': 'Current', 'quantity': 'slice_peak_current', 'units': 'A', 'text': 'I', 'name': 'I', 'range': [0,100]},
         {'label': 'Slice Relative Momentum Spread', 'quantity': 'slice_relative_momentum_spread', 'units': '%', 'name': '&sigma;<sub>cp</sub>/p', 'range': [0,0.2]},
         'next_row',
-        {'label': 'Slice Horizontal Beta Function', 'quantity': 'slice_beta_x', 'units': 'm', 'name': '&beta;<sub>x</sub>', 'range': [0,250]},
-        {'label': 'Slice Vertical Beta Function', 'quantity': 'slice_beta_y', 'units': 'm', 'name': '&beta;<sub>y</sub>', 'range': [0,250]},
+        {'label': 'Slice Horizontal Beta Function', 'quantity': 'slice_beta_x', 'units': 'm', 'name': '&beta;<sub>x</sub>', 'range': [0,250], 'xlabel': 't (ps)'},
+        {'label': 'Slice Vertical Beta Function', 'quantity': 'slice_beta_y', 'units': 'm', 'name': '&beta;<sub>y</sub>', 'range': [0,250], 'xlabel': 't (ps)'},
     ]
 
     def __init__(self, **kwargs):
-        super(slicePlotWidget, self).__init__(**kwargs)
+        super(slicePlotWidget, self).__init__(setTitles=False,**kwargs)
         self.beams = {}
-        self.set_horizontal_axis_label('t','ps')
+        # self.set_horizontal_axis_label('t','ps')
         self.slicePlotSliceWidthWidget = QSpinBox()
         self.slicePlotSliceWidthWidget.setMaximum(500)
         self.slicePlotSliceWidthWidget.setValue(25)
@@ -101,7 +101,7 @@ class slicePlotWidget(multiPlotWidget):
                     # color = self.colors[n]
                     # pen = pg.mkPen(color=color, style=self.styles[self.plotColor % len(self.styles)], width=3)
                     exponent = np.floor(np.log10(np.abs(beamobject.slice_length)))
-                    x = 10**(12) * np.array((beamobject.slice_bins - np.mean(beamobject.slice_bins)))
+                    x = 1e12 * np.array((beamobject.slice_bins - np.mean(beamobject.slice_bins)))
                     # self.multiPlot.setRange(xRange=[min(x),max(x)])
                     y = getattr(beamobject, param['quantity'])
                     # print('#################################################################')
@@ -151,7 +151,7 @@ class slicePlotWidget(multiPlotWidget):
             if not param == 'next_row':
                 label = param['label']
                 exponent = np.floor(np.log10(np.abs(beam.slice_length)))
-                x = 10**(12) * np.array((beam.slice_bins - np.mean(beam.slice_bins)))
+                x = 1e12 * np.array((beam.slice_bins - np.mean(beam.slice_bins)))
                 # self.multiPlotWidgets[label].setRange(xRange=[min(x),max(x)])
                 y = getattr(beam, param['quantity'])
                 if name in self.curves and label in self.curves[name]:
