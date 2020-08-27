@@ -91,14 +91,29 @@ class expandableTabWidget(QtWidgets.QTabWidget):
         # Properties
         # self.setMovable(True)
         # self.setTabsClosable(True)
-
+        self.buttonWidget = QtWidgets.QWidget()
+        self.buttonWidgetLayout = QtWidgets.QHBoxLayout()
+        self.buttonWidgetLayout.setSpacing(0)
+        self.buttonWidgetLayout.setContentsMargins(0,0,0,0)
+        self.buttonWidget.setLayout(self.buttonWidgetLayout)
+        # Add tab button
         self.plusButton = QtWidgets.QToolButton(self)
         self.plusButton.setText("+")
         self.plusButton.setFixedSize(QtCore.QSize(20, 20))
-        self.setCornerWidget(self.plusButton)
+        self.plusButton.setToolTip('Add Scanning Dimension')
+        self.buttonWidgetLayout.addWidget(self.plusButton)
+        # Clear scanning checkboxes
+        self.clearButton = QtWidgets.QToolButton(self)
+        self.clearButton.setText("Clear")
+        self.clearButton.setFixedSize(QtCore.QSize(35, 20))
+        self.clearButton.setToolTip('Clear all Scan checkboxes')
+        self.buttonWidgetLayout.addWidget(self.clearButton)
+        # Set Corner widget
+        self.setCornerWidget(self.buttonWidget)
 
         # Signals
         self.plusButton.clicked.connect(self.addScanTab)
+        self.clearButton.clicked.connect(self.clearScans)
         # self.tab.plusClicked.connect(self.addTab)
         # self.tab.tabMoved.connect(self.tab.moveTab)
         self.tab.tabCloseRequested.connect(self.removeScanTab)
@@ -116,6 +131,10 @@ class expandableTabWidget(QtWidgets.QTabWidget):
         id = self.widget(tab).id
         self.scanTabRemoved.emit(id)
         self.removeTab(tab)
+
+    def clearScans(self):
+        for id, tab in self.tabs.items():
+            tab.scanCheckbox.setCheckState(QtCore.Qt.Unchecked)
 
 class TabExample(QtWidgets.QMainWindow):
     def __init__(self):
