@@ -661,7 +661,7 @@ class Ui_MainWindow(object):
         self.buckingsol_strength = QtWidgets.QDoubleSpinBox(self.widget_3)
         self.buckingsol_strength.setDecimals(3)
         self.buckingsol_strength.setMinimum(-0.5)
-        self.buckingsol_strength.setMaximum(0.0)
+        self.buckingsol_strength.setMaximum(0.5)
         self.buckingsol_strength.setSingleStep(0.005)
         self.buckingsol_strength.setProperty("value", -0.311)
         self.buckingsol_strength.setObjectName("buckingsol_strength")
