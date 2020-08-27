@@ -70,10 +70,10 @@ class DatabaseController():
                 self.writer.save_dict_to_db(settings_to_save, run_id, lattices=lattices_to_be_saved)
                 # We also need to save entries to the run table
                 self.reader.add_to_run_id_and_settings_dict_from_database(run_id)
-            elif 'scan' in settings_to_save and settings_to_save['scan']['parameter_scan']:
+            # elif 'scan' in settings_to_save and settings_to_save['scan']['parameter_scan']:
                 # If we run a scan, but a settings exists, we still need to add it to the scans table, so we can join all of the scan files up
                 # Some of the directories will be common but we will be unique in the parameter and the start/stop/step/value parameters
-                self.save_scan_information(run_id, **settings_to_save['scan'])
+                # self.save_scan_information(run_id, **settings_to_save['scan'])
 
     def get_all_run_ids(self):
         return self.reader.get_all_run_ids()

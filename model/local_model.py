@@ -33,8 +33,8 @@ def convert_data_types( export_dict={}, data_dict={}, keyname=None):
 def create_yaml_dictionary(data):
     export_dict = dict()
     data_dicts = ['generator'] + lattices.lattices + ['runs']
-    if data['scanDict']['parameter_scan']:
-        data_dicts.append('scan')
+    # if data['scanDict']['parameter_scan']:
+    data_dicts.append('scan')
     for n in data_dicts:
         export_dict = convert_data_types(export_dict, data['parameterDict'][n], n)
     return export_dict
@@ -259,17 +259,11 @@ class Model(object):
         if not os.path.exists(dir):
             os.makedirs(dir, exist_ok=True)
 
-    def export_parameter_values_to_yaml_file(self, auto=False):
+    def export_parameter_values_to_yaml_file(self, auto=False, filename="", directory="."):
         export_dict = dict()
         if auto:
             directory = 'test/'+self.directoryname
             filename = 'settings.yaml'
-        else:
-            dialog = QFileDialog()
-            filename, _filter = QFileDialog.getSaveFileNameAndFilter(dialog, caption='Save File', directory='c:\\',
-                                                                 filter="YAML Files (*.YAML *.YML *.yaml *.yml")
-            filename = filename[0] if isinstance(filename,tuple) else filename
-            dirctory, filename = os.path.split(filename)
         if not filename == "":
             # print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
             self.create_subdirectory(directory)
