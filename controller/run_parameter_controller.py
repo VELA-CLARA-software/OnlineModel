@@ -274,6 +274,17 @@ class RunParameterController(QObject):
             checkbox.setCheckState(Qt.Checked)
         # self.run_plot_colors[run_id] = color
 
+    def enable_plot_on_row(self, row):
+        table = self.view.run_parameters_table
+        checkbox = table.cellWidget(row, self.run_table_columns['plot_checkbox'])
+        checkbox.setCheckState(Qt.Checked)
+        # self.run_plot_colors[run_id] = color
+
+    def get_id_for_row(self, row):
+        table = self.view.run_parameters_table
+        item = table.item(row, self.run_table_columns['run_id'])
+        return item.text()
+
     def clear_all_plots(self):
         table = self.view.run_parameters_table
         for row in range(0,table.rowCount()):

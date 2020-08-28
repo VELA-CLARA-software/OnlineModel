@@ -18,11 +18,6 @@ from model import local_model as lmodel
 from detachable_tab_widget import DetachableTabWidget
 import argparse
 
-parser = argparse.ArgumentParser(description='Add Sets.')
-parser.add_argument('-s', '--server', default=None, type=str)
-parser.add_argument('-p', '--port', default='8192', type=str)
-args = parser.parse_args()
-
 class MainApp(QObject):
 
     def __init__(self, app, sys_argv):
@@ -46,22 +41,26 @@ class MainApp(QObject):
         # self.DatabaseController = database_controller.DatabaseController(self.socket)
         #self.PostProcessingController = post_processing_controller.PostProcessingController(app, self.view, self.model)
         self.UnifiedController = unified_controller.UnifiedController(self.RunParameterController, self.DynamicPlotController, self.DatabaseController)
+
+    def show(self):
         self.MainWindow.show()
 
     def initialise_zeromq(self):
-        if args.server is not None:
-            context = zmq.Context()
-            self.socket = context.socket(zmq.REQ)
-            self.socket.setsockopt(zmq.LINGER, 1)
-            print('Connecting to server at ',args.server,':',args.port)
-            self.socket.connect("tcp://"+args.server+":"+args.port+"")
-            print('sending hello!')
-            self.socket.send_pyobj('hello')
-            print('waiting for response!')
-            return self.zmq_timeout_pyobj()
+        if 'args' in globals():
+            if args.server is not None:
+                context = zmq.Context()
+                self.socket = context.socket(zmq.REQ)
+                self.socket.setsockopt(zmq.LINGER, 1)
+                print('Connecting to server at ',args.server,':',args.port)
+                self.socket.connect("tcp://"+args.server+":"+args.port+"")
+                print('sending hello!')
+                self.socket.send_pyobj('hello')
+                print('waiting for response!')
+                return self.zmq_timeout_pyobj()
+            else:
+                return False
         else:
             return False
-            # raise IOError("Timeout processing auth request")
 
     def zmq_timeout_pyobj(self):
         poller = zmq.Poller()
@@ -72,7 +71,148 @@ class MainApp(QObject):
         else:
             return False
 
+    def modify_widget(self, aname, value):
+        self.RunParameterController.update_widgets_with_values(aname, value)
+
+    def list_widget_layouts(self):
+        return self.RunParameterController.runParameterLayouts
+
+    def list_widgets(self):
+        return [w for w in self.RunParameterController.accessibleNames.keys() if w is not '']
+
+    def list_run_ids(self):
+        return self.RunParameterController.model.get_all_directory_names()
+
+    def plot_run_id(self, id):
+        self.RunParameterController.enable_plot_on_id(id)
+
+    def plot_row(self, row):
+        self.RunParameterController.enable_plot_on_row(row)
+
+    def get_id_for_row(self, row):
+        return self.RunParameterController.get_id_for_row(row)
+
+    def track(self):
+        self.view.runButton.clicked.emit()
+
+    def set_plot_on_track(self, checked=True):
+        self.view.autoPlotCheckbox.setCheckState(checked)
+
+    def get_screen_indices(self):
+        combobox = self.DynamicPlotController.ompbeam.fileSelector
+        return [[i, combobox.itemData(i)[0]] for i in range(combobox.count())]
+
+    def set_screen_index(self, index):
+        combobox = self.DynamicPlotController.ompbeam.fileSelector
+        combobox.setCurrentIndex(index)
+
+    def set_screen_name(self, screen):
+        combobox = self.DynamicPlotController.ompbeam.fileSelector
+        indices = list(zip(*self.get_screen_indices()))[1]
+        combobox.setCurrentIndex(indices.index(screen))
+
+    def get_twiss_at_screen_for_id(self, run_id):
+        ompbeam = self.DynamicPlotController.ompbeam
+        zpos = ompbeam.fileSelector.currentData()[1]
+        return self.get_twiss_at_zpos_for_id(run_id, zpos)
+
+    def get_twiss_at_zpos_for_id(self, run_id, zpos):
+        ompbeam = self.DynamicPlotController.ompbeam
+        twissData = ompbeam.globalTwissPlotWidget.twissDataObjects[run_id]
+        twissValues = {}
+        for row, twiss in enumerate(ompbeam.twissFunctions):
+            if not twiss[0] == 'run_id':
+                twissValues[twiss[0]] = twissData.get_parameter_at_z(twiss[0], zpos)
+        return twissValues
+
+    def get_twiss_at_zpos_for_row(self, row, zpos):
+        self.plot_row(row)
+        id = self.get_id_for_row(row)
+        return self.get_twiss_at_zpos_for_id(id, zpos)
+
+    def get_twiss_at_screen_for_row(self, row):
+        self.plot_row(row)
+        id = self.get_id_for_row(row)
+        return self.get_twiss_at_screen_for_id(id)
+
+    def get_twiss(self):
+        ompbeam = self.DynamicPlotController.ompbeam
+        zpos = ompbeam.fileSelector.currentData()[1]
+        return self.get_twiss_at_zpos(zpos)
+
+    def get_twiss_at_zpos(self, zpos):
+        ompbeam = self.DynamicPlotController.ompbeam
+        twissValues = {}
+        for run_id in ompbeam.globalTwissPlotWidget.twissDataObjects:
+            twissData = ompbeam.globalTwissPlotWidget.twissDataObjects[run_id]
+            twissValues[run_id] = {}
+            for row, twiss in enumerate(ompbeam.twissFunctions):
+                if not twiss[0] == 'run_id':
+                    twissValues[run_id][twiss[0]] = twissData.get_parameter_at_z(twiss[0], zpos)
+        return twissValues
+
+    def get_slice_data(self):
+        slicedata = {}
+        sliceWidget = self.DynamicPlotController.ompbeam.slicePlotWidget
+        for id in sliceWidget.curves.keys():
+            slicedata[id] = self.get_slice_data_for_id(id)
+        return slicedata
+
+    def get_slice_data_for_row(self, row):
+        self.plot_row(row)
+        id = self.get_id_for_row(row)
+        return self.get_slice_data_for_id(id)
+
+    def get_slice_data_for_id(self, id):
+        slicedata = {}
+        sliceWidget = self.DynamicPlotController.ompbeam.slicePlotWidget
+        allplotdataitems = sliceWidget.curves[id]
+        for var, plotdataitem in allplotdataitems.items():
+            slicedata['t'] = plotdataitem.xData
+            slicedata[var] = plotdataitem.yData
+        return slicedata
+
+    def get_beam_data(self):
+        beamdata = {}
+        beamWidget = self.DynamicPlotController.ompbeam.beamPlotWidget
+        for id in beamWidget.curves.keys():
+            beamdata[id] = self.get_beam_data_for_id(id)
+        return beamdata
+
+    def get_beam_data_for_row(self, row):
+        self.plot_row(row)
+        id = self.get_id_for_row(row)
+        return self.get_beam_data_for_id(id)
+
+    def get_beam_data_for_id(self, id):
+        beamdata = {}
+        beamWidget = self.DynamicPlotController.ompbeam.beamPlotWidget
+        plotdataitem = beamWidget.curves[id]
+        xvar = beamWidget.get_horizontal_variable()
+        yvar = beamWidget.get_vertical_variable()
+        beamdata[xvar['quantity']] = plotdataitem.xData
+        beamdata[yvar['quantity']] = plotdataitem.yData
+        return beamdata
+
+    def get_beam_objects(self):
+        return self.DynamicPlotController.ompbeam.beamPlotWidget.beams
+
+    def get_beam_object_for_row(self, row):
+        self.plot_row(row)
+        id = self.get_id_for_row(row)
+        return self.get_beam_object_for_id(id)
+
+    def get_beam_object_for_id(self, id):
+        beamWidget = self.DynamicPlotController.ompbeam.beamPlotWidget
+        return beamWidget.beams[id]
+
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Add Sets.')
+    parser.add_argument('-s', '--server', default=None, type=str)
+    parser.add_argument('-p', '--port', default='8192', type=str)
+    args = parser.parse_args()
+
     app = QApplication(sys.argv)
     app_object = MainApp(app, sys.argv)
+    app_object.show()
     sys.exit(app.exec_())

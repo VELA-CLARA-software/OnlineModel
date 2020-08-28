@@ -198,6 +198,12 @@ class beamPlotWidget(QWidget):
             return color
         return None
 
+    def get_horizontal_variable(self):
+        return self.beamParams[str(self.beamPlotXAxisCombo.currentText())]
+
+    def get_vertical_variable(self):
+        return self.beamParams[str(self.beamPlotYAxisCombo.currentText())]
+
     def updateBeamPlot(self, updatebeam=True, updateprojections=True, updateCurveHighlights=True):
         xdict = self.beamParams[str(self.beamPlotXAxisCombo.currentText())]
         ydict = self.beamParams[str(self.beamPlotYAxisCombo.currentText())]
