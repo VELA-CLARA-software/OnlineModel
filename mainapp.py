@@ -1,9 +1,11 @@
 import sys
+import time
 import os
 import zmq
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
+from PyQt5.QtTest import *
 from pyqtgraph import DataTreeWidget
 QApplication.setAttribute(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
 sys.path.append(os.path.join(str(os.path.dirname(os.path.abspath(__file__))), 'model'))
@@ -74,6 +76,9 @@ class MainApp(QObject):
     def modify_widget(self, aname, value):
         self.RunParameterController.update_widgets_with_values(aname, value)
 
+    def get_widget_value(self, aname):
+        return self.RunParameterController.get_widget_value(self.RunParameterController.get_object_by_accessible_name(aname))
+
     def list_widget_layouts(self):
         return self.RunParameterController.runParameterLayouts
 
@@ -89,11 +94,20 @@ class MainApp(QObject):
     def plot_row(self, row):
         self.RunParameterController.enable_plot_on_row(row)
 
+    def clear_all_plots(self):
+        self.RunParameterController.clear_all_plots()
+
     def get_id_for_row(self, row):
         return self.RunParameterController.get_id_for_row(row)
 
     def track(self):
         self.view.runButton.clicked.emit()
+        while not self.view.runButton.isEnabled():
+            QTest.qWait(10)
+        # self.RunParameterController.enable_run_button()
+        # self.RunParameterController.save_settings_to_database(self.view.autoPlotCheckbox.isChecked())
+        # self.RunParameterController.update_directory_widget()
+        return self.get_widget_value('runs:directory')
 
     def set_plot_on_track(self, checked=True):
         self.view.autoPlotCheckbox.setCheckState(checked)
@@ -117,6 +131,7 @@ class MainApp(QObject):
         return self.get_twiss_at_zpos_for_id(run_id, zpos)
 
     def get_twiss_at_zpos_for_id(self, run_id, zpos):
+        self.plot_run_id(run_id)
         ompbeam = self.DynamicPlotController.ompbeam
         twissData = ompbeam.globalTwissPlotWidget.twissDataObjects[run_id]
         twissValues = {}
@@ -151,6 +166,21 @@ class MainApp(QObject):
                     twissValues[run_id][twiss[0]] = twissData.get_parameter_at_z(twiss[0], zpos)
         return twissValues
 
+    def get_twiss_object_for_row(self, row):
+        id = self.get_id_for_row(row)
+        return self.get_twiss_object_for_id(id)
+
+    def get_twiss_object_for_id(self, id):
+        self.plot_run_id(id)
+        twissWidget = self.DynamicPlotController.ompbeam.latticeTwissPlotWidget
+        self.app.processEvents()
+        i = 0
+        while not id in twissWidget.twissDataObjects and i < 10:
+            time.sleep(0.01)
+            self.app.processEvents()
+            i += 1
+        return twissWidget.twissDataObjects[id]
+
     def get_slice_data(self):
         slicedata = {}
         sliceWidget = self.DynamicPlotController.ompbeam.slicePlotWidget
@@ -159,11 +189,11 @@ class MainApp(QObject):
         return slicedata
 
     def get_slice_data_for_row(self, row):
-        self.plot_row(row)
         id = self.get_id_for_row(row)
         return self.get_slice_data_for_id(id)
 
     def get_slice_data_for_id(self, id):
+        self.plot_run_id(id)
         slicedata = {}
         sliceWidget = self.DynamicPlotController.ompbeam.slicePlotWidget
         allplotdataitems = sliceWidget.curves[id]
@@ -180,11 +210,11 @@ class MainApp(QObject):
         return beamdata
 
     def get_beam_data_for_row(self, row):
-        self.plot_row(row)
         id = self.get_id_for_row(row)
         return self.get_beam_data_for_id(id)
 
     def get_beam_data_for_id(self, id):
+        self.plot_run_id(id)
         beamdata = {}
         beamWidget = self.DynamicPlotController.ompbeam.beamPlotWidget
         plotdataitem = beamWidget.curves[id]
@@ -198,13 +228,20 @@ class MainApp(QObject):
         return self.DynamicPlotController.ompbeam.beamPlotWidget.beams
 
     def get_beam_object_for_row(self, row):
-        self.plot_row(row)
         id = self.get_id_for_row(row)
         return self.get_beam_object_for_id(id)
 
     def get_beam_object_for_id(self, id):
+        self.plot_run_id(id)
         beamWidget = self.DynamicPlotController.ompbeam.beamPlotWidget
         return beamWidget.beams[id]
+
+    def export_yaml(self, *args, **kwargs):
+        self.RunParameterController.export_parameter_values_to_yaml_file(*args, **kwargs)
+
+    def import_yaml(self, *args, **kwargs):
+        self.RunParameterController.import_parameter_values_from_yaml_file(*args, **kwargs)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add Sets.')

@@ -1649,7 +1649,7 @@
                   <double>0.001000000000000</double>
                  </property>
                  <property name="value">
-                  <double>0.250000000000000</double>
+                  <double>0.225000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -1709,7 +1709,7 @@
                   <double>0.010000000000000</double>
                  </property>
                  <property name="value">
-                  <double>0.050000000000000</double>
+                  <double>0.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -1756,7 +1756,7 @@
                   <double>0.010000000000000</double>
                  </property>
                  <property name="value">
-                  <double>-0.050000000000000</double>
+                  <double>0.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -2616,7 +2616,7 @@
                   <double>5.000000000000000</double>
                  </property>
                  <property name="value">
-                  <double>250.000000000000000</double>
+                  <double>100.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -2695,12 +2695,12 @@
                  </property>
                  <item>
                   <property name="text">
-                   <string>Gaussian</string>
+                   <string>Uniform</string>
                   </property>
                  </item>
                  <item>
                   <property name="text">
-                   <string>Uniform</string>
+                   <string>Gaussian</string>
                   </property>
                  </item>
                 </widget>
@@ -2709,28 +2709,6 @@
                 <widget class="QLabel" name="label_32">
                  <property name="text">
                   <string>Cut-offs</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QSpinBox" name="spinBox_10">
-                 <property name="toolTip">
-                  <string>Only for Gaussian distributions</string>
-                 </property>
-                 <property name="accessibleName">
-                  <string>generator:transverse_cutoff:value</string>
-                 </property>
-                 <property name="suffix">
-                  <string> sigma</string>
-                 </property>
-                 <property name="prefix">
-                  <string/>
-                 </property>
-                 <property name="maximum">
-                  <number>6</number>
-                 </property>
-                 <property name="value">
-                  <number>3</number>
                  </property>
                 </widget>
                </item>
@@ -2748,6 +2726,31 @@
                 <widget class="QLineEdit" name="lineEdit">
                  <property name="enabled">
                   <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QDoubleSpinBox" name="doubleSpinBox_10">
+                 <property name="toolTip">
+                  <string>Only for Gaussian distributions</string>
+                 </property>
+                 <property name="accessibleName">
+                  <string>generator:transverse_cutoff:value</string>
+                 </property>
+                 <property name="suffix">
+                  <string> sigma</string>
+                 </property>
+                 <property name="decimals">
+                  <number>1</number>
+                 </property>
+                 <property name="minimum">
+                  <double>0.100000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>6.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>3.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -2867,25 +2870,6 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="1">
-                <widget class="QSpinBox" name="spinBox_11">
-                 <property name="toolTip">
-                  <string>Only for Gaussian distributions</string>
-                 </property>
-                 <property name="accessibleName">
-                  <string>generator:longitudinal_cutoff:value</string>
-                 </property>
-                 <property name="suffix">
-                  <string> sigma</string>
-                 </property>
-                 <property name="maximum">
-                  <number>6</number>
-                 </property>
-                 <property name="value">
-                  <number>3</number>
-                 </property>
-                </widget>
-               </item>
                <item row="4" column="0">
                 <widget class="QLabel" name="label_29">
                  <property name="text">
@@ -2912,6 +2896,31 @@
                  </property>
                  <property name="value">
                   <double>0.900000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QDoubleSpinBox" name="doubleSpinBox_11">
+                 <property name="toolTip">
+                  <string>Only for Gaussian distributions</string>
+                 </property>
+                 <property name="accessibleName">
+                  <string>generator:longitudinal_cutoff:value</string>
+                 </property>
+                 <property name="suffix">
+                  <string> sigma</string>
+                 </property>
+                 <property name="decimals">
+                  <number>1</number>
+                 </property>
+                 <property name="minimum">
+                  <double>0.100000000000000</double>
+                 </property>
+                 <property name="maximum">
+                  <double>6.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>3.000000000000000</double>
                  </property>
                 </widget>
                </item>
@@ -3003,7 +3012,7 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_9">
           <item>
-           <widget class="QTableWidget" name="run_parameters_table">
+           <widget class="QTableView" name="run_parameters_table">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -3012,13 +3021,13 @@
             </property>
             <property name="minimumSize">
              <size>
-              <width>380</width>
+              <width>365</width>
               <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>380</width>
+              <width>365</width>
               <height>16777215</height>
              </size>
             </property>
@@ -3031,37 +3040,18 @@
             <property name="alternatingRowColors">
              <bool>true</bool>
             </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::NoSelection</enum>
+            </property>
             <property name="sortingEnabled">
              <bool>true</bool>
             </property>
-            <property name="columnCount">
-             <number>4</number>
-            </property>
             <attribute name="horizontalHeaderVisible">
-             <bool>false</bool>
-            </attribute>
-            <attribute name="horizontalHeaderCascadingSectionResizes">
-             <bool>true</bool>
-            </attribute>
-            <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-             <bool>true</bool>
-            </attribute>
-            <attribute name="horizontalHeaderStretchLastSection">
              <bool>false</bool>
             </attribute>
             <attribute name="verticalHeaderVisible">
              <bool>false</bool>
             </attribute>
-            <attribute name="verticalHeaderShowSortIndicator" stdset="0">
-             <bool>false</bool>
-            </attribute>
-            <attribute name="verticalHeaderStretchLastSection">
-             <bool>false</bool>
-            </attribute>
-            <column/>
-            <column/>
-            <column/>
-            <column/>
            </widget>
           </item>
           <item>

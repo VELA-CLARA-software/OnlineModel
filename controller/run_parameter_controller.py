@@ -7,6 +7,7 @@ except:
     from PyQt5.QtWidgets import *
 import database.run_parameters_parser as yaml_parser
 from model.local_model import create_yaml_dictionary
+import controller.run_table as run_table
 import sys, os
 import time
 import collections
@@ -190,6 +191,7 @@ class RunParameterController(QObject):
         self.run_plots = []
         self.run_plot_colors = {}
         self.tracking_success = False
+        start = time.time()
         self.create_datatree_widget()
         self.populate_run_parameters_table()
         self.toggle_BSOL_tracking()
@@ -200,9 +202,14 @@ class RunParameterController(QObject):
         # layout = self.view.run_splitter
         # layout.addWidget(self.view.yaml_tree_widget)
         table = self.view.run_parameters_table
-        table.cellClicked.connect(self.show_yaml_in_datatree)
-        table.cellDoubleClicked.connect(self.emit_run_id_clicked_signal)
-        table.resizeColumnsToContents()
+        table.setColumnWidth(0,10)
+        table.setColumnWidth(2,10)
+        table.setColumnWidth(3,10)
+        self.tablemodel = run_table.RunModel([], self)
+        table.setModel(self.tablemodel)
+        table.setItemDelegateForColumn(0, run_table.LoadButtonDelegate(table, self))
+        table.setItemDelegateForColumn(2, run_table.PlotCheckboxDelegate(table, self))
+        table.setItemDelegateForColumn(3, run_table.PlotColorDelegate(table, self))
 
     def show_yaml_in_datatree(self, row, col):
         table = self.view.run_parameters_table
@@ -217,40 +224,23 @@ class RunParameterController(QObject):
     def emit_run_id_clicked_signal(self, row, col):
         table = self.view.run_parameters_table
         runno = table.item(row, self.run_table_columns['run_id']).text()
-        # print('clicked run_id = ', runno)
         self.run_id_clicked.emit(str(runno))
 
     def populate_run_parameters_table(self):
+        timer = QElapsedTimer()
+        timer.start()
         table = self.view.run_parameters_table
-        table.setEditTriggers(QTableWidget.NoEditTriggers)
-        table.clearContents()
-        table.setRowCount(0)
+        model = table.model()
+        if model is not None:
+            table.setModel(None)
+            model.deleteLater()
         dirnames = self.model.get_all_directory_names()
-        for k,v in enumerate(reversed(dirnames)):
-            self.add_run_table_row(k, v)
-
-    def add_run_table_row(self, k, v, row=None):
-        table = self.view.run_parameters_table
-        rowPosition = table.rowCount() if row is None else row
-        table.insertRow(rowPosition)
-        # table.setItem(rowPosition, 0, QTableWidgetItem(str(int(k))))
-        dir = os.path.basename(v)
-        table.setItem(rowPosition, self.run_table_columns['run_id'], QTableWidgetItem(str(dir)))
-        open_folder_button = QPushButton('Open')
-        open_folder_button.setEnabled(False)
-        open_folder_button.clicked.connect(lambda : self.open_folder_on_server(dir))
-        load_run_button = QPushButton('Load')
-        load_run_button.setEnabled(True)
-        load_run_button.setMaximumSize(50,50)
-        load_run_button.clicked.connect(lambda : self.load_yaml_from_db(dir))
-        table.setCellWidget(rowPosition, self.run_table_columns['load_run_button'], load_run_button)
-        add_plot_button = QCheckBox('Plot')
-        if dir in self.run_plots:
-            add_plot_button.setChecked(True)
-            self.setrunplotcolor(rowPosition, self.run_plot_colors[dir])
-        add_plot_button.stateChanged.connect(lambda x: self.emit_plot_signals(k, v, x))
-        table.setCellWidget(rowPosition, self.run_table_columns['plot_checkbox'], add_plot_button)
-        table.resizeColumnsToContents()
+        self.tablemodel = run_table.RunModel(list(reversed(dirnames)), self)
+        table.setModel(self.tablemodel)
+        table.setColumnWidth(0,12)
+        table.setColumnWidth(1,228)
+        table.setColumnWidth(2,12)
+        table.setColumnWidth(3,12)
 
     def delete_run_id(self, run_id):
         self.delete_run_id_signal.emit(run_id)
@@ -258,53 +248,46 @@ class RunParameterController(QObject):
 
     def setrunplotcolor(self, row, color):
         table = self.view.run_parameters_table
-        colorWidget = pg.ColorButton()
-        colorWidget.setEnabled(False)
-        colorWidget.setColor(color)
-        table.setCellWidget(row, self.run_table_columns['plot_color'], colorWidget)
-        run_id = table.item(row, self.run_table_columns['run_id']).text()
+        run_id = table.model()._data[row]
         self.run_plot_colors[run_id] = color
+        # self.populate_run_parameters_table()
 
     def enable_plot_on_id(self, id):
         table = self.view.run_parameters_table
-        items = table.findItems(id, Qt.MatchExactly)
-        for item in items:
-            row = item.row()
-            checkbox = table.cellWidget(row, self.run_table_columns['plot_checkbox'])
-            checkbox.setCheckState(Qt.Checked)
-        # self.run_plot_colors[run_id] = color
+        row = table.model()._data.index(id)
+        self.emit_plot_signals(row, id, Qt.Checked)
+        self.populate_run_parameters_table()
 
     def enable_plot_on_row(self, row):
         table = self.view.run_parameters_table
-        checkbox = table.cellWidget(row, self.run_table_columns['plot_checkbox'])
-        checkbox.setCheckState(Qt.Checked)
-        # self.run_plot_colors[run_id] = color
+        item = table.model()._data[row]
+        self.emit_plot_signals(row, item, Qt.Checked)
+        self.populate_run_parameters_table()
 
     def get_id_for_row(self, row):
         table = self.view.run_parameters_table
-        item = table.item(row, self.run_table_columns['run_id'])
-        return item.text()
+        item = table.model()._data[row]
+        return item
 
     def clear_all_plots(self):
-        table = self.view.run_parameters_table
-        for row in range(0,table.rowCount()):
-            checkbox = table.cellWidget(row, self.run_table_columns['plot_checkbox'])
-            checkbox.setCheckState(Qt.Unchecked)
-        # self.run_plot_colors[run_id] = color
+        [self.remove_plot_signal.emit(v) for v in self.run_plots]
+        self.run_plots = []
+        self.run_plot_colors = {}
+        self.populate_run_parameters_table()
 
     def open_folder_on_server(self, dir):
         remote_dir = self.model.get_absolute_folder_location(dir)
         os.startfile(remote_dir)
 
     def emit_plot_signals(self, k, v, state):
-        if state == Qt.Checked:
-            self.add_plot_signal.emit(k,v)
+        if state and not v in self.run_plots:
             self.run_plots.append(v)
-        elif state == Qt.Unchecked:
-            self.remove_plot_signal.emit(v)
+            self.add_plot_signal.emit(k,v)
+        elif v in self.run_plots:
             self.run_plots.remove(v)
-            table = self.view.run_parameters_table
-            table.removeCellWidget(k, self.run_table_columns['plot_color'])
+            del self.run_plot_colors[v]
+            self.remove_plot_signal.emit(v)
+        self.populate_run_parameters_table()
 
     def toggle_BSOL_tracking(self):
         widget = self.view.bsol_track_checkBox
@@ -485,7 +468,7 @@ class RunParameterController(QObject):
                     else:
                         widget.setChecked(False)
                 elif type(widget) is QComboBox:
-                    index = widget.findText(value)
+                    index = widget.findText(str(value))
                     # print('combo:',widget.objectName(),'value = ', value, 'index = ', index)
                     if index == -1:
                         index = widget.findData(value)
@@ -496,7 +479,7 @@ class RunParameterController(QObject):
 
     ## Need to port this to the unified controller
     @pyqtSlot()
-    def import_parameter_values_from_yaml_file(self, filename=None):
+    def import_parameter_values_from_yaml_file(self, filename=None, directory=None):
         if filename is None:
             dialog = QFileDialog()
             filename = QFileDialog.getOpenFileName(dialog, caption='Open file',
@@ -504,6 +487,8 @@ class RunParameterController(QObject):
                                                          filter="YAML files (*.YAML *.YML *.yaml *.yml)")
         filename = filename[0] if isinstance(filename,tuple) else filename
         filename = str(filename)
+        if directory is not None and filename is not None:
+            filename = os.path.join(directory, filename)
         if not filename == '' and not filename is None and (filename[-4:].lower() == '.yml' or filename[-5:].lower() == '.yaml'):
             loaded_parameter_dict = yaml_parser.parse_parameter_input_file(filename)
             self.update_widgets_from_yaml_dict(loaded_parameter_dict)
@@ -518,15 +503,20 @@ class RunParameterController(QObject):
         for (parameter, value) in loaded_parameter_dict.items():
                 self.update_widgets_with_values(parameter, value)
 
-    def export_parameter_values_to_yaml_file(self, auto=False):
-        if not auto:
+    def export_parameter_values_to_yaml_file(self, auto=False, filename=None, directory=None):
+        if auto is True:
+            self.model.export_parameter_values_to_yaml_file(auto=True)
+            return
+        elif filename is None and directory is None:
             dialog = QFileDialog()
             filename, _filter = QFileDialog.getSaveFileName(dialog, caption='Save File', directory='.',
                                                                  filter="YAML Files (*.YAML *.YML *.yaml *.yml")
             filename = filename[0] if isinstance(filename,tuple) else filename
             directory, filename = os.path.split(filename)
-            self.model.export_parameter_values_to_yaml_file(auto=False, filename=filename, directory=directory)
-        self.model.export_parameter_values_to_yaml_file(auto=True)
+        if directory is None:
+            directory = '.'
+        self.model.export_parameter_values_to_yaml_file(auto=False, filename=filename, directory=directory)
+
 
     def disable_run_button(self, scan=False):
         for k, v in self.accessibleNames.items():
@@ -602,7 +592,7 @@ class RunParameterController(QObject):
             scan_end = float(self.model.data.scanDict['parameter' + str(dimension) + '_scan_to_value'])
             scan_step_size = float(self.model.data.scanDict['parameter' + str(dimension) + '_scan_step_size'])
             parameter = self.model.data.scanDict['parameter' + str(dimension)]
-            return do_scan, scan_start, scan_end+scan_step_size, scan_step_size, parameter
+            return do_scan, scan_start, scan_end, scan_step_size, parameter
         else:
             return do_scan, 0, 0, 0, None
 
@@ -697,7 +687,7 @@ class RunParameterController(QObject):
     def check_if_scanning(self):
         # scanParameterComboBoxes = self.view.scan_tabWidget.tabs
         scanning = [tab.scanCheckbox.isChecked() for tab in self.view.scan_tabWidget.tabs.values()]
-        print('Are we scanning? ', scanning)
+        # print('Are we scanning? ', scanning)
         return any(scanning)
 
     def app_sequence(self):

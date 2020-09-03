@@ -125,7 +125,9 @@ class DatabaseReader():
         #         run_id_for_settings = run_id
         #         return found_in_db, run_id
         # If they didn't match, it may be because it is not a full run, so find the nearest match using the prefix runs
+        # start = time.time()
         found_run_id, lattices = self.find_lattices_that_dont_exist(yaml_settings)
+        # print('Check exists time = ', time.time() - start)
         # If there was a full match the function returns [run_id, None]
         # We do a double check: run_id is not False (which would be No match) and the lattices is None (nothing to re-run)
         if found_run_id is not False and lattices is None:
@@ -242,7 +244,7 @@ class DatabaseReader():
         return run_id
 
     def get_all_run_ids(self):
-        return self.reader.run_id_settings_dict.keys()
+        return self.run_id_settings_dict.keys()
 
 if __name__ == '__main__':
     db_reader = DatabaseReader()

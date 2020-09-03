@@ -220,7 +220,7 @@ class beamPlotWidget(QWidget):
             if updatebeam:
                 self.curves[id].setData(x=x, y=y, symbolSize=self.pointSize)
 
-            if updateprojections:
+            if updateprojections and id in self.rightcurves and id in self.bottomcurves:
                 # self.add_projected_curves(id)
                 color = self.curve_colors[id]
                 if id in self.fillAlpha:
@@ -273,6 +273,10 @@ class beamPlotWidget(QWidget):
             self.rightBeamPlotWidget.removeItem(self.rightcurves[id])
             del self.rightcurves[id]
         self.updateCurveHighlights()
+        self.removeData(id)
+
+    def removeData(self, id):
+        del self.beams[id]
 
     def changePointSize(self, size):
         self.pointSize = int(size)
