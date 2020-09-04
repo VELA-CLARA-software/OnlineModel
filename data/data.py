@@ -35,7 +35,7 @@ class Data(object):
         self.parameterDict['runs'] = collections.OrderedDict()
         self.runsDict = self.parameterDict['runs']
         self.scannableParametersDict = collections.OrderedDict()
-        self.Framework = Fw.Framework(directory='.', clean=False, verbose=False)
+        self.Framework = Fw.Framework(directory='.', clean=False, verbose=False, delete_output_files=True)
         self.Framework.loadSettings(lattices.lattice_definition)
         self.my_name = "data"
         self.get_data()

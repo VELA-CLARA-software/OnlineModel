@@ -85,24 +85,39 @@ def setChicane(quads=None):
     return res.x
 
 def optFuncVELA(names, values):
-    global bestdelta
-    try:
+        global bestdelta
+    # try:
         [OM.modify_widget(name, val) for name, val in list(zip(names, values))]
         run_id = OM.track()
         OM.clear_all_plots()
+        OM.plot_run_id(run_id)
         constraintsList = {}
         twiss = OM.get_twiss_object_for_id(run_id)
         c2v1index = list(twiss['element_name']).index('CLA-C2V-MARK-01')
         c2v2index = list(twiss['element_name']).index('CLA-C2V-MARK-02')
         ipindex = list(twiss['element_name']).index('EBT-BA1-COFFIN-FOC')
+        beamdata = OM.get_beam_object_for_id(run_id)
+        # print(slicedata)
+        current = beamdata.slice_peak_current
+        peakI = max(current)
+        # print('peakI = ', peakI)
+        # print(list(zip(twiss['z'],twiss['beta_y'])))
+        # print(list(zip(twiss['z'],twiss['beta_y']))[c2v2index:ipindex])
+        # print(c2v1index, c2v2index, ipindex)
+        # exit()
         constraintsListBA1 = {
-            'BA1_max_betax': {'type': 'lessthan', 'value': twiss['beta_x_beam'][c2v2index:ipindex], 'limit': 50, 'weight': 150},
-            'BA1_max_betay': {'type': 'lessthan', 'value': twiss['beta_y_beam'][c2v2index:ipindex], 'limit': 50, 'weight': 150},
+            'BA1_max_betax': {'type': 'lessthan', 'value': twiss['beta_x'][c2v2index:ipindex], 'limit': 50, 'weight': 150},
+            'BA1_max_betay': {'type': 'lessthan', 'value': twiss['beta_y'][c2v2index:ipindex], 'limit': 50, 'weight': 150},
 
-            'c2v_betax': {'type': 'equalto', 'value': twiss['beta_x'][c2v1index], 'limit': twiss['beta_x'][c2v2index], 'weight': 1},
-            'c2v_betay': {'type': 'equalto', 'value': twiss['beta_y'][c2v1index], 'limit': twiss['beta_y'][c2v2index], 'weight': 1},
-            'c2v_alphax': {'type': 'equalto', 'value': twiss['alpha_x'][c2v1index], 'limit': twiss['alpha_x'][c2v2index], 'weight': 1},
-            'c2v_alphay': {'type': 'equalto', 'value': twiss['alpha_y'][c2v1index], 'limit': twiss['alpha_y'][c2v2index], 'weight': 1},
+            'BA1_max_betax2': {'type': 'lessthan', 'value': twiss['beta_x'][c2v2index:], 'limit': 100, 'weight': 150},
+            'BA1_max_betay2': {'type': 'lessthan', 'value': twiss['beta_y'][c2v2index:], 'limit': 100, 'weight': 150},
+
+            'c2v_betax': {'type': 'equalto', 'value': twiss['beta_x'][c2v2index], 'limit': twiss['beta_x'][c2v1index], 'weight': 1},
+            'c2v_betay': {'type': 'equalto', 'value': twiss['beta_y'][c2v2index], 'limit': twiss['beta_y'][c2v1index], 'weight': 1},
+            'c2v_alphax': {'type': 'equalto', 'value': twiss['alpha_x'][c2v2index], 'limit': -1*twiss['alpha_x'][c2v1index], 'weight': 1},
+            'c2v_alphay': {'type': 'equalto', 'value': twiss['alpha_y'][c2v2index], 'limit': -1*twiss['alpha_y'][c2v1index], 'weight': 1},
+
+            'ip_peakI': {'type': 'greaterthan', 'value': peakI, 'limit': 250, 'weight': 300},
 
             'ip_Sx': {'type': 'lessthan', 'value': 1e6*twiss['sigma_x'][ipindex], 'limit': 150, 'weight': 25},
             'ip_Sy': {'type': 'lessthan', 'value': 1e6*twiss['sigma_y'][ipindex], 'limit': 150, 'weight': 25},
@@ -120,23 +135,24 @@ def optFuncVELA(names, values):
         updateOutput('VELA delta = ' + str(delta))
         if delta < bestdelta:
             bestdelta = delta
-            print('### New Best: ', delta)
             # print(*args, sep = ", ")
             print ('[',', '.join(map(str,values)),']')
             print(cons.constraintsList(constraintsList))
             OM.export_yaml(auto=False, filename='optimise_100pC.yaml', directory='.')
+            print('### New Best: ', delta)
         return delta
-    except Exception as e:
-        print('Error!', e)
-        delta = 1e6
-    else:
-        return delta
+    # except Exception as e:
+    #     print('Error!', e)
+    #     delta = 1e6
+    # else:
+    #     return delta
 
 def setVELA(quads):
     global bestdelta
+    OM.set_screen_name('EBT-BA1-COFFIN-FOC')
     bestdelta = 1e10
     names, best = list(zip(*quads))
-    res = minimize(lambda x: optFuncVELA(names, x), best, method='nelder-mead', options={'disp': False, 'adaptive': False, 'fatol': 1e-3, 'maxiter': 100})
+    res = minimize(lambda x: optFuncVELA(names, x), best, method='nelder-mead', options={'disp': False, 'adaptive': True, 'fatol': 1e-3, 'maxiter': 250})
     return res
 
 def optimise_Lattice(q=100, do_optimisation=False, quads=None):
@@ -168,6 +184,7 @@ if __name__ == '__main__':
     # If in ASTRA, there is an additional offset of ~ 4degrees - elegant = -8, ASTRA = -12
     OM.modify_widget('Linac:CLA-L01-CAV:phase', -5)
     quad_names = [
+        'Linac:CLA-L01-CAV:phase',
         'CLA-S02:CLA-S02-MAG-QUAD-01:k1l',
         'CLA-S02:CLA-S02-MAG-QUAD-02:k1l',
         'CLA-S02:CLA-S02-MAG-QUAD-03:k1l',

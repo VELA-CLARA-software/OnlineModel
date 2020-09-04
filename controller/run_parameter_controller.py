@@ -255,13 +255,13 @@ class RunParameterController(QObject):
     def enable_plot_on_id(self, id):
         table = self.view.run_parameters_table
         row = table.model()._data.index(id)
-        self.emit_plot_signals(row, id, Qt.Checked)
+        self.emit_plot_signals(row, id, True)
         self.populate_run_parameters_table()
 
     def enable_plot_on_row(self, row):
         table = self.view.run_parameters_table
         item = table.model()._data[row]
-        self.emit_plot_signals(row, item, Qt.Checked)
+        self.emit_plot_signals(row, item, True)
         self.populate_run_parameters_table()
 
     def get_id_for_row(self, row):
@@ -283,7 +283,7 @@ class RunParameterController(QObject):
         if state and not v in self.run_plots:
             self.run_plots.append(v)
             self.add_plot_signal.emit(k,v)
-        elif v in self.run_plots:
+        elif not state and v in self.run_plots:
             self.run_plots.remove(v)
             del self.run_plot_colors[v]
             self.remove_plot_signal.emit(v)

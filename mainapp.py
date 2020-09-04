@@ -173,11 +173,9 @@ class MainApp(QObject):
     def get_twiss_object_for_id(self, id):
         self.plot_run_id(id)
         twissWidget = self.DynamicPlotController.ompbeam.latticeTwissPlotWidget
-        self.app.processEvents()
         i = 0
         while not id in twissWidget.twissDataObjects and i < 10:
-            time.sleep(0.01)
-            self.app.processEvents()
+            QTest.qWait(100)
             i += 1
         return twissWidget.twissDataObjects[id]
 
@@ -196,6 +194,11 @@ class MainApp(QObject):
         self.plot_run_id(id)
         slicedata = {}
         sliceWidget = self.DynamicPlotController.ompbeam.slicePlotWidget
+        i = 0
+        while not id in sliceWidget.beams and i < 10:
+            QTest.qWait(100)
+            i += 1
+            print(sliceWidget.beams)
         allplotdataitems = sliceWidget.curves[id]
         for var, plotdataitem in allplotdataitems.items():
             slicedata['t'] = plotdataitem.xData

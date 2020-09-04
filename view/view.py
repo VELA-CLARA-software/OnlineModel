@@ -590,7 +590,7 @@ class Ui_MainWindow(object):
         self.formLayout_4.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.linac1_phase_label)
         self.linac1_phase_2 = QtWidgets.QDoubleSpinBox(self.tab_11)
         self.linac1_phase_2.setMaximumSize(QtCore.QSize(150, 16777215))
-        self.linac1_phase_2.setDecimals(0)
+        self.linac1_phase_2.setDecimals(1)
         self.linac1_phase_2.setMinimum(-180.0)
         self.linac1_phase_2.setMaximum(180.0)
         self.linac1_phase_2.setObjectName("linac1_phase_2")
