@@ -7,7 +7,7 @@ CLA-C2V:
     - 6.03053164909332e-05
     - 0.014739040805921
     - 0.0137593271780352
-    k1l: 5.755
+    k1l: 5.797
     magnetic_length: 121.567272525393
     pv_suffix_alias: SETI
     type: quadrupole
@@ -19,7 +19,7 @@ CLA-C2V:
     - 5.97762384752619e-05
     - 0.0147596073775721
     - 0.0158516912403471
-    k1l: -5.18
+    k1l: -4.95
     magnetic_length: 121.511900610076
     pv_suffix_alias: SETI
     type: quadrupole
@@ -31,7 +31,7 @@ CLA-C2V:
     - 6.036266595182e-05
     - 0.0147634437187611
     - 0.013343693771224
-    k1l: 5.711
+    k1l: 5.714
     magnetic_length: 121.550749828396
     pv_suffix_alias: SETI
     type: quadrupole
@@ -59,7 +59,7 @@ CLA-S02:
     - 0.000111195870210961
     - 0.0238129337415767
     - 0.00981229429460256
-    k1l: 2.208
+    k1l: 1.775
     magnetic_length: 128.68478212775
     pv_suffix_alias: SETI
     type: quadrupole
@@ -71,7 +71,7 @@ CLA-S02:
     - 0.000139687166906618
     - 0.0232819099224878
     - 0.00977695097574923
-    k1l: -1.952
+    k1l: -1.648
     magnetic_length: 126.817287248819
     pv_suffix_alias: SETI
     type: quadrupole
@@ -83,7 +83,7 @@ CLA-S02:
     - 0.000137571730391246
     - 0.0233327839789932
     - 0.00949568371388574
-    k1l: 2.315
+    k1l: 2.219
     magnetic_length: 127.241994829126
     pv_suffix_alias: SETI
     type: quadrupole
@@ -95,7 +95,7 @@ CLA-S02:
     - 0.000127524427731924
     - 0.0234218216296292
     - 0.00938588316008555
-    k1l: -1.834
+    k1l: -1.387
     magnetic_length: 127.421664936758
     pv_suffix_alias: SETI
     type: quadrupole
@@ -119,7 +119,7 @@ EBT-BA1:
     field_integral_coefficients:
     - 1.59491
     - -0.0176
-    k1l: 0.882
+    k1l: -0.264
     magnetic_length: 70.4236023746139
     pv_suffix_alias: SETI
     type: quadrupole
@@ -127,7 +127,7 @@ EBT-BA1:
     field_integral_coefficients:
     - 1.59214
     - -0.01508
-    k1l: -1.732
+    k1l: -0.959
     magnetic_length: 70.4236023746139
     pv_suffix_alias: SETI
     type: quadrupole
@@ -135,7 +135,7 @@ EBT-BA1:
     field_integral_coefficients:
     - 1.5902
     - -0.01823
-    k1l: 1.049
+    k1l: 1.225
     magnetic_length: 70.4236023746139
     pv_suffix_alias: SETI
     type: quadrupole
@@ -143,7 +143,7 @@ EBT-BA1:
     field_integral_coefficients:
     - 1.58881
     - -0.01033
-    k1l: 1.265
+    k1l: 1.15
     magnetic_length: 70.4236023746139
     pv_suffix_alias: SETI
     type: quadrupole
@@ -151,7 +151,7 @@ EBT-BA1:
     field_integral_coefficients:
     - 1.59298
     - -0.02111
-    k1l: 0.044
+    k1l: 0.039
     magnetic_length: 70.4236023746139
     pv_suffix_alias: SETI
     type: quadrupole
@@ -159,7 +159,7 @@ EBT-BA1:
     field_integral_coefficients:
     - 1.58624
     - 0.00451
-    k1l: -1.233
+    k1l: -1.334
     magnetic_length: 70.4236023746139
     pv_suffix_alias: SETI
     type: quadrupole
@@ -167,7 +167,7 @@ EBT-BA1:
     field_integral_coefficients:
     - 0.36799
     - 0.00144
-    k1l: 1.382
+    k1l: 1.361
     magnetic_length: 70.4236023746139
     pv_suffix_alias: SETI
     type: quadrupole
@@ -193,7 +193,7 @@ EBT-INJ:
     - 0.000208236492203741
     - 0.102224127676636
     - 0.00205656183129602
-    k1l: 2.25
+    k1l: 1.724
     magnetic_length: 125.299909233924
     pv_suffix_alias: SETI
     type: quadrupole
@@ -203,7 +203,7 @@ EBT-INJ:
     - 0.000442533546326552
     - 0.101577009522434
     - 0.00146589509380893
-    k1l: -2.074
+    k1l: -1.587
     magnetic_length: 125.27558356645
     pv_suffix_alias: SETI
     type: quadrupole
@@ -211,7 +211,7 @@ EBT-INJ:
     field_integral_coefficients:
     - 0.111939163037871
     - -0.00132252769474545
-    k1l: 0.58
+    k1l: 0.376
     magnetic_length: 70.4236023746139
     pv_suffix_alias: SETI
     type: quadrupole
@@ -219,7 +219,7 @@ EBT-INJ:
     field_integral_coefficients:
     - 0.111966157109812
     - -0.00170732356716569
-    k1l: -0.534
+    k1l: -0.39
     magnetic_length: 70.4236023746139
     pv_suffix_alias: SETI
     type: quadrupole
@@ -227,7 +227,7 @@ EBT-INJ:
     field_integral_coefficients:
     - 0.112072763436341
     - -0.00182025848896622
-    k1l: 0.401
+    k1l: 0.171
     magnetic_length: 70.4236023746139
     pv_suffix_alias: SETI
     type: quadrupole
@@ -235,7 +235,7 @@ EBT-INJ:
     field_integral_coefficients:
     - 0.111954754
     - -0.001381788
-    k1l: -0.171
+    k1l: 0.123
     magnetic_length: 70.4236023746139
     pv_suffix_alias: SETI
     type: quadrupole
@@ -257,7 +257,7 @@ EBT-INJ:
 Gun:
   CLA-LRG1-GUN-CAV:
     controller_name: GUN10
-    field_amplitude: 58.8
+    field_amplitude: 71.5
     length: 0.17
     phase: -5.0
     pv_field_amplitude_alias: ad1:ch6:power_remote_s.POWER
@@ -266,7 +266,7 @@ Gun:
     type: cavity
   CLA-LRG1-MAG-BSOL-01:
     cavity: CLA-LRG1-GUN-CAV
-    field_amplitude: -0.21
+    field_amplitude: -0.225
     field_integral_coefficients:
     - 0.000513431
     - -1.27695e-07
@@ -289,7 +289,7 @@ Gun:
     type: solenoid
   CLA-LRG1-MAG-SOL-01:
     cavity: CLA-LRG1-GUN-CAV
-    field_amplitude: 0.233
+    field_amplitude: 0.25
     field_integral_coefficients:
     - 2.17321571
     - -0.858179277
@@ -324,16 +324,16 @@ Gun:
 Linac:
   CLA-L01-CAV:
     controller_name: L01
-    field_amplitude: 21.2
+    field_amplitude: 21.0
     length: 2.0333300000000003
-    phase: -4.8
+    phase: 0.0
     pv_field_amplitude_alias: ad1:ch6:power_remote_s.POWER
     pv_phase_alias: vm:dsp:sp_ph:phase
     pv_root_alias: CLA-L01-LRF-CTRL-01
     type: cavity
   CLA-L01-MAG-SOL-01:
     cavity: CLA-L01-CAV
-    field_amplitude: 0.0
+    field_amplitude: 0.05
     field_integral_coefficients:
     - 0.911580969
     - -0.0374385376
@@ -349,7 +349,7 @@ Linac:
     type: solenoid
   CLA-L01-MAG-SOL-02:
     cavity: CLA-L01-CAV
-    field_amplitude: 0.0
+    field_amplitude: -0.05
     field_integral_coefficients:
     - 0.84768888
     - -0.0653499119
@@ -392,10 +392,10 @@ generator:
     pv_root_alias: CLA-S01-DIA-WCM-01
     pv_suffix_alias: Q
     type: generator
-    value: 100.0
+    value: 70.0
   longitudinal_cutoff:
     type: generator
-    value: 3.0
+    value: 3
   longitudinal_distribution:
     type: generator
     value: Plateau
@@ -428,17 +428,15 @@ generator:
     value: ASTRA
   transverse_cutoff:
     type: generator
-    value: 3.0
+    value: 3
   transverse_distribution:
     type: generator
-    value: Uniform
+    value: Gaussian
 runs:
-  autoPlot: true
-  directory: 1fa73ad5-0a96-4813-9714-f625ff583807
-  prefix: 65a2a37e-6b59-446d-968f-a99a0c39cc75
-  start_lattice: CLA-C2V
+  autoPlot: false
+  directory: ''
   tags: []
-  timestamp: '1599165977.4965127'
+  timestamp: '1598725078.2200766'
   username: jkj62
 scan:
   parameter1: CLA-S02:lsc_bins:value
