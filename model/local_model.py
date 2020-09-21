@@ -33,8 +33,8 @@ def convert_data_types( export_dict={}, data_dict={}, keyname=None):
 def create_yaml_dictionary(data):
     export_dict = dict()
     data_dicts = ['generator'] + lattices.lattices + ['runs']
-    if data['scanDict']['parameter_scan']:
-        data_dicts.append('scan')
+    # if data['scanDict']['parameter_scan']:
+    data_dicts.append('scan')
     for n in data_dicts:
         export_dict = convert_data_types(export_dict, data['parameterDict'][n], n)
     return export_dict
@@ -120,14 +120,14 @@ class Model(object):
     def run_script(self):
         success = True
         self.directoryname = ''
-        print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
+        # print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
         self.yaml = create_yaml_dictionary(self.data)
         # del self.yaml['simulation']['directory']
         if self.are_settings_in_database(self.yaml):
             self.directoryname = self.get_run_id_for_settings(self.yaml)
         else:
             self.directoryname = self.create_random_directory_name()
-        print('+++++++++++++++++ Using directory ', 'test/'+self.directoryname, ' ++++++++++++++++++++++')
+        # print('+++++++++++++++++ Using directory ', 'test/'+self.directoryname, ' ++++++++++++++++++++++')
         if not self.are_settings_in_database(self.yaml):
             self.update_tracking_codes()
             self.update_CSR()
@@ -140,18 +140,18 @@ class Model(object):
                 if closest_match is not False:
                     self.data.Framework[start_lattice].prefix = '../'+closest_match+'/'
                     self.data.runsDict['prefix'] = closest_match
-                    print('Setting',start_lattice,'prefix = ', closest_match)
+                    # print('Setting',start_lattice,'prefix = ', closest_match)
                     self.data.runsDict['start_lattice'] = start_lattice
                 self.yaml = create_yaml_dictionary(self.data)
                 self.data.Framework.setSubDirectory('test/'+self.directoryname)
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
-                try:
-                    self.data.Framework.track(startfile=start_lattice)#, endfile=endLattice)
-                except Exception as e:
-                    print('!!!! Error in Tracking - settings not saved !!!!')
-                    print(e)
-                    success = False
+                # try:
+                self.data.Framework.track(startfile=start_lattice)#, endfile=endLattice)
+                # except Exception as e:
+                #     print('!!!! Error in Tracking - settings not saved !!!!')
+                #     print(e)
+                #     success = False
         return success
 
     def get_directory_name(self):
@@ -259,26 +259,21 @@ class Model(object):
         if not os.path.exists(dir):
             os.makedirs(dir, exist_ok=True)
 
-    def export_parameter_values_to_yaml_file(self, auto=False):
-        export_dict = dict()
-        if auto:
-            directory = 'test/'+self.directoryname
+    def export_parameter_values_to_yaml_file(self, auto=False, filename=None, directory="."):
+        if auto is True:
             filename = 'settings.yaml'
-        else:
-            dialog = QFileDialog()
-            filename, _filter = QFileDialog.getSaveFileNameAndFilter(dialog, caption='Save File', directory='c:\\',
-                                                                 filter="YAML Files (*.YAML *.YML *.yaml *.yml")
-            filename = filename[0] if isinstance(filename,tuple) else filename
-            dirctory, filename = os.path.split(filename)
-        if not filename == "":
+            directory = 'test/'+self.directoryname
+        if filename is not None:
             # print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
             self.create_subdirectory(directory)
             try:
                 yaml_parser.write_parameter_output_file(str(os.path.relpath(directory + '/' + filename)), create_yaml_dictionary(self.data))
-            except:
-                print('Can\'t write YAML file!')
+            except Exception as e:
+                print('Can\'t write YAML file!', filename, directory)
+                print(e)
         else:
             print( 'Failed to export, please provide a filename.')
+            exit()
 
     def import_yaml(self, directoryname):
         return self.import_parameter_values_from_yaml_file('test/'+directoryname+'/settings.yaml')

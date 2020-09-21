@@ -151,6 +151,9 @@ class twissPlotWidget(multiPlotWidget):
         twiss.read_elegant_twiss_files(elegantfiles, reset=reset)
         return twiss
 
+    def removeData(self, id):
+        del self.twissDataObjects[id]
+
 class globalTwissPlotWidget(twissPlotWidget):
     # Layout oder for the individual Tiwss plot items
 

@@ -40,11 +40,14 @@ class DatabaseReader():
     def update_lattice_tables_from_sql(self, table_name, lattice_id_settings_dict):
         """Take an SQL cursor and iteratively add elements to the lattice dictionary."""
         # It's faster to do this in chunks (not sure why, might be an SQLite issue?)
-        chunk_size = 5000000
+        chunk_size = 500000
         while True:
+            start = time.time()
             settings_for_lattice_id = self.sql_cursor.fetchmany(chunk_size)
+            # print('       time to execute LATTICE fetchmany = ', time.time() - start, 'seconds ')
+            start = time.time()
             if not settings_for_lattice_id:
-                # We've run out od data, so stop!
+                # We've run out of data, so stop!
                 break
             for run_id, component, parameter, value in settings_for_lattice_id:
                 # Some tables don't use the component column, this will be 'null'
@@ -52,6 +55,7 @@ class DatabaseReader():
                     lattice_id_settings_dict[run_id][table_name][parameter] = json.loads(value)
                 else:
                     lattice_id_settings_dict[run_id][table_name][component][parameter] = json.loads(value)
+            # print('       time to execute LATTICE dict update = ', time.time() - start, 'seconds ')
 
     def update_run_tables_from_sql(self, table_name, run_id_settings_dict):
         """Take an SQL cursor and iteratively add elements to the run dictionary."""
@@ -82,16 +86,23 @@ class DatabaseReader():
         lattice_id_settings_dict = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
         run_id_settings_dict = defaultdict(lambda: defaultdict(lambda: defaultdict(dict)))
         # For each of the lattice sections
+        self.sql_start = time.time()
         for table_name in self.table_name_list:
+            start = time.time()
             # Load table rows from the DB
             sql = 'select run_id, component, parameter, value from \''+table_name+'\''
             self.sql_cursor.execute(sql)
+            # print('       time to execute LATTICE SQL = ', time.time() - start, 'seconds ')
             # Add the data to the dictionary
             self.update_lattice_tables_from_sql(table_name, lattice_id_settings_dict)
+        # print('       time to update LATTICE TABLE = ', time.time() - start, 'seconds ')
+        self.sql_start = time.time()
         # We need to do the same for the run table (which has a different format)
         sql = 'select run_id, prefix, start_lattice from \'runs\''
         self.sql_cursor.execute(sql)
+        # print('       time to execute RUN SQL = ', time.time() - self.sql_start, 'seconds ')
         self.update_run_tables_from_sql(table_name, run_id_settings_dict)
+        # print('       time to update RUN TABLE = ', time.time() - self.sql_start, 'seconds ')
 
         return lattice_id_settings_dict, run_id_settings_dict
 
@@ -125,7 +136,9 @@ class DatabaseReader():
         #         run_id_for_settings = run_id
         #         return found_in_db, run_id
         # If they didn't match, it may be because it is not a full run, so find the nearest match using the prefix runs
+        # start = time.time()
         found_run_id, lattices = self.find_lattices_that_dont_exist(yaml_settings)
+        # print('Check exists time = ', time.time() - start)
         # If there was a full match the function returns [run_id, None]
         # We do a double check: run_id is not False (which would be No match) and the lattices is None (nothing to re-run)
         if found_run_id is not False and lattices is None:
@@ -242,7 +255,7 @@ class DatabaseReader():
         return run_id
 
     def get_all_run_ids(self):
-        return self.reader.run_id_settings_dict.keys()
+        return self.run_id_settings_dict.keys()
 
 if __name__ == '__main__':
     db_reader = DatabaseReader()

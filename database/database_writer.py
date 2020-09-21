@@ -90,11 +90,12 @@ class DatabaseWriter():
         return dictname, pv, param
 
     def save_entry_to_scan_table(self, run_id, parameter=None, parameter_scan_step_size=None, parameter_scan_from_value=None, parameter_scan_to_value=None, value=None, **kwargs):
-        area, component, parameter = self.split_accessible_name(parameter)
-        columnstring = '(run_id, area, component, parameter, parameter_scan_from_value, parameter_scan_to_value, parameter_scan_step_size, value)'
-        valuestring = '(?,?,?,?,?,?,?,?)'
-        sql = '''INSERT OR IGNORE INTO scan ''' + columnstring + ''' VALUES ''' + valuestring
-        self.sql_cursor.execute(sql, [run_id, area, component, parameter, parameter_scan_from_value, parameter_scan_to_value, parameter_scan_step_size, value])
+        pass
+        # area, component, parameter = self.split_accessible_name(parameter)
+        # columnstring = '(run_id, area, component, parameter, parameter_scan_from_value, parameter_scan_to_value, parameter_scan_step_size, value)'
+        # valuestring = '(?,?,?,?,?,?,?,?)'
+        # sql = '''INSERT OR IGNORE INTO scan ''' + columnstring + ''' VALUES ''' + valuestring
+        # self.sql_cursor.execute(sql, [run_id, area, component, parameter, parameter_scan_from_value, parameter_scan_to_value, parameter_scan_step_size, value])
 
     def save_entry_to_simulation_table(self, run_id, component, parameter, value):
         columnstring = '(run_id, component, parameter, value)'

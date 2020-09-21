@@ -65,6 +65,6 @@ class DynamicPlotController(QObject):
         self.plotcolor.emit(id, color)
 
     def remove_twiss_plot(self, dir):
-        print('Removing twiss plot: ', dir)
+        # print('Removing twiss plot: ', dir)
         # self.omp.removeCurve(dir)
         self.ompbeam.removeRunIDFromListWidget(dir)

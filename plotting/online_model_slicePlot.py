@@ -162,6 +162,9 @@ class slicePlotWidget(multiPlotWidget):
         self.beams = {}
         super(slicePlotWidget, self).clear()
 
+    def removeData(self, id):
+        del self.beams[id]
+
 def main():
     app = QApplication(sys.argv)
     pg.setConfigOptions(antialias=True)
