@@ -140,7 +140,8 @@ class RunParameterController(QObject):
     remove_plot_signal = pyqtSignal(str)
     delete_run_id_signal = pyqtSignal(str)
     add_plot_window_signal = pyqtSignal(int, str)
-    run_id_clicked = pyqtSignal(str)
+    run_id_clicked_signal = pyqtSignal(str)
+    change_database_signal = pyqtSignal(str)
 
     tags = ['BA1', 'User Experiment', 'Front End', 'Emittance', 'Energy Spread', 'Commissioning']
 
@@ -219,12 +220,12 @@ class RunParameterController(QObject):
         ddiff = DeepDiff(data, guidata, ignore_order=True, exclude_paths={"root['runs']"})
         # print(ddiff)
         self.view.yaml_tree_widget.setData(ddiff)
-        # self.run_id_clicked.emit(runno)
+        # self.run_id_clicked_signal.emit(runno)
 
     def emit_run_id_clicked_signal(self, row, col):
         table = self.view.run_parameters_table
         runno = table.item(row, self.run_table_columns['run_id']).text()
-        self.run_id_clicked.emit(str(runno))
+        self.run_id_clicked_signal.emit(str(runno))
 
     def populate_run_parameters_table(self):
         timer = QElapsedTimer()
@@ -658,6 +659,7 @@ class RunParameterController(QObject):
             # self.update_widgets_with_values('runs:directory', self.scan_basedir)
             #
             self.thread = GenericThread(self.do_scan)
+            self.thread.started.connect(lambda:self.export_parameter_values_to_yaml_file(auto=True))
             self.thread.finished.connect(lambda:self.save_settings_to_database(self.view.autoPlotCheckbox.isChecked()))
             self.thread.finished.connect(self.continue_scan)
             self.thread.start()
@@ -700,6 +702,7 @@ class RunParameterController(QObject):
                 return
         else:
             self.thread = GenericThread(self.do_scan)
+            self.thread.started.connect(lambda:self.export_parameter_values_to_yaml_file(auto=True))
             self.thread.finished.connect(self.enable_run_button)
             self.thread.finished.connect(self.update_directory_widget)
             self.thread.finished.connect(lambda:self.save_settings_to_database(self.view.autoPlotCheckbox.isChecked()))
@@ -753,3 +756,15 @@ class RunParameterController(QObject):
         self.view.tags_Layout.addWidget(self.view.userTagComboBox,0,0,1,2)
         self.view.tags_Layout.addWidget(self.view.username,1,0,1,1)
         self.view.tags_Layout.addWidget(self.view.time,1,1,1,1)
+
+    def change_database(self, database=False):
+        if database is False:
+            dialog = QFileDialog()
+            database, _filter = QFileDialog.getSaveFileName(dialog, caption='Database File', directory='.',
+                                                                 filter="SQLite Files (*.db)")
+        print(database)
+        if database is not False and database is not None and isinstance(database, str):
+            self.change_database_signal.emit(database)
+
+    def database_changed(self):
+        self.populate_run_parameters_table()

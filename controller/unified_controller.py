@@ -14,6 +14,8 @@ class UnifiedController():
             self.rpc.view.actionExport_YAML.triggered.connect(self.rpc.export_parameter_values_to_yaml_file)
             self.rpc.view.actionRead_from_EPICS.triggered.connect(self.rpc.read_from_epics)
             self.rpc.view.actionRead_from_DBURT.triggered.connect(self.rpc.read_from_DBURT)
+
+            self.rpc.view.actionChange_DB.triggered.connect(self.rpc.change_database)
             # self.rpc.view.actionAuto_load_Settings.toggled.connect(self.rpc.connect_auto_load_settings)
 
             # Connects signal from the run controller to add a plot to the plot controller
@@ -24,8 +26,14 @@ class UnifiedController():
             self.dpc.plotcolor.connect(self.rpc.setrunplotcolor)
             # Connects a signal from the run controller to the database controller to delete an entry from the database
             self.rpc.delete_run_id_signal.connect(self.dbc.delete_run_id_from_database)
+            # Connects a signal from the run controller to the database controller to change the active database file
+            self.rpc.change_database_signal.connect(self.change_database)
+            # Connects a signal from clicking on a run_id to the plotting controller
+            self.rpc.run_id_clicked_signal.connect(self.dpc.curveClicked)
 
-            self.rpc.run_id_clicked.connect(self.dpc.curveClicked)
+        def change_database(self, database):
+            self.dbc.change_database(database)
+            self.rpc.database_changed()
 
         def run_rpc_process(self):
             self.rpc.disable_run_button()

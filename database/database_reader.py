@@ -19,11 +19,12 @@ from collections import defaultdict, OrderedDict
 
 class DatabaseReader():
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, database='SimulationDatabase.db', *args, **kwargs):
         start = time.time()
         self.args = args
         self.kwargs = kwargs
-        self.sql_connection = sqlite3.connect('SimulationDatabase.db')
+        self.database = database
+        self.sql_connection = sqlite3.connect(self.database)
         self.sql_cursor = self.sql_connection.cursor()
         # List of lattice tables. This should be taken from a unified top-level controller at some point...
         self.table_name_list = ['generator'] + lattices.lattices

@@ -2695,7 +2695,7 @@
                  </property>
                  <item>
                   <property name="text">
-                   <string>Uniform</string>
+                   <string>Radial</string>
                   </property>
                  </item>
                  <item>
@@ -3452,8 +3452,15 @@
     <addaction name="actionAuto_load_Settings"/>
     <addaction name="actionClean_Directory"/>
    </widget>
+   <widget class="QMenu" name="menuDatabase">
+    <property name="title">
+     <string>Database</string>
+    </property>
+    <addaction name="actionChange_DB"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSettings"/>
+   <addaction name="menuDatabase"/>
   </widget>
   <action name="actionImport_YAML">
    <property name="text">
@@ -3489,6 +3496,11 @@
   <action name="actionRead_from_DBURT">
    <property name="text">
     <string>Read from DBURT</string>
+   </property>
+  </action>
+  <action name="actionChange_DB">
+   <property name="text">
+    <string>Change DB</string>
    </property>
   </action>
  </widget>

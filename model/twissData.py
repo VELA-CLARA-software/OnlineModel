@@ -43,13 +43,13 @@ class twissData(object):
     def loadDataFile(self, directory, sections=None, reset=True, twiss=None):
         ''' loads ASTRA and Elegant data files from a directory and returns a twiss object'''
         if sections is None or (isinstance(sections, str) and sections.lower() == 'all'):
-            astrafiles = sorted(glob.glob(directory+"/*Xemit*"))
+            astrafiles = sorted(glob.glob(directory+"/*Xemit.*"))
             elegantfiles = sorted(glob.glob(directory+"/*.flr"))
         else:
             astrafiles = []
             elegantfiles = []
             for s in sections:
-                astrafiles += sorted(glob.glob(directory+"/"+s+"*Xemit*"))
+                astrafiles += sorted(glob.glob(directory+"/"+s+"*Xemit.*"))
                 elegantfiles += sorted(glob.glob(directory+"/"+s+"*.flr"))
         if twiss is None: # If it doesn't exist need to instantiate a twiss obkject
             twiss = rtf.twiss()

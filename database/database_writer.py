@@ -10,10 +10,11 @@ import json
 
 class DatabaseWriter():
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, database='SimulationDatabase.db', *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
-        self.sql_connection = sqlite3.connect('SimulationDatabase.db')
+        self.database = database
+        self.sql_connection = sqlite3.connect(self.database)
         self.sql_cursor = self.sql_connection.cursor()
 
     def tempname(self):

@@ -65,6 +65,7 @@ class Model(object):
     def update_tracking_codes(self):
         for l in self.data.lattices:
             code = self.data.parameterDict[l]['tracking_code']['value']
+            # print('Setting',l,'to',code)
             self.data.Framework.change_Lattice_Code(l, code)
 
     def update_CSR(self):
@@ -147,7 +148,8 @@ class Model(object):
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
                 # try:
-                self.data.Framework.track(startfile=start_lattice)#, endfile=endLattice)
+                # self.data.Framework['CLA-S02'].file_block['output']['end_element'] = 'EBT-BA1-DIA-FCUP-01'
+                self.data.Framework.track(startfile=start_lattice)#, endfile='CLA-S02')
                 # except Exception as e:
                 #     print('!!!! Error in Tracking - settings not saved !!!!')
                 #     print(e)
@@ -181,8 +183,8 @@ class Model(object):
                         self.data.Framework.modifyElement(key, 'field_amplitude', float(value['field_amplitude']))
 
     def modify_framework(self, scan=False, type=None, modify=None, cavity_params=None, generator_param=None):
+        self.data.Framework.defineASTRACommand(scaling=int(self.data.generatorDict['number_of_particles']['value']))
         if not os.name == 'nt':
-            self.data.Framework.defineASTRACommand(scaling=int(self.data.generatorDict['number_of_particles']['value']))
             self.data.Framework.defineCSRTrackCommand(scaling=int(self.data.generatorDict['number_of_particles']['value']))
             self.data.Framework.define_gpt_command(scaling=int(self.data.generatorDict['number_of_particles']['value']))
 
@@ -222,8 +224,10 @@ class Model(object):
             self.data.Framework.generator.distribution_type_y = "2DGaussian"
             self.data.Framework.generator.guassian_cutoff_x = int(self.data.generatorDict['transverse_cutoff']['value'])
             self.data.Framework.generator.guassian_cutoff_y = int(self.data.generatorDict['transverse_cutoff']['value'])
-        elif str(self.data.generatorDict['transverse_distribution']['value']) == "Uniform":
+        elif str(self.data.generatorDict['transverse_distribution']['value']) == "Radial":
             # If we are in uniform or plateau we need to set the correct ASTRA parameter
+            self.data.Framework.generator.distribution_type_x = "radial"
+            self.data.Framework.generator.distribution_type_y = "radial"
             self.data.Framework.generator.lx = self.data.generatorDict['spot_size']['value'] * 1e-3
             self.data.Framework.generator.ly = self.data.generatorDict['spot_size']['value'] * 1e-3
         self.data.Framework.generator.sigma_x = self.data.generatorDict['spot_size']['value'] * 1e-3

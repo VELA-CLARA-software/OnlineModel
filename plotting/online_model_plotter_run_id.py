@@ -225,7 +225,7 @@ class onlineModelPlotterWidget(QWidget):
                 n = k
                 p = v['position']
                 self.allscreens.append([n, p, l])
-        sortedscreennames = sorted(self.allscreens, key=lambda x: float(x[1]))
+        self.allscreens = sortedscreennames = sorted(self.allscreens, key=lambda x: float(x[1]))
         selected = False
         for n,p,l in sortedscreennames:
             self.fileSelector.addItem(n.ljust(20,' ') + '('+str(p)+'m)',[n,p])
@@ -282,9 +282,11 @@ class onlineModelPlotterWidget(QWidget):
             screens, positions, lattices = list(zip(*self.allscreens))
             screen_idx = screens.index(self.fileSelector.currentData()[0])
             lattice = lattices[screen_idx]
+            # print(screen_idx, lattice, lattices)
             for run, prefixes in self.run_id_prefixes.items():
                 directory = 'test/' + prefixes[lattice]
                 color = self.run_id_color[run]
+                # print(directory, beamfilename)
                 self.loadBeamDataFile(directory, beamfilename, color, run)
 
     def curveClicked(self, item):
