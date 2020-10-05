@@ -27,3 +27,4 @@ Output/
 SimulationDatabase.db
 Split_Lattice_LSC/
 *.exe
+*dist/

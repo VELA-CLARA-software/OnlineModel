@@ -764,8 +764,7 @@ class RunParameterController(QObject):
         if database is False:
             dialog = QFileDialog()
             database, _filter = QFileDialog.getSaveFileName(dialog, caption='Database File', directory='.',
-                                                                 filter="SQLite Files (*.db)")
-        print(database)
+                                                                 filter="SQLite Files (*.db)", options=QFileDialog.DontConfirmOverwrite	)
         if database is not False and database is not None and isinstance(database, str):
             self.change_database_signal.emit(database)
 

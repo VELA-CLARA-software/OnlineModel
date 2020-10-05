@@ -267,7 +267,6 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--config', default=None, type=str)
     parser.add_argument('-d', '--database', default=None, type=str)
     args = parser.parse_args()
-    print(args)
 
     app = QApplication(sys.argv)
     app_object = MainApp(app, sys.argv)
