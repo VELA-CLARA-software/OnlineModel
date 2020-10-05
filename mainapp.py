@@ -48,6 +48,11 @@ class MainApp(QObject):
         #self.PostProcessingController = post_processing_controller.PostProcessingController(app, self.view, self.model)
         self.UnifiedController = unified_controller.UnifiedController(self.RunParameterController, self.DynamicPlotController, self.DatabaseController)
 
+        if ('args' in globals() or 'args' in locals()) and args.database is not None:
+            self.UnifiedController.change_database_folder(args.database)
+        else:
+            self.UnifiedController.change_database_folder(self.DatabaseController.database)
+
         if ('args' in globals() or 'args' in locals()) and args.config is not None:
             self.import_yaml(args.config)
 

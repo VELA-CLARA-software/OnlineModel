@@ -34,6 +34,12 @@ class UnifiedController():
         def change_database(self, database):
             self.dbc.change_database(database)
             self.rpc.database_changed()
+            self.change_database_folder(database)
+
+        def change_database_folder(self, database):
+            foldername = 'output/'+os.path.splitext(os.path.basename(database))[0]
+            self.dpc.set_base_directory(foldername)
+            self.rpc.set_base_directory(foldername)
 
         def run_rpc_process(self):
             self.rpc.disable_run_button()

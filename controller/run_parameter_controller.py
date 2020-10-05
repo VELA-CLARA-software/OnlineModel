@@ -198,6 +198,9 @@ class RunParameterController(QObject):
         self.toggle_BSOL_tracking()
         self.toggle_BSOL_tracking()
 
+    def set_base_directory(self, directory):
+        self.model.set_base_directory(directory)
+
     def create_datatree_widget(self):
         # self.view.yaml_tree_widget = pg.DataTreeWidget()
         # layout = self.view.run_splitter

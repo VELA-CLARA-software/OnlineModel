@@ -240,7 +240,7 @@ class onlineModelPlotterWidget(QWidget):
         prefixes = self.run_id_prefixes[id]
         twissList = []
         for s, d in prefixes.items():
-            twissList.append({'directory': 'test/'+d, 'sections': [s]})
+            twissList.append({'directory': d, 'sections': [s]})
         twiss, id, color = self.globalTwissPlotWidget.addTwissDirectory(twissList, id=id, color=self.run_id_color[id])
         self.latticeTwissPlotWidget.addtwissDataObject(twiss, id, color=color)
         self.beamTwissPlotWidget.addtwissDataObject(twiss, id, color=color)
@@ -284,7 +284,7 @@ class onlineModelPlotterWidget(QWidget):
             lattice = lattices[screen_idx]
             # print(screen_idx, lattice, lattices)
             for run, prefixes in self.run_id_prefixes.items():
-                directory = 'test/' + prefixes[lattice]
+                directory = prefixes[lattice]
                 color = self.run_id_color[run]
                 # print(directory, beamfilename)
                 self.loadBeamDataFile(directory, beamfilename, color, run)
@@ -306,7 +306,7 @@ class onlineModelPlotterWidget(QWidget):
         screen_idx = screens.index(self.fileSelector.currentData()[0])
         lattice = lattices[screen_idx]
         prefix = self.run_id_prefixes[run_id]
-        directory = 'test/' + prefix[lattice]
+        directory = prefix[lattice]
         return directory+'/'+run_id
 
     def highlightPlot(self, name):

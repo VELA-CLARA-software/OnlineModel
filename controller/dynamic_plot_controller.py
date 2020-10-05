@@ -41,12 +41,15 @@ class DynamicPlotController(QObject):
         self.view = view
         # self.view.main_tab_widget.removeTab(3)
         # self.omp = twissPlotWidget()
-        self.ompbeam = onlineModelPlotterWidget(self.model.data.screenDict, directory='./test/')
+        self.ompbeam = onlineModelPlotterWidget(self.model.data.screenDict, directory='.')
         # self.view.post_tab = self.omp
         # self.view.main_tab_widget.addTab(self.omp, "Twiss Plots")
         self.view.plots_yaml_tab.insertTab(0, self.ompbeam, "Plots")
         self.view.plots_yaml_tab.setCurrentIndex(0)
         self.clickedCurve = None
+
+    def set_base_directory(self, directory):
+        self.basedirectoryname = directory
 
     def curveClicked(self, name):
         # print('Clicked:', name)
@@ -62,10 +65,10 @@ class DynamicPlotController(QObject):
         # twissdata = self.model.run_twiss(dir)
         # color, style = self.omp.addtwissDataObject(dataobject=twissdata, name=dir)
         # print(id, dir, self.model.dbcontroller.find_run_id_for_each_lattice(dir))
-        color = self.ompbeam.addRunIDToListWidget(dir, self.model.dbcontroller.find_run_id_for_each_lattice(dir))
+        color = self.ompbeam.addRunIDToListWidget(self.basedirectoryname+'/'+dir, self.model.dbcontroller.find_run_id_for_each_lattice(self.basedirectoryname+'/', dir))
         self.plotcolor.emit(id, color)
 
     def remove_twiss_plot(self, dir):
         # print('Removing twiss plot: ', dir)
         # self.omp.removeCurve(dir)
-        self.ompbeam.removeRunIDFromListWidget(dir)
+        self.ompbeam.removeRunIDFromListWidget(self.basedirectoryname+'/'+dir)

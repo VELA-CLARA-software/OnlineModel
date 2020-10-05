@@ -51,8 +51,11 @@ class Model(object):
         # self.dbcontroller = dbc.DatabaseController()
         self.directoryname = ''
 
+    def set_base_directory(self, directory):
+        self.basedirectoryname = directory
+
     def run_twiss(self, directory):
-        twiss_model = twissData.twissData(directory='test/'+directory, name=directory)
+        twiss_model = twissData.twissData(directory=self.basedirectoryname+'/'+directory, name=directory)
         twiss = twiss_model.run_script()
         return twiss
 
@@ -144,7 +147,7 @@ class Model(object):
                     # print('Setting',start_lattice,'prefix = ', closest_match)
                     self.data.runsDict['start_lattice'] = start_lattice
                 self.yaml = create_yaml_dictionary(self.data)
-                self.data.Framework.setSubDirectory('test/'+self.directoryname)
+                self.data.Framework.setSubDirectory(self.basedirectoryname+'/'+self.directoryname)
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
                 # try:
@@ -257,7 +260,7 @@ class Model(object):
             return None
 
     def get_absolute_folder_location(self, directoryname):
-        return os.path.abspath(__file__+'/../../test/'+directoryname)
+        return os.path.abspath(__file__+'/../../'+self.basedirectoryname+'/'+directoryname)
 
     def create_subdirectory(self, dir):
         if not os.path.exists(dir):
@@ -266,7 +269,7 @@ class Model(object):
     def export_parameter_values_to_yaml_file(self, auto=False, filename=None, directory="."):
         if auto is True:
             filename = 'settings.yaml'
-            directory = 'test/'+self.directoryname
+            directory = self.basedirectoryname+'/'+self.directoryname
         if filename is not None:
             # print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
             self.create_subdirectory(directory)
@@ -280,7 +283,7 @@ class Model(object):
             exit()
 
     def import_yaml(self, directoryname):
-        return self.import_parameter_values_from_yaml_file('test/'+directoryname+'/settings.yaml')
+        return self.import_parameter_values_from_yaml_file(self.basedirectoryname+'/'+directoryname+'/settings.yaml')
 
     def import_parameter_values_from_yaml_file(self, filename):
         filename = filename[0] if isinstance(filename,tuple) else filename

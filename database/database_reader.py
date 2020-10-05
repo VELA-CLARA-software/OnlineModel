@@ -223,11 +223,11 @@ class DatabaseReader():
                     return self.get_run_id_for_lattice(self.run_id_settings_dict[run_id]['runs']['prefix'], t)
             return run_id
 
-    def get_run_id_for_each_lattice(self, run_id):
+    def get_run_id_for_each_lattice(self, prefix='', run_id=''):
         """For each lattice, find the corresponding run_id taking into account prefix runs"""
         result = {}
         for t in self.table_name_list:
-            result[t] = self.get_run_id_for_lattice(run_id, t)
+            result[t] = prefix + self.get_run_id_for_lattice(run_id, t)
         return result
 
     def get_settings_dict_to_check(self, settings_to_save):
