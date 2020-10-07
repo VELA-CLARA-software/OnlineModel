@@ -65,7 +65,7 @@ class DynamicPlotController(QObject):
         # twissdata = self.model.run_twiss(dir)
         # color, style = self.omp.addtwissDataObject(dataobject=twissdata, name=dir)
         # print(id, dir, self.model.dbcontroller.find_run_id_for_each_lattice(dir))
-        color = self.ompbeam.addRunIDToListWidget(self.basedirectoryname+'/'+dir, self.model.dbcontroller.find_run_id_for_each_lattice(self.basedirectoryname+'/', dir))
+        color = self.ompbeam.addRunIDToListWidget(self.basedirectoryname+'/'+dir, self.model.dbcontroller.find_run_id_for_each_lattice(dir))
         self.plotcolor.emit(id, color)
 
     def remove_twiss_plot(self, dir):

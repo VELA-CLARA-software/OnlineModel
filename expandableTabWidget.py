@@ -1,5 +1,6 @@
 import sys
 from PyQt5 import QtGui, QtCore, QtWidgets
+from collections import OrderedDict
 
 class scanningTab(QtWidgets.QWidget):
     """Widget that sets scanning parameters."""
@@ -11,22 +12,17 @@ class scanningTab(QtWidgets.QWidget):
         self.setLayout(self.layout)
 
         self.scanCheckbox = QtWidgets.QCheckBox()
-        self.scanCheckbox.setAccessibleName("scan:parameter"+str(self.id)+"_scan")
 
-        self.scanSelectionLabel = QtWidgets.QLabel('Scan Parameter ' + str(self.id))
+        self.scanSelectionLabel = QtWidgets.QLabel()
         self.scanSelectionWidget = QtWidgets.QComboBox()
-        self.scanSelectionWidget.setAccessibleName("scan:parameter"+str(self.id))
 
         self.scanFromLabel = QtWidgets.QLabel('Scan From')
         self.scanToLabel = QtWidgets.QLabel('Scan To')
         self.scanStepLabel = QtWidgets.QLabel('Scan Step')
 
         self.scanFromWidget = QtWidgets.QLineEdit()
-        self.scanFromWidget.setAccessibleName("scan:parameter"+str(self.id)+"_scan_from_value")
         self.scanToWidget = QtWidgets.QLineEdit()
-        self.scanToWidget.setAccessibleName("scan:parameter"+str(self.id)+"_scan_to_value")
         self.scanStepWidget = QtWidgets.QLineEdit()
-        self.scanStepWidget.setAccessibleName("scan:parameter"+str(self.id)+"_scan_step_size")
 
         self.scanSelectionWidget.setEnabled(False)
         self.scanFromWidget.setEnabled(False)
@@ -44,6 +40,15 @@ class scanningTab(QtWidgets.QWidget):
         self.layout.addWidget(self.scanStepWidget,1,6,1,1)
 
         self.scanCheckbox.stateChanged.connect(self.toggle_scan_parameters_state)
+
+    def set_id(self, id):
+        self.id = id
+        self.scanCheckbox.setAccessibleName("scan:"+str(id)+":scan")
+        self.scanSelectionLabel.setText('Scan Parameter ' + str(id))
+        self.scanSelectionWidget.setAccessibleName("scan:"+str(id)+':parameter')
+        self.scanFromWidget.setAccessibleName("scan:"+str(id)+":scan_from_value")
+        self.scanToWidget.setAccessibleName("scan:"+str(id)+":scan_to_value")
+        self.scanStepWidget.setAccessibleName("scan:"+str(id)+":scan_step_size")
 
     def toggle_scan_parameters_state(self):
         if self.scanCheckbox.isChecked():
@@ -76,12 +81,12 @@ class expandableTabWidget(QtWidgets.QTabWidget):
     """Tab Widget that that can have new tabs easily added to it."""
 
     scanTabAdded = QtCore.pyqtSignal(int)
-    scanTabRemoved = QtCore.pyqtSignal(int)
+    scanTabRemoved = QtCore.pyqtSignal(object)
 
     def __init__(self, parent=None):
         super(expandableTabWidget, self).__init__(parent)
         self.id = 1
-        self.tabs = {}
+        self.tabs = OrderedDict()
         # QtGui.QTabWidget.__init__(self, parent)
 
         # Tab Bar
@@ -114,23 +119,33 @@ class expandableTabWidget(QtWidgets.QTabWidget):
         # Signals
         self.plusButton.clicked.connect(self.addScanTab)
         self.clearButton.clicked.connect(self.clearScans)
-        # self.tab.plusClicked.connect(self.addTab)
-        # self.tab.tabMoved.connect(self.tab.moveTab)
         self.tab.tabCloseRequested.connect(self.removeScanTab)
-        # self.tab.tabCloseRequested.connect(self.removeTab)
 
     def addScanTab(self):
-        tab = scanningTab(self.id)
-        self.tabs[self.id] = tab
-        self.addTab(tab,'Scan '+str(self.id))
-        self.scanTabAdded.emit(self.id)
+        tab = scanningTab(0)
+        self.addTab(tab,'')
         self.setCurrentWidget(tab)
-        self.id += 1
+        self.relabel_tabs()
+        self.scanTabAdded.emit(tab.id)
 
-    def removeScanTab(self, tab):
-        id = self.widget(tab).id
-        self.scanTabRemoved.emit(id)
-        self.removeTab(tab)
+    def removeScanTab(self, index):
+        id = self.widget(index).id
+        tab = self.widget(index)
+        self.removeTab(index)
+        tab.deleteLater()
+        self.relabel_tabs()
+        self.scanTabRemoved.emit(tab.layout)
+        if not self.tab.count() > 0:
+            self.addScanTab()
+
+    def relabel_tabs(self):
+        tabs = {}
+        for i in range(self.tab.count()):
+            v = self.widget(i)
+            v.set_id(i+1)
+            tabs[i+1] = v
+            self.setTabText(i, 'Scan '+str(i+1))
+        self.tabs = tabs
 
     def clearScans(self):
         for id, tab in self.tabs.items():

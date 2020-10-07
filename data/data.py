@@ -25,9 +25,10 @@ class Data(object):
         self.lattices = lattices.lattices
         [self.parameterDict.update({l:collections.OrderedDict()}) for l in self.lattices]
         [self.screenDict.update({l:collections.OrderedDict()}) for l in self.lattices]
+        self.parameterDict['astra'] = collections.OrderedDict()
         self.parameterDict['scan'] = collections.OrderedDict()
         self.scanDict = self.parameterDict['scan']
-        self.scanDict['parameter_scan'] = False
+        # self.scanDict['parameter_scan'] = False
         # self.parameterDict['simulation'] = collections.OrderedDict()
         # self.simulationDict = self.parameterDict['simulation']
         self.parameterDict['generator'] = collections.OrderedDict()
@@ -49,6 +50,8 @@ class Data(object):
 
     def initialise_data(self):
         # [self.runParameterDict.update({key: value}) for key, value in zip(data_keys, data_v)]
+        self.parameterDict['Gun']['h_min'] = {'value': 0.0001, 'type': 'simulation'}
+        self.parameterDict['Gun']['h_max'] = {'value': 0.0001, 'type': 'simulation'}
         [[self.screenDict[l].update({key: value}) for key, value in self.screen_values.items() if l == key[:len(l)]] for l in self.lattices]
         [self.screenDict['Gun'].update({key: value}) for key, value in self.screen_values.items() if 'CLA-S01' == key[:len('CLA-S01')]]
         [self.screenDict['Linac'].update({key: value}) for key, value in self.screen_values.items() if 'CLA-L01' == key[:len('CLA-L01')]]
@@ -73,8 +76,9 @@ class Data(object):
                 self.parameterDict[l][key]['type'] = 'simulation'
         self.update_mag_field_coefficients()
 
-    def initialise_scan(self):
-        [self.scan_values.update({key: value}) for key, value in zip(scan_parameter_keys, scan_parameter_v)]
+    def initialise_scan(self, id):
+        self.scanDict[str(id)] = {}
+        [self.scanDict[str(id)].update({key: None}) for key in ['scan', 'parameter', 'scan_from_value', 'scan_to_value', 'scan_step_size']]
 
     def initialise_scan_parameters(self):
         [self.scan_parameter.update({key: value}) for key, value in zip(scan_keys, scan_v)]

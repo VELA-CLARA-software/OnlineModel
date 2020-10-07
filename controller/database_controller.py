@@ -97,8 +97,8 @@ class DatabaseController():
         self.writer.delete_run_id(run_id)
         self.reader.delete_run_id_from_settings_dict(run_id)
 
-    def find_run_id_for_each_lattice(self, prefix='', run_id=''):
-        return self.reader.get_run_id_for_each_lattice(prefix, run_id)
+    def find_run_id_for_each_lattice(self, run_id=''):
+        return self.reader.get_run_id_for_each_lattice(run_id)
 
 if __name__ == '__main__':
     dbc = DatabaseController()

@@ -1917,14 +1917,14 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0">
+               <item row="4" column="0">
                 <widget class="QLabel" name="label">
                  <property name="text">
                   <string>Linac Tracking Code</string>
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
+               <item row="4" column="1">
                 <widget class="QComboBox" name="comboBox_5">
                  <property name="accessibleName">
                   <string>Linac:tracking_code:value</string>
@@ -1944,14 +1944,14 @@
                  </item>
                 </widget>
                </item>
-               <item row="3" column="0">
+               <item row="5" column="0">
                 <widget class="QLabel" name="label_23">
                  <property name="text">
                   <string>Linac Space Charge</string>
                  </property>
                 </widget>
                </item>
-               <item row="3" column="1">
+               <item row="5" column="1">
                 <widget class="QCheckBox" name="checkBox_10">
                  <property name="accessibleName">
                   <string>Linac:lsc:value</string>
@@ -1964,14 +1964,14 @@
                  </property>
                 </widget>
                </item>
-               <item row="4" column="0">
+               <item row="6" column="0">
                 <widget class="QLabel" name="label_24">
                  <property name="text">
                   <string>Linac LSC Bins</string>
                  </property>
                 </widget>
                </item>
-               <item row="4" column="1">
+               <item row="6" column="1">
                 <widget class="QSpinBox" name="spinBox_9">
                  <property name="accessibleName">
                   <string>Linac:lsc_bins:value</string>
@@ -1987,14 +1987,14 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="0">
+               <item row="7" column="0">
                 <widget class="QLabel" name="label_25">
                  <property name="text">
                   <string>Linac Long. Wakefields</string>
                  </property>
                 </widget>
                </item>
-               <item row="5" column="1">
+               <item row="7" column="1">
                 <widget class="QCheckBox" name="linaczwake">
                  <property name="accessibleName">
                   <string>Linac:zwake:value</string>
@@ -2007,14 +2007,14 @@
                  </property>
                 </widget>
                </item>
-               <item row="6" column="0">
+               <item row="8" column="0">
                 <widget class="QLabel" name="label_26">
                  <property name="text">
                   <string>Linac Trans. Wakefields</string>
                  </property>
                 </widget>
                </item>
-               <item row="6" column="1">
+               <item row="8" column="1">
                 <widget class="QCheckBox" name="linactrwake">
                  <property name="accessibleName">
                   <string>Linac:trwake:value</string>
@@ -2024,6 +2024,64 @@
                  </property>
                  <property name="checked">
                   <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_36">
+                 <property name="text">
+                  <string>H_Max (ASTRA)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QDoubleSpinBox" name="doubleSpinBox_29">
+                 <property name="accessibleName">
+                  <string>Gun:h_max:value</string>
+                 </property>
+                 <property name="buttonSymbols">
+                  <enum>QAbstractSpinBox::NoButtons</enum>
+                 </property>
+                 <property name="decimals">
+                  <number>6</number>
+                 </property>
+                 <property name="maximum">
+                  <double>0.010000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>0.001000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="label_37">
+                 <property name="text">
+                  <string>H_Min (ASTRA)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QDoubleSpinBox" name="doubleSpinBox_30">
+                 <property name="accessibleName">
+                  <string>Gun:h_min:value</string>
+                 </property>
+                 <property name="buttonSymbols">
+                  <enum>QAbstractSpinBox::NoButtons</enum>
+                 </property>
+                 <property name="decimals">
+                  <number>6</number>
+                 </property>
+                 <property name="maximum">
+                  <double>0.010000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.000000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>0.000010000000000</double>
                  </property>
                 </widget>
                </item>

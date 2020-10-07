@@ -37,7 +37,8 @@ class DatabaseCreator():
                 	"username"	TEXT,
                     "tags"	TEXT,
                     "prefix" TEXT,
-                    "start_lattice" TEXT
+                    "start_lattice" TEXT,
+                    "directory" TEXT
                 );'''
         self.sql_cursor.execute(sql)
         if clean:

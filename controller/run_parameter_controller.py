@@ -362,6 +362,7 @@ class RunParameterController(QObject):
         widget = self.sender()
         dictname, pv, param = self.split_accessible_name(widget.accessibleName())
         value = self.get_widget_value(widget)
+        # pv = int(pv) if pv.isdigit() else pv
         if param is None:
             try:
                 self.model.data.parameterDict[dictname].update({pv: value})
@@ -411,6 +412,64 @@ class RunParameterController(QObject):
                 widget.update.connect(self.update_value_in_dict)
                 widget.update.emit()
                 self.view.runButton.clicked.connect(widget.update.emit)
+            self.accessibleNames[k] = v
+
+    def trigger_children(self, layout):
+        accessibleNames = {}
+        childCount = layout.count()
+        for child in range(0,childCount):
+            widget = layout.itemAt(child).widget()
+            if widget is not None and widget.accessibleName() is not None and not widget.accessibleName() == "":
+                accessibleNames[widget.accessibleName()] = widget
+            else:
+                pass
+        for k, v in accessibleNames.items():
+            widget = v
+            if type(widget) is QLineEdit:
+                widget.textChanged.emit(widget.placeholderText())
+            elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
+                widget.valueChanged.emit(widget.value())
+            elif type(widget) is QCheckBox:
+                widget.stateChanged.emit(widget.isChecked())
+            elif type(widget) is QComboBox:
+                widget.currentIndexChanged.emit(widget.currentIndex())
+            elif isinstance(widget, CheckableComboBox):
+                # print('analyse_children: CheckableComboBox! ', widget)
+                widget.tagChanged.emit()
+            elif isinstance(widget, userWidget):
+                widget.update.emit()
+            elif isinstance(widget, timeWidget):
+                widget.update.emit()
+
+    def remove_children(self, layout):
+        accessibleNames = {}
+        childCount = layout.count()
+        for child in range(0,childCount):
+            widget = layout.itemAt(child).widget()
+            if widget is not None and widget.accessibleName() is not None and not widget.accessibleName() == "":
+                accessibleNames[widget.accessibleName()] = widget
+            else:
+                pass
+        for k, v in accessibleNames.items():
+            # print('Removing widget ', widget)
+            widget = v
+            if type(widget) is QLineEdit:
+                widget.textChanged.disconnect()
+            elif type(widget) is QDoubleSpinBox or type(widget) is QSpinBox:
+                widget.valueChanged.disconnect()
+            elif type(widget) is QCheckBox:
+                widget.stateChanged.disconnect()
+            elif type(widget) is QComboBox:
+                widget.currentIndexChanged.disconnect()
+            elif isinstance(widget, CheckableComboBox):
+                widget.tagChanged.disconnect()
+            elif isinstance(widget, userWidget):
+                widget.update.disconnect()
+            elif isinstance(widget, timeWidget):
+                widget.update.disconnect()
+            widget.deleteLater()
+            if k in self.accessibleNames:
+                del self.accessibleNames[k]
 
     def initialize_run_parameter_data(self):
         self.scannableParameters = []
@@ -432,11 +491,15 @@ class RunParameterController(QObject):
         scanParameterComboBox = self.view.scan_tabWidget.tabs[id].scanSelectionWidget
         for (parameterDisplayStr, parameter) in self.model.data.scannableParametersDict.items():
             scanParameterComboBox.addItem(parameterDisplayStr, parameter)
+        self.model.data.initialise_scan(id)
         self.analyse_children(self.view.scan_tabWidget.tabs[id].layout)
 
-    def remove_scan_dict(self, id):
-        for key in ['', '_scan', '_scan_from_value', '_scan_to_value', '_scan_step_size']:
-            del self.model.data.scanDict['parameter'+str(id)+key]
+    def remove_scan_dict(self, layout):
+        self.remove_children(layout)
+        self.model.data.scanDict = self.model.data.parameterDict['scan'] = collections.OrderedDict()
+        for k,v in self.view.scan_tabWidget.tabs.items():
+            self.model.data.initialise_scan(k)
+            self.trigger_children(v.layout)
 
     def update_widget_from_dict(self, aname):
         widget = self.get_object_by_accessible_name(aname)
@@ -456,7 +519,7 @@ class RunParameterController(QObject):
     def update_widgets_with_values(self, aname, value):
         if isinstance(value, (dict)):
             for k,v in value.items():
-                self.update_widgets_with_values(aname.replace('Dict','')+':'+k,v)
+                self.update_widgets_with_values(aname.replace('Dict','')+':'+str(k),v)
         else:
             widget = self.get_object_by_accessible_name(aname)
             if widget is not None:
@@ -480,6 +543,8 @@ class RunParameterController(QObject):
                     widget.setCurrentIndex(index)
                 elif isinstance(widget, CheckableComboBox):
                     widget.setTagStates(value)
+            # else:
+            #     print(aname, widget)
 
     ## Need to port this to the unified controller
     @pyqtSlot()
@@ -495,12 +560,26 @@ class RunParameterController(QObject):
             filename = os.path.join(directory, filename)
         if not filename == '' and not filename is None and (filename[-4:].lower() == '.yml' or filename[-5:].lower() == '.yaml'):
             loaded_parameter_dict = yaml_parser.parse_parameter_input_file(filename)
+            if 'scan' in loaded_parameter_dict:
+                ntabs = len(loaded_parameter_dict['scan'].keys())
+                self.view.scan_tabWidget.clear()
+                self.model.data.scanDict = self.model.data.parameterDict['scan'] = collections.OrderedDict()
+                self.view.scan_tabWidget.addScanTab()
+                while self.view.scan_tabWidget.tab.count() < ntabs:
+                    self.view.scan_tabWidget.addScanTab()
             self.update_widgets_from_yaml_dict(loaded_parameter_dict)
         else:
             print('Failed to import, please provide a filename')
 
     def load_yaml_from_db(self, run_id):
         loaded_parameter_dict = self.model.import_yaml(run_id)
+        if 'scan' in loaded_parameter_dict:
+            ntabs = len(loaded_parameter_dict['scan'].keys())
+            self.view.scan_tabWidget.clear()
+            self.model.data.scanDict = self.model.data.parameterDict['scan'] = collections.OrderedDict()
+            self.view.scan_tabWidget.addScanTab()
+            while self.view.scan_tabWidget.tab.count() < ntabs:
+                self.view.scan_tabWidget.addScanTab()
         self.update_widgets_from_yaml_dict(loaded_parameter_dict)
 
     def update_widgets_from_yaml_dict(self, loaded_parameter_dict):
@@ -520,7 +599,6 @@ class RunParameterController(QObject):
         if directory is None:
             directory = '.'
         self.model.export_parameter_values_to_yaml_file(auto=False, filename=filename, directory=directory)
-
 
     def disable_run_button(self, scan=False):
         for k, v in self.accessibleNames.items():
@@ -590,12 +668,13 @@ class RunParameterController(QObject):
             self.finished_tracking = True
 
     def generate_scan_range(self, dimension=1):
-        do_scan = self.model.data.scanDict['parameter' + str(dimension) + '_scan']
+        dimension = str(dimension)
+        do_scan = self.model.data.scanDict[dimension]['scan']
         if do_scan:
-            scan_start = float(self.model.data.scanDict['parameter' + str(dimension) + '_scan_from_value'])
-            scan_end = float(self.model.data.scanDict['parameter' + str(dimension) + '_scan_to_value'])
-            scan_step_size = float(self.model.data.scanDict['parameter' + str(dimension) + '_scan_step_size'])
-            parameter = self.model.data.scanDict['parameter' + str(dimension)]
+            scan_start = float(self.model.data.scanDict[dimension]['scan_from_value'])
+            scan_end = float(self.model.data.scanDict[dimension]['scan_to_value'])
+            scan_step_size = float(self.model.data.scanDict[dimension]['scan_step_size'])
+            parameter = self.model.data.scanDict[dimension]['parameter']
             return do_scan, scan_start, scan_end, scan_step_size, parameter
         else:
             return do_scan, 0, 0, 0, None
@@ -617,7 +696,7 @@ class RunParameterController(QObject):
         scan_data = [s for s in scancombineddata if s[0] is True]
         # Generate slice indexes based on selected data
         # s[1] = start, s[2] = end, s[3] = step
-        idx = tuple(slice(s[1], s[2], s[3]) for s in scan_data)
+        idx = tuple(slice(s[1], s[2]+s[3], s[3]) for s in scan_data)
         # Generate values for each dimension
         grid = np.mgrid[idx].reshape(ndims,-1).T
         # get list of params
@@ -679,9 +758,9 @@ class RunParameterController(QObject):
         for tab in self.view.scan_tabWidget.tabs.values():
             if tab.scanCheckbox.isChecked():
                 try:
-                    scan_start = float(self.model.data.scanDict['parameter'+str(tab.id)+'_scan_from_value'])
-                    scan_end = float(self.model.data.scanDict['parameter'+str(tab.id)+'_scan_to_value'])
-                    scan_step_size = float(self.model.data.scanDict['parameter'+str(tab.id)+'_scan_step_size'])
+                    scan_start = float(self.model.data.scanDict[str(tab.id)]['scan_from_value'])
+                    scan_end = float(self.model.data.scanDict[str(tab.id)]['scan_to_value'])
+                    scan_step_size = float(self.model.data.scanDict[str(tab.id)]['scan_step_size'])
                     scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
                     if not len(scan_range) > 0:
                         return False

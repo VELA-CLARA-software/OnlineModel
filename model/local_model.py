@@ -121,6 +121,13 @@ class Model(object):
         for l in self.data.lattices:
             self.data.Framework[l].prefix = ''
 
+    def update_astra_parameters(self):
+        for l in self.data.lattices:
+            latt = self.data.Framework[l]
+            if latt.code == 'astra':
+                self.data.Framework[l].headers['newrun']['h_min'] = self.data.parameterDict['Gun']['h_min']['value']
+                self.data.Framework[l].headers['newrun']['h_max'] = self.data.parameterDict['Gun']['h_max']['value']
+
     def run_script(self):
         success = True
         self.directoryname = ''
@@ -138,6 +145,7 @@ class Model(object):
             self.update_LSC()
             self.update_Wakefields()
             self.clear_prefixes()
+            self.update_astra_parameters()
             closest_match, lattices_to_be_saved = self.dbcontroller.reader.find_lattices_that_dont_exist(self.yaml)
             if len(lattices_to_be_saved) > 0:
                 start_lattice = lattices_to_be_saved[0]
@@ -146,8 +154,9 @@ class Model(object):
                     self.data.runsDict['prefix'] = closest_match
                     # print('Setting',start_lattice,'prefix = ', closest_match)
                     self.data.runsDict['start_lattice'] = start_lattice
+                self.data.runsDict['directory'] = os.path.abspath(self.basedirectoryname+'/'+self.directoryname)
                 self.yaml = create_yaml_dictionary(self.data)
-                self.data.Framework.setSubDirectory(self.basedirectoryname+'/'+self.directoryname)
+                self.data.Framework.setSubDirectory(os.path.relpath(self.data.runsDict['directory']))
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
                 # try:
