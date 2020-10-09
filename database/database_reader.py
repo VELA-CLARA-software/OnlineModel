@@ -1,7 +1,7 @@
 import sys, os
 sys.path.append(os.path.abspath(__file__+'/../../'))
 
-import sys, os, time
+import sys, os, time, datetime
 import sqlite3
 import uuid
 import database.run_parameters_parser as yaml_parser
@@ -60,9 +60,10 @@ class DatabaseReader():
     def update_run_tables_from_sql(self, table_name, run_id_settings_dict):
         """Take an SQL cursor and iteratively add elements to the run dictionary."""
         settings_for_run_id = self.sql_cursor.fetchall()
-        for run_id, prefix, start_lattice in settings_for_run_id:
+        for run_id, timestamp, prefix, start_lattice in settings_for_run_id:
             run_id_settings_dict[run_id]['runs']['prefix'] = prefix
             run_id_settings_dict[run_id]['runs']['start_lattice'] = start_lattice
+            run_id_settings_dict[run_id]['runs']['timestamp'] = datetime.datetime.fromtimestamp(float(timestamp)).strftime('%d-%m-%Y %H:%M:%S')
 
     def add_to_run_id_and_settings_dict_from_database(self, run_id):
         """Append a new run to the existing run and lattice dictionaries."""
@@ -98,7 +99,7 @@ class DatabaseReader():
         # print('       time to update LATTICE TABLE = ', time.time() - start, 'seconds ')
         self.sql_start = time.time()
         # We need to do the same for the run table (which has a different format)
-        sql = 'select run_id, prefix, start_lattice from \'runs\''
+        sql = 'select run_id, timestamp, prefix, start_lattice from \'runs\''
         self.sql_cursor.execute(sql)
         # print('       time to execute RUN SQL = ', time.time() - self.sql_start, 'seconds ')
         self.update_run_tables_from_sql(table_name, run_id_settings_dict)
@@ -256,6 +257,13 @@ class DatabaseReader():
 
     def get_all_run_ids(self):
         return self.run_id_settings_dict.keys()
+        
+    def get_all_run_timestamps(self):
+        run_id_list = self.get_all_run_ids()
+        timestamp_dict = dict()
+        for id in run_id_list:
+            timestamp_dict[id] = self.run_id_settings_dict[id]['runs']['timestamp']
+        return timestamp_dict
 
 if __name__ == '__main__':
     db_reader = DatabaseReader()

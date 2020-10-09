@@ -77,6 +77,9 @@ class DatabaseController():
 
     def get_all_run_ids(self):
         return self.reader.get_all_run_ids()
+        
+    def get_all_run_timestamps(self):
+        return self.reader.get_all_run_timestamps()
 
     def save_scan_information(self, *args, **kwargs):
         self.writer.save_entry_to_scan_table(*args, **kwargs)
