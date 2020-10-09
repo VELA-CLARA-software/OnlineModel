@@ -488,9 +488,8 @@ class RunParameterController(QObject):
         return scannableParameterDict
 
     def populate_scan_combo_box(self, id=1):
-        scanParameterComboBox = self.view.scan_tabWidget.tabs[id].scanSelectionWidget
-        for (parameterDisplayStr, parameter) in self.model.data.scannableParametersDict.items():
-            scanParameterComboBox.addItem(parameterDisplayStr, parameter)
+        scanParameterComboBox = self.view.scan_tabWidget.tabs[id]
+        scanParameterComboBox.addItems(self.model.data.scannableParametersDict)
         self.model.data.initialise_scan(id)
         self.analyse_children(self.view.scan_tabWidget.tabs[id].layout)
 
@@ -696,7 +695,7 @@ class RunParameterController(QObject):
         scan_data = [s for s in scancombineddata if s[0] is True]
         # Generate slice indexes based on selected data
         # s[1] = start, s[2] = end, s[3] = step
-        idx = tuple(slice(s[1], s[2]+s[3], s[3]) for s in scan_data)
+        idx = tuple(slice(s[1], s[2] + s[3] - s[2]%s[3], s[3]) for s in scan_data)
         # Generate values for each dimension
         grid = np.mgrid[idx].reshape(ndims,-1).T
         # get list of params
