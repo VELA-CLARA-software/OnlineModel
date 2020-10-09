@@ -58,6 +58,9 @@ class Model(object):
 
     def get_all_directory_names(self):
         return list(self.dbcontroller.get_all_run_ids())
+        
+    def get_all_run_timestamps(self):
+        return self.dbcontroller.get_all_run_timestamps()
 
     def close_connection(self):
         return self.client.close()

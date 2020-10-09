@@ -144,7 +144,7 @@ class RunParameterController(QObject):
 
     tags = ['BA1', 'User Experiment', 'Front End', 'Emittance', 'Energy Spread', 'Commissioning']
 
-    run_table_columns = {'run_id': 1, 'load_run_button': 0, 'plot_checkbox': 2, 'plot_color': 3}
+    run_table_columns = {'run_id': 1, 'load_run_button': 0, 'plot_checkbox': 2, 'plot_color': 3, 'time_stamp':4}
 
     def __init__(self, app, view, model):
         super(RunParameterController, self).__init__()
@@ -242,12 +242,14 @@ class RunParameterController(QObject):
             table.setModel(None)
             model.deleteLater()
         dirnames = self.model.get_all_directory_names()
-        self.tablemodel = run_table.RunModel(list(reversed(dirnames)), self)
+        timestamps = self.model.get_all_run_timestamps()
+        self.tablemodel = run_table.RunModel(list(reversed(dirnames)),timestamps, self)
         table.setModel(self.tablemodel)
         table.setColumnWidth(0,12)
         table.setColumnWidth(1,228)
         table.setColumnWidth(2,12)
         table.setColumnWidth(3,12)
+        table.setColumnWidth(4,228)
 
     def delete_run_id(self, run_id):
         self.delete_run_id_signal.emit(run_id)

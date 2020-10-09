@@ -70,16 +70,22 @@ class PlotColorDelegate(LoadButtonDelegate):
 class RunModel(QAbstractTableModel):
     ActiveRole = Qt.UserRole + 1
 
-    def __init__(self, data, parent=None):
+    def __init__(self, data, timestamps=None, parent=None):
         super().__init__()
         self._data = data
+        self._timestamps = timestamps
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._data)
 
     def columnCount(self, parent=QModelIndex()):
-        return 4
+        return 5
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
-            return QVariant(self._data[index.row()]) if index.column() == 1 else None
+            if index.column() == 1:
+                return QVariant(self._data[index.row()])
+            elif index.column() == 4:
+                return QVariant(self._timestamps[self._data[index.row()]]) 
+            else:
+                return None
