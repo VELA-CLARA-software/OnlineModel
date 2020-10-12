@@ -43,9 +43,12 @@ class Model(object):
     output_directory = 'C:/Users/ujo48515/Documents/'
     width = 1000
     height = 600
-    def __init__(self):
+    def __init__(self, dataClass=None):
         self.path_exists = False
-        self.data = data.Data()
+        if dataClass is None:
+            self.data = data.Data()
+        else:
+            self.data = dataClass
         self.generator_params = ['number_of_particles', 'dist_x', 'dist_y', 'dist_z', 'sig_x', 'sig_y', 'sig_z']
         self.scan_progress = -1
         # self.dbcontroller = dbc.DatabaseController()

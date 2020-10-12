@@ -1134,7 +1134,7 @@ class Ui_MainWindow(object):
         self.run_parameters_table.setMaximumSize(QtCore.QSize(365, 16777215))
         self.run_parameters_table.setDragDropOverwriteMode(False)
         self.run_parameters_table.setAlternatingRowColors(True)
-        self.run_parameters_table.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
+        self.run_parameters_table.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.run_parameters_table.setSortingEnabled(True)
         self.run_parameters_table.setObjectName("run_parameters_table")
         self.run_parameters_table.horizontalHeader().setVisible(False)

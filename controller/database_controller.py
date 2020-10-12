@@ -9,8 +9,9 @@ import database.database_creator as database_creator
 class DatabaseController():
     """Top-level controller for DB operations."""
 
-    def __init__(self, database='SimulationDatabase.db'):
+    def __init__(self, database='SimulationDatabase.db', verbose=True):
         self.database = database
+        self.verbose = verbose
         ### Check/Create database
         self.change_database(self.database)
         self.settings_dict = None
@@ -19,7 +20,7 @@ class DatabaseController():
         self.database = database
         self.creator = database_creator.DatabaseCreator(self.database)
         self.creator.create_simulation_database(clean=False)
-        self.reader = database_reader.DatabaseReader(self.database)
+        self.reader = database_reader.DatabaseReader(self.database, verbose=self.verbose)
         self.writer = database_writer.DatabaseWriter(self.database)
 
     ## NEED TO CHECK IF YAML_DICT HAS BEEN SET, OTHERWISE USE ARGUMENT.

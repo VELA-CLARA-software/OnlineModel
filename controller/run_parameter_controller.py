@@ -6,13 +6,15 @@ except:
     from PyQt5.QtGui import *
     from PyQt5.QtWidgets import *
 import database.run_parameters_parser as yaml_parser
-from model.local_model import create_yaml_dictionary
+from model.local_model import create_yaml_dictionary, Model
 import controller.run_table as run_table
+from controller import database_controller
 import sys, os
 import time
 import collections
 import numpy as np
 import pyqtgraph as pg
+from copy import deepcopy
 from deepdiff import DeepDiff
 
 class CheckableComboBox(QComboBox):
@@ -108,6 +110,62 @@ class GenericThread(QThread):
         if not self._stopped:
             self.object = self.function(*self.args, **self.kwargs)
 
+class WorkerSignals(QObject):
+    '''
+    Defines the signals available from a running worker thread.
+
+    Supported signals are:
+
+    finished
+        No data
+
+    error
+        `tuple` (exctype, value, traceback.format_exc() )
+
+    result
+        `object` data returned from processing, anything
+
+    '''
+    finished = pyqtSignal()
+    error = pyqtSignal(tuple)
+    result = pyqtSignal(object)
+
+class GenericWorker(QRunnable):
+    '''
+    Worker thread
+
+    Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
+
+    :param callback: The function callback to run on this worker thread. Supplied args and
+                     kwargs will be passed through to the runner.
+    :type callback: function
+    :param args: Arguments to pass to the callback function
+    :param kwargs: Keywords to pass to the callback function
+
+    '''
+
+    def __init__(self, fn, *args, **kwargs):
+        super(GenericWorker, self).__init__()
+        # Store constructor arguments (re-used for processing)
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signals = WorkerSignals()
+
+    @pyqtSlot()
+    def run(self):
+        '''
+        Initialise the runner function with passed args, kwargs.
+        '''
+        try:
+            result = self.fn(*self.args, **self.kwargs)
+        except:
+            pass
+        else:
+            self.signals.result.emit(result)  # Return the result of the processing
+        finally:
+            self.signals.finished.emit()  # Done
+
 class signalling_monitor(QObject):
 
     valueChanged = pyqtSignal(int)
@@ -142,6 +200,7 @@ class RunParameterController(QObject):
     add_plot_window_signal = pyqtSignal(int, str)
     run_id_clicked_signal = pyqtSignal(str)
     change_database_signal = pyqtSignal(str)
+    run_finished_signal = pyqtSignal(int, str, dict)
 
     tags = ['BA1', 'User Experiment', 'Front End', 'Emittance', 'Energy Spread', 'Commissioning']
 
@@ -188,6 +247,7 @@ class RunParameterController(QObject):
         self.view.runButton.clicked.connect(self.run_astra)
         self.view.directory.textChanged[str].emit(self.view.directory.text())
         self.view.clearPlotsButton.clicked.connect(self.clear_all_plots)
+        self.run_finished_signal.connect(self.run_finished)
         self.abort_scan = False
         self.run_plots = []
         self.run_plot_colors = {}
@@ -197,6 +257,8 @@ class RunParameterController(QObject):
         self.populate_run_parameters_table()
         self.toggle_BSOL_tracking()
         self.toggle_BSOL_tracking()
+        self.threadpool = QThreadPool()
+        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
     def set_base_directory(self, directory):
         self.model.set_base_directory(directory)
@@ -206,6 +268,12 @@ class RunParameterController(QObject):
         # layout = self.view.run_splitter
         # layout.addWidget(self.view.yaml_tree_widget)
         table = self.view.run_parameters_table
+        table.horizontalHeader().setVisible(True)
+        table.setSortingEnabled(True)
+        # table.horizontalHeader().setResizeMode(QHeaderView.Stretch)
+        table.setShowGrid(True)
+        table.setSelectionBehavior(QTableView.SelectRows)
+        table.setAlternatingRowColors(True)
         table.setColumnWidth(0,10)
         table.setColumnWidth(2,10)
         table.setColumnWidth(3,10)
@@ -246,9 +314,21 @@ class RunParameterController(QObject):
         table.setColumnWidth(2,12)
         table.setColumnWidth(3,12)
 
+    def update_run_parameters_table(self):
+        table = self.view.run_parameters_table
+        model = table.model()
+        dirnames = self.model.get_all_directory_names()
+        model.update_data(list(reversed(dirnames)))
+        model.modelReset.emit()
+
+    def refresh_run_parameters_table(self):
+        table = self.view.run_parameters_table
+        model = table.model()
+        model.modelReset.emit()
+
     def delete_run_id(self, run_id):
         self.delete_run_id_signal.emit(run_id)
-        self.populate_run_parameters_table()
+        self.update_run_parameters_table()
 
     def setrunplotcolor(self, row, color):
         table = self.view.run_parameters_table
@@ -260,13 +340,13 @@ class RunParameterController(QObject):
         table = self.view.run_parameters_table
         row = table.model()._data.index(id)
         self.emit_plot_signals(row, id, True)
-        self.populate_run_parameters_table()
+        self.refresh_run_parameters_table()
 
     def enable_plot_on_row(self, row):
         table = self.view.run_parameters_table
         item = table.model()._data[row]
         self.emit_plot_signals(row, item, True)
-        self.populate_run_parameters_table()
+        self.refresh_run_parameters_table()
 
     def get_id_for_row(self, row):
         table = self.view.run_parameters_table
@@ -277,7 +357,7 @@ class RunParameterController(QObject):
         [self.remove_plot_signal.emit(v) for v in self.run_plots]
         self.run_plots = []
         self.run_plot_colors = {}
-        self.populate_run_parameters_table()
+        self.refresh_run_parameters_table()
 
     def open_folder_on_server(self, dir):
         remote_dir = self.model.get_absolute_folder_location(dir)
@@ -291,7 +371,8 @@ class RunParameterController(QObject):
             self.run_plots.remove(v)
             del self.run_plot_colors[v]
             self.remove_plot_signal.emit(v)
-        self.populate_run_parameters_table()
+        self.refresh_run_parameters_table()
+        # self.populate_run_parameters_table()
 
     def toggle_BSOL_tracking(self):
         widget = self.view.bsol_track_checkBox
@@ -713,13 +794,37 @@ class RunParameterController(QObject):
         # dictname, pv, param = self.split_accessible_name(self.scan_parameter)
         # self.scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
         self.scan_no = 0
-        self.continue_scan()
+        print(self.scanning_grid[0][0][0].split(':')[0])
+        print(self.check_lattices_to_be_scanned())
+        exit()
+        # self.continue_scan()
 
-    def do_scan(self):
+    def do_scan(self, data, doPlot):
+        # data = deepcopy(self.model.data)
+        # doPlot = self.view.autoPlotCheckbox.isChecked()
+        localmodel = Model(dataClass=data)
+        localmodel.dbcontroller = database_controller.DatabaseController(self.model.dbcontroller.database, verbose=False)
+        localmodel.basedirectoryname = self.model.basedirectoryname
         self.tracking_success = False
-        self.tracking_success = self.model.run_script()
+        self.tracking_success = localmodel.run_script()
+        self.run_finished_signal.emit(doPlot, localmodel.directoryname, localmodel.yaml)
         if self.tracking_success:
-            self.export_parameter_values_to_yaml_file(auto=True)
+            localmodel.export_parameter_values_to_yaml_file(auto=True)
+            # localmodel.save_settings_to_database(localmodel.yaml, localmodel.directoryname)
+            # self.update_runs_widget(plot=doPlot, id=localmodel.directoryname)
+
+    def check_lattices_to_be_scanned(self):
+        start_lattices = []
+        for scgrid in self.scanning_grid:
+            current_scan = scgrid
+            for aname, value in current_scan:
+                self.update_widgets_with_values(aname, value)
+            yaml = create_yaml_dictionary(self.model.data)
+            print('db:', self.model.dbcontroller.reader.find_lattices_that_dont_exist(yaml))
+            closest_match, lattices_to_be_saved = self.model.dbcontroller.reader.find_lattices_that_dont_exist(yaml)
+            if lattices_to_be_saved is not None and len(lattices_to_be_saved) > 0:
+                start_lattices.append(lattices_to_be_saved[0])
+        return start_lattices
 
     def continue_scan(self):
         if not self.abort_scan and self.scan_no < len(self.scanning_grid):
@@ -739,11 +844,12 @@ class RunParameterController(QObject):
             # # subdir = (self.scan_basedir + '/' + pv + '_' + str(current_scan_value)).replace('//','/')
             # self.update_widgets_with_values('runs:directory', self.scan_basedir)
             #
-            self.thread = GenericThread(self.do_scan)
-            self.thread.started.connect(lambda:self.export_parameter_values_to_yaml_file(auto=True))
-            self.thread.finished.connect(lambda:self.save_settings_to_database(self.view.autoPlotCheckbox.isChecked()))
-            self.thread.finished.connect(self.continue_scan)
-            self.thread.start()
+            data = deepcopy(self.model.data)
+            worker = GenericWorker(self.do_scan, data, self.view.autoPlotCheckbox.isChecked())
+            # self.thread.started.connect(lambda:self.export_parameter_values_to_yaml_file(auto=True))
+            # self.thread.finished.connect(lambda:self.save_settings_to_database(self.view.autoPlotCheckbox.isChecked()))
+            worker.signals.finished.connect(self.continue_scan)
+            self.threadpool.start(worker)
             self.scan_no += 1
         else:
             self.abort_scan = False
@@ -782,13 +888,15 @@ class RunParameterController(QObject):
                 self.enable_run_button()
                 return
         else:
-            self.thread = GenericThread(self.do_scan)
-            self.thread.started.connect(lambda:self.export_parameter_values_to_yaml_file(auto=True))
-            self.thread.finished.connect(self.enable_run_button)
-            self.thread.finished.connect(self.update_directory_widget)
-            self.thread.finished.connect(lambda:self.save_settings_to_database(self.view.autoPlotCheckbox.isChecked()))
-            self.thread.start()
+            data = deepcopy(self.model.data)
+            worker = GenericWorker(self.do_scan, data, self.view.autoPlotCheckbox.isChecked())
+            self.threadpool.start(worker)
         return
+
+    def run_finished(self, doPlot, directoryname, yaml):
+        print('run_finished!', doPlot, directoryname)
+        self.model.save_settings_to_database(yaml, directoryname)
+        self.update_runs_widget(plot=doPlot, id=directoryname)
 
     def save_settings_to_database(self, plot=False):
         if self.tracking_success:
@@ -803,7 +911,7 @@ class RunParameterController(QObject):
         dirname = self.model.get_directory_name()
         # settings = self.model.import_yaml_from_server()
         # print('Adding row - ', str(self.model.run_number), dirname)
-        self.populate_run_parameters_table()
+        self.update_run_parameters_table()
         if plot:
             self.enable_plot_on_id(id)
 
@@ -815,7 +923,7 @@ class RunParameterController(QObject):
         self.timer.start()
 
     def run_astra(self):
-        self.disable_run_button()
+        # self.disable_run_button()
         self.app_sequence()
 
     ##### User tags
@@ -847,4 +955,4 @@ class RunParameterController(QObject):
             self.change_database_signal.emit(database)
 
     def database_changed(self):
-        self.populate_run_parameters_table()
+        self.update_run_parameters_table()
