@@ -75,7 +75,7 @@ class RunModel(QAbstractTableModel):
         self._data = data
         self._timestamps = timestamps
         self._rpc = rpc
-        self.currentSortDirection = None
+        self.currentSortDirection = 0
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._data)
