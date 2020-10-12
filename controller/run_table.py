@@ -20,7 +20,7 @@ class LoadButtonDelegate(QStyledItemDelegate):
         return loadButton
 
     def get_id(self, index):
-        return self.owner.model()._data[index.row()]
+        return index.siblingAtColumn(1).data()
 
 class PlotCheckboxDelegate(QItemDelegate):
     """
@@ -45,7 +45,7 @@ class PlotCheckboxDelegate(QItemDelegate):
         self.drawCheck(painter, option, option.rect.translated(-10,0), Qt.Checked if self.get_id(index) in self.rpc.run_plots else Qt.Unchecked)
 
     def get_id(self, index):
-        return self.owner.model()._data[index.row()]
+        return index.siblingAtColumn(1).data()
 
     def editorEvent(self, event, model, option, index):
         '''
@@ -70,16 +70,36 @@ class PlotColorDelegate(LoadButtonDelegate):
 class RunModel(QAbstractTableModel):
     ActiveRole = Qt.UserRole + 1
 
-    def __init__(self, data, timestamps=None, parent=None):
+    def __init__(self, data, timestamps=None, rpc=None, parent=None):
         super().__init__()
         self._data = data
         self._timestamps = timestamps
+        self._rpc = rpc
+        self.currentSortDirection = None
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._data)
 
     def columnCount(self, parent=QModelIndex()):
         return 5
+
+    def sort(self, column=None, direction=0):
+        """ 
+            - only able to sort if column = 4 (timestamp) for now.
+            - Direction=0 -> ASCENDING
+            - Direction=1 -> DESCENDING
+        """
+
+        self.layoutAboutToBeChanged.emit()
+        self.currentSortDirection = direction
+        if column == 4:
+            self._rpc.emit_sort_by_timestamp_signal(column, direction)
+            self._timestamps=dict(sorted(self._timestamps.items(), key=lambda x: x[1],reverse=(not direction)))
+            self._data = list(self._timestamps.keys())
+            self.modelReset.emit()
+        print('SORT CALLED on column: ', column)
+        print('SORT ORDER: ', direction)
+       
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
