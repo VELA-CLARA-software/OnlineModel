@@ -77,7 +77,7 @@ class DatabaseReader():
             # Add the data to the dictionary
             self.update_lattice_tables_from_sql(table_name, lattice_id_settings_dict)
         # We need to do the same for the run table (which has a different format)
-        sql = 'select run_id, prefix, start_lattice from \'runs\' where run_id = \'' + run_id + '\''
+        sql = 'select run_id, timestamp, prefix, start_lattice from \'runs\' where run_id = \'' + run_id + '\''
         self.sql_cursor.execute(sql)
         self.update_run_tables_from_sql(table_name, run_id_settings_dict)
 
