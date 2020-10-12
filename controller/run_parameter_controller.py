@@ -212,8 +212,12 @@ class RunParameterController(QObject):
         table.setColumnWidth(0,10)
         table.setColumnWidth(2,10)
         table.setColumnWidth(3,10)
-        self.tablemodel = run_table.RunModel([], self)
+        self.tablemodel = run_table.RunModel(data=[],timestamps=[], rpc=self)
+        # Doesn't appear 
+        #proxyModel = QSortFilterProxyModel()
+        #proxyModel.setSourceModel(self.tablemodel)
         table.setModel(self.tablemodel)
+        table.setSortingEnabled(True)
         table.setItemDelegateForColumn(0, run_table.LoadButtonDelegate(table, self))
         table.setItemDelegateForColumn(2, run_table.PlotCheckboxDelegate(table, self))
         table.setItemDelegateForColumn(3, run_table.PlotColorDelegate(table, self))
@@ -232,6 +236,11 @@ class RunParameterController(QObject):
         table = self.view.run_parameters_table
         runno = table.item(row, self.run_table_columns['run_id']).text()
         self.run_id_clicked.emit(str(runno))
+        
+    def emit_sort_by_timestamp_signal(self, column, order):
+        table = self.view.run_parameters_table
+        if column == 4:
+            table.sortByColumn(column, order)
 
     def populate_run_parameters_table(self):
         timer = QElapsedTimer()
@@ -251,9 +260,15 @@ class RunParameterController(QObject):
         table.setColumnWidth(3,12)
         table.setColumnWidth(4,228)
 
+    def refresh_run_parameters_table(self):
+        table = self.view.run_parameters_table
+        model = table.model()
+        model.modelReset.emit()
+        model.sort(4,model.currentSortDirection)
+
     def delete_run_id(self, run_id):
         self.delete_run_id_signal.emit(run_id)
-        self.populate_run_parameters_table()
+        self.refresh_run_parameters_table()
 
     def setrunplotcolor(self, row, color):
         table = self.view.run_parameters_table
@@ -265,13 +280,13 @@ class RunParameterController(QObject):
         table = self.view.run_parameters_table
         row = table.model()._data.index(id)
         self.emit_plot_signals(row, id, True)
-        self.populate_run_parameters_table()
+        self.refresh_run_parameters_table()
 
     def enable_plot_on_row(self, row):
         table = self.view.run_parameters_table
         item = table.model()._data[row]
         self.emit_plot_signals(row, item, True)
-        self.populate_run_parameters_table()
+        self.refresh_run_parameters_table()
 
     def get_id_for_row(self, row):
         table = self.view.run_parameters_table
@@ -282,7 +297,7 @@ class RunParameterController(QObject):
         [self.remove_plot_signal.emit(v) for v in self.run_plots]
         self.run_plots = []
         self.run_plot_colors = {}
-        self.populate_run_parameters_table()
+        self.refresh_run_parameters_table()
 
     def open_folder_on_server(self, dir):
         remote_dir = self.model.get_absolute_folder_location(dir)
@@ -296,7 +311,7 @@ class RunParameterController(QObject):
             self.run_plots.remove(v)
             del self.run_plot_colors[v]
             self.remove_plot_signal.emit(v)
-        self.populate_run_parameters_table()
+        self.refresh_run_parameters_table()
 
     def toggle_BSOL_tracking(self):
         widget = self.view.bsol_track_checkBox
@@ -728,7 +743,7 @@ class RunParameterController(QObject):
         dirname = self.model.get_directory_name()
         # settings = self.model.import_yaml_from_server()
         # print('Adding row - ', str(self.model.run_number), dirname)
-        self.populate_run_parameters_table()
+        self.refresh_run_parameters_table()
         if plot:
             self.enable_plot_on_id(id)
 
