@@ -240,7 +240,7 @@ class RunParameterController(QObject):
     def emit_sort_by_timestamp_signal(self, column, order):
         table = self.view.run_parameters_table
         if column == 4:
-            table.sortByColumn(column, order)
+            table.sortByColumn(column, order=order)
 
     def populate_run_parameters_table(self):
         timer = QElapsedTimer()
@@ -743,7 +743,7 @@ class RunParameterController(QObject):
         dirname = self.model.get_directory_name()
         # settings = self.model.import_yaml_from_server()
         # print('Adding row - ', str(self.model.run_number), dirname)
-        self.refresh_run_parameters_table()
+        self.populate_run_parameters_table()
         if plot:
             self.enable_plot_on_id(id)
 
