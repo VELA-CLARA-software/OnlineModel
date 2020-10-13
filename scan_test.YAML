@@ -442,12 +442,12 @@ runs:
   autoPlot: false
   directory: ''
   tags: []
-  timestamp: '1602497117.7472348'
+  timestamp: '1602582024.438234'
   username: jkj62
 scan:
   '1':
-    parameter: Gun:CLA-LRG1-GUN-CAV:phase
+    parameter: EBT-BA1:EBT-BA1-MAG-QUAD-05:k1l
     scan: true
-    scan_from_value: -20.0
-    scan_step_size: 1.0
-    scan_to_value: 20.0
+    scan_from_value: 0.1
+    scan_step_size: 0.1
+    scan_to_value: 0.5
