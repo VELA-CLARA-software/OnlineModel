@@ -106,7 +106,7 @@ class onlineModelPlotterWidget(QWidget):
 
         self.fileSelector = QComboBox()
         self.fileSelector.setMinimumWidth(200)
-        self.fileSelector.currentIndexChanged.connect(self.loadScreen)
+        self.fileSelector.currentIndexChanged.connect(self.updateScreens)
         self.fileSelector.currentIndexChanged.connect(self.loadTwissTable)
         self.beamWidget = QGroupBox()
         self.beamLayout = QHBoxLayout()
@@ -154,10 +154,11 @@ class onlineModelPlotterWidget(QWidget):
         self.shadowCurves = []
         self.connect_plot_signals()
         self.tabWidget.currentChanged.connect(self.changeTab)
-        self.fileSelector.currentIndexChanged.connect(self.loadScreen)
+        self.fileSelector.currentIndexChanged.connect(self.updateScreens)
         self.fileSelector.currentIndexChanged.connect(self.loadTwissTable)
 
     def connect_plot_signals(self):
+        return
         # When either subplot highlights a plot, connect it to the other plot and the listWidget
         self.globalTwissPlotWidget.highlightCurveSignal.connect(self.subplotHighlighted)
         self.latticeTwissPlotWidget.highlightCurveSignal.connect(self.subplotHighlighted)
@@ -185,7 +186,7 @@ class onlineModelPlotterWidget(QWidget):
             color = pg.mkColor(color)
         self.run_id_color[run_id] = color
         self.loadTwiss(run_id)
-        self.loadScreen()
+        self.loadScreen(run_id)
         self.loadTwissTable()
         return color
 
@@ -275,7 +276,23 @@ class onlineModelPlotterWidget(QWidget):
                 else:
                     self.twissTableWidget.setItem(row, 1+col, QTableWidgetItem(str(round(twiss[2]*twissData.get_parameter_at_z(twiss[0], zpos),2))))
 
-    def loadScreen(self):
+    def loadScreen(self, run_id):
+        # self.clearBeamScreens()
+        if len(self.screenpositions) > 0 and not self.fileSelector.currentText() == '':
+            beamfilename = str(self.fileSelector.currentData()[0])+'.hdf5'
+            screens, positions, lattices = list(zip(*self.allscreens))
+            screen_idx = screens.index(self.fileSelector.currentData()[0])
+            lattice = lattices[screen_idx]
+            # print(screen_idx, lattice, lattices)
+            for run, prefixes in self.run_id_prefixes.items():
+                # print('loadScreen:',run, run_id)
+                if run == run_id:
+                    directory = prefixes[lattice]
+                    color = self.run_id_color[run]
+                    # print(directory, beamfilename)
+                    self.loadBeamDataFile(directory, beamfilename, color, run)
+
+    def updateScreens(self):
         self.clearBeamScreens()
         if len(self.screenpositions) > 0 and not self.fileSelector.currentText() == '':
             beamfilename = str(self.fileSelector.currentData()[0])+'.hdf5'

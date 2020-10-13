@@ -200,7 +200,7 @@ class RunParameterController(QObject):
     add_plot_window_signal = pyqtSignal(int, str)
     run_id_clicked_signal = pyqtSignal(str)
     change_database_signal = pyqtSignal(str)
-    run_finished_signal = pyqtSignal(int, str, dict)
+    run_finished_signal = pyqtSignal(int, int, str, dict)
 
     tags = ['BA1', 'User Experiment', 'Front End', 'Emittance', 'Energy Spread', 'Commissioning']
 
@@ -244,7 +244,7 @@ class RunParameterController(QObject):
         # self.populate_scan_combo_box(1)
         # self.view.parameter_scan.stateChanged.connect(lambda: self.toggle_scan_parameters_state(self.view.parameter_scan))
         self.view.bsol_track_checkBox.stateChanged.connect(self.toggle_BSOL_tracking)
-        self.view.runButton.clicked.connect(self.run_astra)
+        self.view.runButton.clicked.connect(self.app_sequence)
         self.view.directory.textChanged[str].emit(self.view.directory.text())
         self.view.clearPlotsButton.clicked.connect(self.clear_all_plots)
         self.run_finished_signal.connect(self.run_finished)
@@ -258,6 +258,7 @@ class RunParameterController(QObject):
         self.toggle_BSOL_tracking()
         self.toggle_BSOL_tracking()
         self.threadpool = QThreadPool()
+        self.threadpool.setMaxThreadCount(self.threadpool.maxThreadCount()/2)
         print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
     def set_base_directory(self, directory):
@@ -552,6 +553,20 @@ class RunParameterController(QObject):
             if k in self.accessibleNames:
                 del self.accessibleNames[k]
 
+    def change_step_size(self, step):
+        accessibleNames = {}
+        for layout in self.formLayoutList:
+            childCount = layout.count()
+            for child in range(0,childCount):
+                widget = layout.itemAt(child).widget()
+                if widget is not None and widget.accessibleName() is not None and not widget.accessibleName() == "" and 'k1l' in widget.accessibleName():
+                    accessibleNames[widget.accessibleName()] = widget
+                else:
+                    pass
+        for k, widget in accessibleNames.items():
+            if type(widget) is QDoubleSpinBox:
+                widget.setSingleStep(step)
+
     def initialize_run_parameter_data(self):
         self.scannableParameters = []
         for layout in self.formLayoutList:
@@ -640,19 +655,17 @@ class RunParameterController(QObject):
             filename = os.path.join(directory, filename)
         if not filename == '' and not filename is None and (filename[-4:].lower() == '.yml' or filename[-5:].lower() == '.yaml'):
             loaded_parameter_dict = yaml_parser.parse_parameter_input_file(filename)
-            if 'scan' in loaded_parameter_dict:
-                ntabs = len(loaded_parameter_dict['scan'].keys())
-                self.view.scan_tabWidget.clear()
-                self.model.data.scanDict = self.model.data.parameterDict['scan'] = collections.OrderedDict()
-                self.view.scan_tabWidget.addScanTab()
-                while self.view.scan_tabWidget.tab.count() < ntabs:
-                    self.view.scan_tabWidget.addScanTab()
+            self.load_scans_from_dict(loaded_parameter_dict)
             self.update_widgets_from_yaml_dict(loaded_parameter_dict)
         else:
             print('Failed to import, please provide a filename')
 
     def load_yaml_from_db(self, run_id):
         loaded_parameter_dict = self.model.import_yaml(run_id)
+        self.load_scans_from_dict(loaded_parameter_dict)
+        self.update_widgets_from_yaml_dict(loaded_parameter_dict)
+
+    def load_scans_from_dict(self, loaded_parameter_dict):
         if 'scan' in loaded_parameter_dict:
             ntabs = len(loaded_parameter_dict['scan'].keys())
             self.view.scan_tabWidget.clear()
@@ -660,7 +673,6 @@ class RunParameterController(QObject):
             self.view.scan_tabWidget.addScanTab()
             while self.view.scan_tabWidget.tab.count() < ntabs:
                 self.view.scan_tabWidget.addScanTab()
-        self.update_widgets_from_yaml_dict(loaded_parameter_dict)
 
     def update_widgets_from_yaml_dict(self, loaded_parameter_dict):
         for (parameter, value) in loaded_parameter_dict.items():
@@ -685,7 +697,7 @@ class RunParameterController(QObject):
             v.setEnabled(False)
         if scan:
             self.view.runButton.setEnabled(True)
-            self.view.runButton.clicked.disconnect(self.run_astra)
+            self.view.runButton.clicked.disconnect(self.app_sequence)
             self.view.runButton.setText('Abort')
             self.view.runButton.clicked.connect(self.abort_ongoing_scan)
 
@@ -730,7 +742,7 @@ class RunParameterController(QObject):
     def enable_run_button(self):
         self.view.runButton.setText('Track')
         try:
-            self.view.runButton.clicked.disconnect(self.run_astra)
+            self.view.runButton.clicked.disconnect(self.app_sequence)
         except:
             try:
                 self.view.runButton.clicked.disconnect(self.abort_ongoing_scan)
@@ -738,7 +750,7 @@ class RunParameterController(QObject):
                 pass
         for k, v in self.accessibleNames.items():
             v.setEnabled(True)
-        self.view.runButton.clicked.connect(self.run_astra)
+        self.view.runButton.clicked.connect(self.app_sequence)
         return
 
     def toggle_finished_tracking(self):
@@ -759,14 +771,6 @@ class RunParameterController(QObject):
         else:
             return do_scan, 0, 0, 0, None
 
-    def generate_scan_range_test(self, dimension=1):
-        do_scan = True
-        scan_start = dimension * 3
-        scan_end = dimension * 3 + 2
-        scan_step_size = 1
-        parameter = 'test_'+dimension
-        return do_scan, scan_start, scan_end+scan_step_size, scan_step_size, parameter
-
     def generate_scan_dictionary(self, n):
         # Generate all scanning data
         scancombineddata = [self.generate_scan_range(i) for i in [tab.id for tab in self.view.scan_tabWidget.tabs.values()]]
@@ -776,7 +780,7 @@ class RunParameterController(QObject):
         scan_data = [s for s in scancombineddata if s[0] is True]
         # Generate slice indexes based on selected data
         # s[1] = start, s[2] = end, s[3] = step
-        idx = tuple(slice(s[1], s[2] + s[3] - s[2]%s[3], s[3]) for s in scan_data)
+        idx = tuple(slice(s[1], s[2] + 1e-15, s[3]) for s in scan_data)
         # Generate values for each dimension
         grid = np.mgrid[idx].reshape(ndims,-1).T
         # get list of params
@@ -794,37 +798,33 @@ class RunParameterController(QObject):
         # dictname, pv, param = self.split_accessible_name(self.scan_parameter)
         # self.scan_range = np.arange(scan_start, scan_end + scan_step_size, scan_step_size)
         self.scan_no = 0
-        print(self.scanning_grid[0][0][0].split(':')[0])
-        print(self.check_lattices_to_be_scanned())
-        exit()
-        # self.continue_scan()
+        self.view.progressBar.setMinimum(0)
+        self.view.progressBar.setMaximum(int(len(self.scanning_grid)))
+        self.view.progressBar.setValue(0)
+        self.continue_scan()
 
     def do_scan(self, data, doPlot):
         # data = deepcopy(self.model.data)
         # doPlot = self.view.autoPlotCheckbox.isChecked()
         localmodel = Model(dataClass=data)
-        localmodel.dbcontroller = database_controller.DatabaseController(self.model.dbcontroller.database, verbose=False)
+        localmodel.dbcontroller = self.model.dbcontroller
         localmodel.basedirectoryname = self.model.basedirectoryname
         self.tracking_success = False
         self.tracking_success = localmodel.run_script()
-        self.run_finished_signal.emit(doPlot, localmodel.directoryname, localmodel.yaml)
+        self.run_finished_signal.emit(self.tracking_success, doPlot, localmodel.directoryname, localmodel.yaml)
         if self.tracking_success:
             localmodel.export_parameter_values_to_yaml_file(auto=True)
-            # localmodel.save_settings_to_database(localmodel.yaml, localmodel.directoryname)
-            # self.update_runs_widget(plot=doPlot, id=localmodel.directoryname)
 
-    def check_lattices_to_be_scanned(self):
-        start_lattices = []
-        for scgrid in self.scanning_grid:
-            current_scan = scgrid
-            for aname, value in current_scan:
-                self.update_widgets_with_values(aname, value)
-            yaml = create_yaml_dictionary(self.model.data)
-            print('db:', self.model.dbcontroller.reader.find_lattices_that_dont_exist(yaml))
-            closest_match, lattices_to_be_saved = self.model.dbcontroller.reader.find_lattices_that_dont_exist(yaml)
-            if lattices_to_be_saved is not None and len(lattices_to_be_saved) > 0:
-                start_lattices.append(lattices_to_be_saved[0])
-        return start_lattices
+    def check_lattices_to_be_scanned(self, current_scan):
+        scan_variable_lattice = current_scan[0][0].split(':')[0]
+        for aname, value in current_scan:
+            self.update_widgets_with_values(aname, value)
+        yaml = create_yaml_dictionary(self.model.data)
+        # print('db:', self.model.dbcontroller.reader.find_lattices_that_dont_exist(yaml))
+        closest_match, lattices_to_be_saved = self.model.dbcontroller.reader.find_lattices_that_dont_exist(yaml)
+        if lattices_to_be_saved is not None and len(lattices_to_be_saved) > 0:
+            return lattices_to_be_saved[0] == scan_variable_lattice
+        return None
 
     def continue_scan(self):
         if not self.abort_scan and self.scan_no < len(self.scanning_grid):
@@ -833,31 +833,24 @@ class RunParameterController(QObject):
                 self.update_widgets_with_values(aname, value)
                 value = self.get_widget_value(self.get_object_by_accessible_name(aname))
                 print('Scanning['+str(self.scan_no)+']: Setting ', aname, ' to ', value, ' - ACTUAL Value = ', self.get_widget_value(self.get_object_by_accessible_name(aname)))
-            # print(self.scan_no, current_scan)
-            # self.view.progressBar.setValue(self.scan_no+1)
-            # self.scan_progress = self.scan_no+1
-            # current_scan_value = round(self.scan_range[self.scan_no], 5)
-            # self.update_widgets_with_values(self.scan_parameter, current_scan_value)
-            # self.model.data.scanDict['value'] = self.get_widget_value(self.get_object_by_accessible_name(self.scan_parameter))
-            # print('Scanning['+str(self.scan_no)+']: Setting ', self.scan_parameter, ' to ', current_scan_value, ' - ACTUAL Value = ', self.get_widget_value(self.get_object_by_accessible_name(self.scan_parameter)))
-            # dictname, pv, param = self.split_accessible_name(self.scan_parameter)
-            # # subdir = (self.scan_basedir + '/' + pv + '_' + str(current_scan_value)).replace('//','/')
-            # self.update_widgets_with_values('runs:directory', self.scan_basedir)
-            #
+            lattice_is_initial = self.check_lattices_to_be_scanned(current_scan)
             data = deepcopy(self.model.data)
             worker = GenericWorker(self.do_scan, data, self.view.autoPlotCheckbox.isChecked())
-            # self.thread.started.connect(lambda:self.export_parameter_values_to_yaml_file(auto=True))
-            # self.thread.finished.connect(lambda:self.save_settings_to_database(self.view.autoPlotCheckbox.isChecked()))
-            worker.signals.finished.connect(self.continue_scan)
+            if lattice_is_initial is False:
+                print('Running initial setup!')
+                worker.signals.finished.connect(self.continue_scan)
             self.threadpool.start(worker)
             self.scan_no += 1
+            if lattice_is_initial is None or lattice_is_initial is True:
+                self.continue_scan()
         else:
-            self.abort_scan = False
-            self.enable_run_button()
-            self.reset_progress_bar_timer()
+            if self.abort_scan:
+                self.enable_run_button()
+                self.reset_progress_bar_timer()
             for aname, value in self.scan_basevalues:
                 self.update_widgets_with_values(aname, value)
-            self.update_directory_widget()
+            # self.update_directory_widget()
+            self.abort_scan = False
 
     def check_scan_parameters(self):
         for tab in self.view.scan_tabWidget.tabs.values():
@@ -880,23 +873,34 @@ class RunParameterController(QObject):
         return any(scanning)
 
     def app_sequence(self):
+        self.progress = 0
         if self.check_if_scanning():
             if self.check_scan_parameters():
+                self.disable_run_button(scan=True)
                 self.setup_scan()
             else:
                 print('Error in scan parameters - aborting!')
-                self.enable_run_button()
                 return
         else:
+            self.disable_run_button(scan=False)
+            self.view.progressBar.setMinimum(0)
+            self.view.progressBar.setMaximum(1)
+            self.view.progressBar.setValue(0)
             data = deepcopy(self.model.data)
             worker = GenericWorker(self.do_scan, data, self.view.autoPlotCheckbox.isChecked())
             self.threadpool.start(worker)
         return
 
-    def run_finished(self, doPlot, directoryname, yaml):
-        print('run_finished!', doPlot, directoryname)
-        self.model.save_settings_to_database(yaml, directoryname)
-        self.update_runs_widget(plot=doPlot, id=directoryname)
+    def run_finished(self, success, doPlot, directoryname, yaml):
+        self.progress += 1
+        self.view.progressBar.setValue(self.progress)
+        if self.progress >= self.view.progressBar.maximum():
+            self.enable_run_button()
+            self.reset_progress_bar_timer()
+        print('run_finished!', directoryname)
+        if success:
+            self.model.save_settings_to_database(yaml, directoryname)
+            self.update_runs_widget(plot=doPlot, id=directoryname)
 
     def save_settings_to_database(self, plot=False):
         if self.tracking_success:
@@ -921,10 +925,6 @@ class RunParameterController(QObject):
         self.timer.setSingleShot(True)
         self.timer.timeout.connect(self.view.progressBar.reset)
         self.timer.start()
-
-    def run_astra(self):
-        # self.disable_run_button()
-        self.app_sequence()
 
     ##### User tags
 

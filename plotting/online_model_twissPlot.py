@@ -145,9 +145,11 @@ class twissPlotWidget(multiPlotWidget):
                 elegantfiles += sorted(glob.glob(directory+"/"+s+"*.flr"))
         if twiss is None: # If it doesn't exist need to instantiate a twiss obkject
             twiss = rtf.twiss()
+        # print('Loading ASTRA files', astrafiles)
         twiss.read_astra_emit_files(astrafiles, reset=reset)
         reset = False if len(astrafiles) > 0 else reset # if we have alreay found some ASTRA files, we need to set this to false to append new data, otherwise check input value
         ''' reset=False stops the previously loaded data from being overwritten'''
+        # print('Loading Elegant files', elegantfiles)
         twiss.read_elegant_twiss_files(elegantfiles, reset=reset)
         return twiss
 

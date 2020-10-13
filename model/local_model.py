@@ -162,13 +162,13 @@ class Model(object):
                 self.data.Framework.setSubDirectory(os.path.relpath(self.data.runsDict['directory']))
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
-                # try:
-                # self.data.Framework['CLA-S02'].file_block['output']['end_element'] = 'EBT-BA1-DIA-FCUP-01'
-                self.data.Framework.track(startfile=start_lattice)#, endfile='CLA-S02')
-                # except Exception as e:
-                #     print('!!!! Error in Tracking - settings not saved !!!!')
-                #     print(e)
-                #     success = False
+                try:
+                    self.data.Framework.track(startfile=start_lattice)#, endfile='CLA-S02')
+                except Exception as e:
+                    print('!!!! Error in Tracking - settings not saved !!!!')
+                    print(e)
+                    print('!!!!', self.directoryname, '!!!!')
+                    success = False
         return success
 
     def get_directory_name(self):
