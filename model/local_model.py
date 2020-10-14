@@ -43,9 +43,12 @@ class Model(object):
     output_directory = 'C:/Users/ujo48515/Documents/'
     width = 1000
     height = 600
-    def __init__(self):
+    def __init__(self, dataClass=None):
         self.path_exists = False
-        self.data = data.Data()
+        if dataClass is None:
+            self.data = data.Data()
+        else:
+            self.data = dataClass
         self.generator_params = ['number_of_particles', 'dist_x', 'dist_y', 'dist_z', 'sig_x', 'sig_y', 'sig_z']
         self.scan_progress = -1
         # self.dbcontroller = dbc.DatabaseController()
@@ -159,13 +162,13 @@ class Model(object):
                 self.data.Framework.setSubDirectory(os.path.relpath(self.data.runsDict['directory']))
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
-                # try:
-                # self.data.Framework['CLA-S02'].file_block['output']['end_element'] = 'EBT-BA1-DIA-FCUP-01'
-                self.data.Framework.track(startfile=start_lattice)#, endfile='CLA-S02')
-                # except Exception as e:
-                #     print('!!!! Error in Tracking - settings not saved !!!!')
-                #     print(e)
-                #     success = False
+                try:
+                    self.data.Framework.track(startfile=start_lattice)#, endfile='CLA-S02')
+                except Exception as e:
+                    print('!!!! Error in Tracking - settings not saved !!!!')
+                    print(e)
+                    print('!!!!', self.directoryname, '!!!!')
+                    success = False
         return success
 
     def get_directory_name(self):
