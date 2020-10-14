@@ -240,7 +240,7 @@ class RunParameterController(QObject):
     def emit_sort_by_timestamp_signal(self, column, order):
         table = self.view.run_parameters_table
         if column == 4:
-            table.sortByColumn(column, order=order)
+            table.sortByColumn(column, order)
 
     def populate_run_parameters_table(self):
         timer = QElapsedTimer()

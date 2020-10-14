@@ -93,7 +93,7 @@ class RunModel(QAbstractTableModel):
         self.layoutAboutToBeChanged.emit()
         self.currentSortDirection = direction
         if column == 4:
-            self._rpc.emit_sort_by_timestamp_signal(column, direction)
+            # self._rpc.emit_sort_by_timestamp_signal(column, direction)
             self._timestamps=dict(sorted(self._timestamps.items(), key=lambda x: x[1],reverse=(not direction)))
             self._data = list(self._timestamps.keys())
             self.modelReset.emit()
