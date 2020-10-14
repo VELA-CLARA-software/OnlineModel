@@ -442,7 +442,7 @@ runs:
   autoPlot: false
   directory: ''
   tags: []
-  timestamp: '1602582024.438234'
+  timestamp: '1602670842.4695218'
   username: jkj62
 scan:
   '1':
@@ -450,4 +450,16 @@ scan:
     scan: true
     scan_from_value: 0.1
     scan_step_size: 0.1
-    scan_to_value: 0.5
+    scan_to_value: 0.4
+  '2':
+    parameter: EBT-INJ:EBT-INJ-MAG-QUAD-15:k1l
+    scan: true
+    scan_from_value: 0.1
+    scan_step_size: 0.1
+    scan_to_value: 0.4
+  '3':
+    parameter: CLA-C2V:CLA-C2V-MAG-QUAD-03:k1l
+    scan: true
+    scan_from_value: 5.5
+    scan_step_size: 0.1
+    scan_to_value: 6.0
