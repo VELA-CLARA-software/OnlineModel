@@ -334,7 +334,7 @@ class DetachableTabWidget(QtWidgets.QTabWidget):
 
             # Determine if the current movement is detected as a drag
             if not self.dragStartPos.isNull() and (
-                    (event.pos() - self.dragStartPos).manhattanLength() < QtWidgets.QApplication.startDragDistance()):
+                    (event.pos() - self.dragStartPos).manhattanLength() > 0):
                 self.dragInitiated = True
 
             # If the current movement is a drag initiated by the left button
@@ -352,14 +352,14 @@ class DetachableTabWidget(QtWidgets.QTabWidget):
                 drag.setMimeData(mimeData)
 
                 # Create the appearance of dragging the tab content
-                pixmap = self.parentWidget().currentWidget().grab()
-                targetPixmap = QtGui.QPixmap(pixmap.size())
-                targetPixmap.fill(QtCore.Qt.transparent)
-                painter = QtGui.QPainter(targetPixmap)
-                painter.setOpacity(0.85)
-                painter.drawPixmap(0, 0, pixmap)
-                painter.end()
-                drag.setPixmap(targetPixmap)
+                # pixmap = self.parentWidget().currentWidget().grab()
+                # targetPixmap = QtGui.QPixmap(pixmap.size())
+                # targetPixmap.fill(QtCore.Qt.transparent)
+                # painter = QtGui.QPainter(targetPixmap)
+                # painter.setOpacity(0.85)
+                # painter.drawPixmap(0, 0, pixmap)
+                # painter.end()
+                # drag.setPixmap(targetPixmap)
 
                 # Initiate the drag
                 dropAction = drag.exec_(QtCore.Qt.MoveAction | QtCore.Qt.CopyAction)
@@ -373,7 +373,7 @@ class DetachableTabWidget(QtWidgets.QTabWidget):
                 # the content to the current cursor position
                 if dropAction == QtCore.Qt.IgnoreAction:
                     event.accept()
-                    self.onDetachTabSignal.emit(self.tabAt(self.dragStartPos), self.mouseCursor.pos())
+                    # self.onDetachTabSignal.emit(self.tabAt(self.dragStartPos), self.mouseCursor.pos())
 
                 # Else if the drag completed inside the tab bar, move the selected tab to the new position
                 elif dropAction == QtCore.Qt.MoveAction:

@@ -2,6 +2,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import pyqtgraph as pg
+from copy import copy
 
 class LoadButtonDelegate(QStyledItemDelegate):
     def __init__(self, owner, rpc):
@@ -20,7 +21,8 @@ class LoadButtonDelegate(QStyledItemDelegate):
         return loadButton
 
     def get_id(self, index):
-        return index.siblingAtColumn(1).data()
+        return self.owner.model()._data[index.row()]
+
 
 class PlotCheckboxDelegate(QItemDelegate):
     """
@@ -45,7 +47,7 @@ class PlotCheckboxDelegate(QItemDelegate):
         self.drawCheck(painter, option, option.rect.translated(-10,0), Qt.Checked if self.get_id(index) in self.rpc.run_plots else Qt.Unchecked)
 
     def get_id(self, index):
-        return index.siblingAtColumn(1).data()
+        return self.owner.model()._data[index.row()]
 
     def editorEvent(self, event, model, option, index):
         '''
@@ -60,10 +62,11 @@ class PlotCheckboxDelegate(QItemDelegate):
 class PlotColorDelegate(LoadButtonDelegate):
 
     def createEditor(self, parent, option, index):
-        colorWidget = pg.ColorButton(parent)
-        colorWidget.setEnabled(False)
-        if self.get_id(index) in self.rpc.run_plots:
-            colorWidget.setColor(self.rpc.run_plot_colors[self.get_id(index)])
+        # print(index.row(), index.siblingAtColumn(1).data(), index.siblingAtColumn(1).data() in self.rpc.run_plots)
+        if index.siblingAtColumn(1).data() in self.rpc.run_plots:
+            colorWidget = pg.ColorButton(parent)
+            colorWidget.setEnabled(False)
+            colorWidget.setColor(self.rpc.run_plot_colors[index.siblingAtColumn(1).data()])
             return colorWidget
         return None
 
@@ -74,8 +77,12 @@ class RunModel(QAbstractTableModel):
         super().__init__()
         self._data = data
         self._timestamps = timestamps
-        self._rpc = rpc
-        self.currentSortDirection = 0
+        self.sortOrder = Qt.AscendingOrder
+        self.header_labels = ['Load', 'Run ID', 'Plot', 'Colour']
+
+    def update_data(self, data):
+        self._data = data
+        self.sort(1, self.sortOrder)
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._data)
@@ -109,3 +116,22 @@ class RunModel(QAbstractTableModel):
                 return QVariant(self._timestamps[self._data[index.row()]]) 
             else:
                 return None
+
+
+    def headerData(self, section, orientation, role=Qt.DisplayRole):
+        if role == Qt.DisplayRole and orientation == Qt.Horizontal:
+            return self.header_labels[section]
+        return QAbstractTableModel.headerData(self, section, orientation, role)
+
+    def sort(self, col, order=Qt.AscendingOrder):
+        self.sortOrder = order
+        oldIndexList = self.persistentIndexList()
+        olddata = self._data[:]
+        if order == Qt.AscendingOrder:
+            self._data.sort()
+        else:
+            self._data.sort(reverse=True)
+        newIndexList = [self.index(self._data.index(olddata[idx.row()]), idx.column(), idx.parent()) for idx in oldIndexList]
+        self.changePersistentIndexList(oldIndexList, newIndexList)
+        self.modelReset.emit()
+

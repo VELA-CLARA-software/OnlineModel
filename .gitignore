@@ -22,5 +22,9 @@ test_yaml/
 DB_Test_Settings/
 _*/
 build/
+Output/
 *test*/
 SimulationDatabase.db
+Split_Lattice_LSC/
+*.exe
+*dist/

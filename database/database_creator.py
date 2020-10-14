@@ -8,10 +8,11 @@ import data.lattices as lattices
 
 class DatabaseCreator():
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, database='SimulationDatabase.db', *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
-        self.sql_connection = sqlite3.connect('SimulationDatabase.db')
+        self.database = database
+        self.sql_connection = sqlite3.connect(self.database)
         self.sql_cursor = self.sql_connection.cursor()
 
     def create_simulation_database(self, clean=False, tables=None):
@@ -36,7 +37,8 @@ class DatabaseCreator():
                 	"username"	TEXT,
                     "tags"	TEXT,
                     "prefix" TEXT,
-                    "start_lattice" TEXT
+                    "start_lattice" TEXT,
+                    "directory" TEXT
                 );'''
         self.sql_cursor.execute(sql)
         if clean:

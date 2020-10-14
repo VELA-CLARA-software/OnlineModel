@@ -232,13 +232,14 @@ class beamPlotWidget(QWidget):
                     xy = zip(x,y)
                     xynew = [a for a in xy if a[0] >= xrange[0] and a[0] <= xrange[1] and a[1] >= yrange[0] and a[1] <= yrange[1]]
                     # ynew = [yy for yy in y if yy >= yrange[0] and yy <= yrange[1]]
-                    xnew, ynew = zip(*xynew)
-                    histy, histx = self.projection(ynew, xmult=-1, ymult=1, range=yrange)
-                    self.rightcurves[id].setData(x=histx, y=histy, stepMode=True, fillLevel=0, brush=color)
-                    # self.rightcurves[id].setData(x=histx, y=histy, stepMode=True, pen=color)
-                    histy, histx = self.projection(xnew, xmult=-1, ymult=-1, range=xrange)
-                    self.bottomcurves[id].setData(x=histx, y=histy, stepMode=True, fillLevel=0, brush=color)
-                    # self.bottomcurves[id].setData(x=histx, y=histy, stepMode=True, pen=color)
+                    if len(xynew) > 0:
+                        xnew, ynew = zip(*xynew)
+                        histy, histx = self.projection(ynew, xmult=-1, ymult=1, range=yrange)
+                        self.rightcurves[id].setData(x=histx, y=histy, stepMode=True, fillLevel=0, brush=color)
+                        # self.rightcurves[id].setData(x=histx, y=histy, stepMode=True, pen=color)
+                        histy, histx = self.projection(xnew, xmult=-1, ymult=-1, range=xrange)
+                        self.bottomcurves[id].setData(x=histx, y=histy, stepMode=True, fillLevel=0, brush=color)
+                        # self.bottomcurves[id].setData(x=histx, y=histy, stepMode=True, pen=color)
         self.rightBeamPlotWidget.setLabel('left', text=ydict['name'], units=ydict['units'], **{'font-size': '12pt', 'font-family': 'Arial'})
         self.bottomBeamPlotWidget.setLabel('bottom', text=xdict['name'], units=xdict['units'], **{'font-size': '12pt', 'font-family': 'Arial'})
         self.rightBeamPlotWidget.enableAutoRange(x=True)

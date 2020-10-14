@@ -19,11 +19,12 @@ from collections import defaultdict, OrderedDict
 
 class DatabaseReader():
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, database='SimulationDatabase.db', verbose=True, *args, **kwargs):
         start = time.time()
         self.args = args
         self.kwargs = kwargs
-        self.sql_connection = sqlite3.connect('SimulationDatabase.db')
+        self.database = database
+        self.sql_connection = sqlite3.connect(self.database)
         self.sql_cursor = self.sql_connection.cursor()
         # List of lattice tables. This should be taken from a unified top-level controller at some point...
         self.table_name_list = ['generator'] + lattices.lattices
@@ -31,11 +32,12 @@ class DatabaseReader():
         # This dictionary is keyed by run-id and
         # the value is a string containing the deformatted dictionary of settings.
         # To see the deformatting function, go to deformat_dictionary(dict)
-        print('###### Loading Database ######')
         self.lattice_id_settings_dict, self.run_id_settings_dict = self.construct_run_id_and_settings_dict_from_database()
-        print('       time to load database = ', time.time() - start, 'seconds ')
-        print('       Number of entries in database = ', len(self.run_id_settings_dict))
-        print('###### Database Loaded ######')
+        if verbose:
+            print('###### Loading Database ######')
+            print('       time to load database = ', time.time() - start, 'seconds ')
+            print('       Number of entries in database = ', len(self.run_id_settings_dict))
+            print('###### Database Loaded ######')
 
     def update_lattice_tables_from_sql(self, table_name, lattice_id_settings_dict):
         """Take an SQL cursor and iteratively add elements to the lattice dictionary."""
@@ -60,10 +62,12 @@ class DatabaseReader():
     def update_run_tables_from_sql(self, table_name, run_id_settings_dict):
         """Take an SQL cursor and iteratively add elements to the run dictionary."""
         settings_for_run_id = self.sql_cursor.fetchall()
-        for run_id, timestamp, prefix, start_lattice in settings_for_run_id:
+        for run_id, timestamp, prefix, start_lattice, directory in settings_for_run_id:
             run_id_settings_dict[run_id]['runs']['prefix'] = prefix
             run_id_settings_dict[run_id]['runs']['start_lattice'] = start_lattice
             run_id_settings_dict[run_id]['runs']['timestamp'] = datetime.datetime.fromtimestamp(float(timestamp)).strftime('%d-%m-%Y %H:%M:%S')
+            run_id_settings_dict[run_id]['runs']['directory'] = directory
+
 
     def add_to_run_id_and_settings_dict_from_database(self, run_id):
         """Append a new run to the existing run and lattice dictionaries."""
@@ -77,7 +81,8 @@ class DatabaseReader():
             # Add the data to the dictionary
             self.update_lattice_tables_from_sql(table_name, lattice_id_settings_dict)
         # We need to do the same for the run table (which has a different format)
-        sql = 'select run_id, timestamp, prefix, start_lattice from \'runs\' where run_id = \'' + run_id + '\''
+
+        sql = 'select run_id, timestamp, prefix, start_lattice, directory from \'runs\' where run_id = \'' + run_id + '\''
         self.sql_cursor.execute(sql)
         self.update_run_tables_from_sql(table_name, run_id_settings_dict)
 
@@ -99,7 +104,7 @@ class DatabaseReader():
         # print('       time to update LATTICE TABLE = ', time.time() - start, 'seconds ')
         self.sql_start = time.time()
         # We need to do the same for the run table (which has a different format)
-        sql = 'select run_id, timestamp, prefix, start_lattice from \'runs\''
+        sql = 'select run_id, timestamp, prefix, start_lattice, directory from \'runs\''
         self.sql_cursor.execute(sql)
         # print('       time to execute RUN SQL = ', time.time() - self.sql_start, 'seconds ')
         self.update_run_tables_from_sql(table_name, run_id_settings_dict)
@@ -212,18 +217,17 @@ class DatabaseReader():
                 # Or if we have a full match, set the lattice's that need to be run to None
                 result[-1] = None
             return result
-        else:
-            return null_result
+        return null_result
 
     def get_run_id_for_lattice(self, run_id, t):
-            table_idx = self.table_name_list.index(t)
-            if self.run_id_settings_dict[run_id]['runs']['prefix'] is not None:
-                start_lattice_idx = self.table_name_list.index(self.run_id_settings_dict[run_id]['runs']['start_lattice'])
-                if  table_idx < start_lattice_idx:
-                    return self.get_run_id_for_lattice(self.run_id_settings_dict[run_id]['runs']['prefix'], t)
-            return run_id
+        table_idx = self.table_name_list.index(t)
+        if self.run_id_settings_dict[run_id]['runs']['prefix'] is not None:
+            start_lattice_idx = self.table_name_list.index(self.run_id_settings_dict[run_id]['runs']['start_lattice'])
+            if  table_idx < start_lattice_idx:
+                return self.get_run_id_for_lattice(self.run_id_settings_dict[run_id]['runs']['prefix'], t)
+        return os.path.relpath(self.run_id_settings_dict[run_id]['runs']['directory'])
 
-    def get_run_id_for_each_lattice(self, run_id):
+    def get_run_id_for_each_lattice(self, run_id=''):
         """For each lattice, find the corresponding run_id taking into account prefix runs"""
         result = {}
         for t in self.table_name_list:

@@ -10,10 +10,11 @@ import json
 
 class DatabaseWriter():
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, database='SimulationDatabase.db', *args, **kwargs):
         self.args = args
         self.kwargs = kwargs
-        self.sql_connection = sqlite3.connect('SimulationDatabase.db')
+        self.database = database
+        self.sql_connection = sqlite3.connect(self.database)
         self.sql_cursor = self.sql_connection.cursor()
 
     def tempname(self):
@@ -22,7 +23,7 @@ class DatabaseWriter():
     def flatten(self, d, parent_key='', sep='£'):
         items = []
         for k, v in d.items():
-            new_key = parent_key + sep + k if parent_key else k
+            new_key = parent_key + sep + str(k) if parent_key else str(k)
             if isinstance(v, collections.MutableMapping):
                 items.extend(self.flatten(v, new_key, sep=sep).items())
             else:
@@ -103,11 +104,11 @@ class DatabaseWriter():
         sql = '''INSERT INTO simulation ''' + columnstring + '''VALUES''' + valuestring
         self.sql_cursor.execute(sql, [run_id] + [component] + [parameter] + [json.dumps(value)])
 
-    def save_entry_to_runs_table(self, run_id, timestamp=None, username=None, tags=None, prefix=None, start_lattice=None, **kwargs):
-        columnstring = '(run_id, timestamp, username, tags, prefix, start_lattice)'
-        valuestring = '(?,?,?,?,?,?)'
+    def save_entry_to_runs_table(self, run_id, timestamp=None, username=None, tags=None, prefix=None, start_lattice=None, directory=None, **kwargs):
+        columnstring = '(run_id, timestamp, username, tags, prefix, start_lattice, directory)'
+        valuestring = '(?,?,?,?,?,?,?)'
         sql = '''INSERT OR IGNORE INTO runs ''' + columnstring + '''VALUES''' + valuestring
-        self.sql_cursor.execute(sql, [run_id, timestamp, username, json.dumps(tags), prefix, start_lattice])
+        self.sql_cursor.execute(sql, [run_id, timestamp, username, json.dumps(tags), prefix, start_lattice, directory])
         # if not self.sql_cursor.rowcount > 0:
         #     sql = '''UPDATE runs SET tags = ? WHERE run_id = ?'''
         #     self.sql_cursor.execute(sql, [json.dumps(tags), run_id])

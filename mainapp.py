@@ -28,7 +28,11 @@ class MainApp(QObject):
         self.app = app
         self.view = view.Ui_MainWindow()
         use_server = self.initialise_zeromq()
-        self.DatabaseController = database_controller.DatabaseController()
+
+        if ('args' in globals() or 'args' in locals()) and args.database is not None:
+            self.DatabaseController = database_controller.DatabaseController(args.database)
+        else:
+            self.DatabaseController = database_controller.DatabaseController()
         if use_server is not False:
             print('Using REMOTE Model')
             self.model = rmodel.Model(self.socket)
@@ -43,6 +47,14 @@ class MainApp(QObject):
         # self.DatabaseController = database_controller.DatabaseController(self.socket)
         #self.PostProcessingController = post_processing_controller.PostProcessingController(app, self.view, self.model)
         self.UnifiedController = unified_controller.UnifiedController(self.RunParameterController, self.DynamicPlotController, self.DatabaseController)
+
+        if ('args' in globals() or 'args' in locals()) and args.database is not None:
+            self.UnifiedController.change_database_folder(args.database)
+        else:
+            self.UnifiedController.change_database_folder(self.DatabaseController.database)
+
+        if ('args' in globals() or 'args' in locals()) and args.config is not None:
+            self.import_yaml(args.config)
 
     def show(self):
         self.MainWindow.show()
@@ -245,11 +257,15 @@ class MainApp(QObject):
     def import_yaml(self, *args, **kwargs):
         self.RunParameterController.import_parameter_values_from_yaml_file(*args, **kwargs)
 
+    def set_database_file(self, database):
+        self.DatabaseController = database_controller.DatabaseController(database)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add Sets.')
     parser.add_argument('-s', '--server', default=None, type=str)
     parser.add_argument('-p', '--port', default='8192', type=str)
+    parser.add_argument('-f', '--config', default=None, type=str)
+    parser.add_argument('-d', '--database', default=None, type=str)
     args = parser.parse_args()
 
     app = QApplication(sys.argv)

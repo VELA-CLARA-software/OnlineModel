@@ -43,16 +43,22 @@ class Model(object):
     output_directory = 'C:/Users/ujo48515/Documents/'
     width = 1000
     height = 600
-    def __init__(self):
+    def __init__(self, dataClass=None):
         self.path_exists = False
-        self.data = data.Data()
+        if dataClass is None:
+            self.data = data.Data()
+        else:
+            self.data = dataClass
         self.generator_params = ['number_of_particles', 'dist_x', 'dist_y', 'dist_z', 'sig_x', 'sig_y', 'sig_z']
         self.scan_progress = -1
         # self.dbcontroller = dbc.DatabaseController()
         self.directoryname = ''
 
+    def set_base_directory(self, directory):
+        self.basedirectoryname = directory
+
     def run_twiss(self, directory):
-        twiss_model = twissData.twissData(directory='test/'+directory, name=directory)
+        twiss_model = twissData.twissData(directory=self.basedirectoryname+'/'+directory, name=directory)
         twiss = twiss_model.run_script()
         return twiss
 
@@ -68,6 +74,7 @@ class Model(object):
     def update_tracking_codes(self):
         for l in self.data.lattices:
             code = self.data.parameterDict[l]['tracking_code']['value']
+            # print('Setting',l,'to',code)
             self.data.Framework.change_Lattice_Code(l, code)
 
     def update_CSR(self):
@@ -120,6 +127,13 @@ class Model(object):
         for l in self.data.lattices:
             self.data.Framework[l].prefix = ''
 
+    def update_astra_parameters(self):
+        for l in self.data.lattices:
+            latt = self.data.Framework[l]
+            if latt.code == 'astra':
+                self.data.Framework[l].headers['newrun']['h_min'] = self.data.parameterDict['Gun']['h_min']['value']
+                self.data.Framework[l].headers['newrun']['h_max'] = self.data.parameterDict['Gun']['h_max']['value']
+
     def run_script(self):
         success = True
         self.directoryname = ''
@@ -137,6 +151,7 @@ class Model(object):
             self.update_LSC()
             self.update_Wakefields()
             self.clear_prefixes()
+            self.update_astra_parameters()
             closest_match, lattices_to_be_saved = self.dbcontroller.reader.find_lattices_that_dont_exist(self.yaml)
             if len(lattices_to_be_saved) > 0:
                 start_lattice = lattices_to_be_saved[0]
@@ -145,16 +160,18 @@ class Model(object):
                     self.data.runsDict['prefix'] = closest_match
                     # print('Setting',start_lattice,'prefix = ', closest_match)
                     self.data.runsDict['start_lattice'] = start_lattice
+                self.data.runsDict['directory'] = os.path.abspath(self.basedirectoryname+'/'+self.directoryname)
                 self.yaml = create_yaml_dictionary(self.data)
-                self.data.Framework.setSubDirectory('test/'+self.directoryname)
+                self.data.Framework.setSubDirectory(os.path.relpath(self.data.runsDict['directory']))
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
-                # try:
-                self.data.Framework.track(startfile=start_lattice)#, endfile=endLattice)
-                # except Exception as e:
-                #     print('!!!! Error in Tracking - settings not saved !!!!')
-                #     print(e)
-                #     success = False
+                try:
+                    self.data.Framework.track(startfile=start_lattice)#, endfile='CLA-S02')
+                except Exception as e:
+                    print('!!!! Error in Tracking - settings not saved !!!!')
+                    print(e)
+                    print('!!!!', self.directoryname, '!!!!')
+                    success = False
         return success
 
     def get_directory_name(self):
@@ -184,8 +201,8 @@ class Model(object):
                         self.data.Framework.modifyElement(key, 'field_amplitude', float(value['field_amplitude']))
 
     def modify_framework(self, scan=False, type=None, modify=None, cavity_params=None, generator_param=None):
+        self.data.Framework.defineASTRACommand(scaling=int(self.data.generatorDict['number_of_particles']['value']))
         if not os.name == 'nt':
-            self.data.Framework.defineASTRACommand(scaling=int(self.data.generatorDict['number_of_particles']['value']))
             self.data.Framework.defineCSRTrackCommand(scaling=int(self.data.generatorDict['number_of_particles']['value']))
             self.data.Framework.define_gpt_command(scaling=int(self.data.generatorDict['number_of_particles']['value']))
 
@@ -225,8 +242,10 @@ class Model(object):
             self.data.Framework.generator.distribution_type_y = "2DGaussian"
             self.data.Framework.generator.guassian_cutoff_x = int(self.data.generatorDict['transverse_cutoff']['value'])
             self.data.Framework.generator.guassian_cutoff_y = int(self.data.generatorDict['transverse_cutoff']['value'])
-        elif str(self.data.generatorDict['transverse_distribution']['value']) == "Uniform":
+        elif str(self.data.generatorDict['transverse_distribution']['value']) == "Radial":
             # If we are in uniform or plateau we need to set the correct ASTRA parameter
+            self.data.Framework.generator.distribution_type_x = "radial"
+            self.data.Framework.generator.distribution_type_y = "radial"
             self.data.Framework.generator.lx = self.data.generatorDict['spot_size']['value'] * 1e-3
             self.data.Framework.generator.ly = self.data.generatorDict['spot_size']['value'] * 1e-3
         self.data.Framework.generator.sigma_x = self.data.generatorDict['spot_size']['value'] * 1e-3
@@ -256,7 +275,7 @@ class Model(object):
             return None
 
     def get_absolute_folder_location(self, directoryname):
-        return os.path.abspath(__file__+'/../../test/'+directoryname)
+        return os.path.abspath(__file__+'/../../'+self.basedirectoryname+'/'+directoryname)
 
     def create_subdirectory(self, dir):
         if not os.path.exists(dir):
@@ -265,7 +284,7 @@ class Model(object):
     def export_parameter_values_to_yaml_file(self, auto=False, filename=None, directory="."):
         if auto is True:
             filename = 'settings.yaml'
-            directory = 'test/'+self.directoryname
+            directory = self.basedirectoryname+'/'+self.directoryname
         if filename is not None:
             # print('directory = ', directory, '   filename = ', filename, '\njoin = ', str(os.path.relpath(directory + '/' + filename)))
             self.create_subdirectory(directory)
@@ -279,7 +298,7 @@ class Model(object):
             exit()
 
     def import_yaml(self, directoryname):
-        return self.import_parameter_values_from_yaml_file('test/'+directoryname+'/settings.yaml')
+        return self.import_parameter_values_from_yaml_file(self.basedirectoryname+'/'+directoryname+'/settings.yaml')
 
     def import_parameter_values_from_yaml_file(self, filename):
         filename = filename[0] if isinstance(filename,tuple) else filename

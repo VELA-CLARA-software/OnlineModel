@@ -19,8 +19,8 @@ global:
     check_ref_part: False
     Zphase: 1
     Zemit: 1050
-    H_max: 0.0001
-    H_min: 0.0001
+    H_max: 0.01
+    H_min: 0.001
     MAX_STEP: 10000000
     title: 'trial'
     run_no: 1
@@ -91,6 +91,7 @@ files:
       end_element: EBT-INJ-PSS-SHUT-02
   EBT-BA1:
     code: elegant
+    starting_rotation: 0
     charge:
       cathode: False
       space_charge_mode: 3D
