@@ -10,6 +10,7 @@ import SimulationFramework.Framework as Fw
 import requests, json, scipy.constants, datetime, math, numpy
 import data.lattices as lattices
 from data.DBURT_parser import DBURT_Parser
+from copy import deepcopy
 
 class Data(object):
 
@@ -44,6 +45,17 @@ class Data(object):
         # yaml.add_representer(collections.OrderedDict, yaml.representer.SafeRepresenter.represent_dict)
         # with open('./screen_positions.yaml', 'w') as output_file:
         #     yaml.dump(self.screenDict, output_file, default_flow_style=False)
+
+    def __deepcopy__(self, memo):
+        # create a copy with self.linked_to *not copied*, just referenced.
+        datacopy = type(self)()
+        datacopy.lattices = deepcopy(self.lattices, memo)
+        datacopy.parameterDict = deepcopy(self.parameterDict, memo)
+        datacopy.runsDict = deepcopy(self.runsDict, memo)
+        datacopy.generatorDict = deepcopy(self.generatorDict, memo)
+        datacopy.Framework = Fw.Framework(directory='.', clean=False, verbose=False, delete_output_files=False)
+        datacopy.Framework.loadSettings(lattices.lattice_definition)
+        return datacopy
 
     def get_framework(self):
         return self.Framework
