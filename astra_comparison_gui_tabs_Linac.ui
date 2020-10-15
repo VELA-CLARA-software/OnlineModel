@@ -46,7 +46,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <property name="tabsClosable">
        <bool>false</bool>
@@ -3150,20 +3150,7 @@
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
-             <widget class="DataTreeWidget" name="yaml_tree_widget" native="true">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>50</width>
-                <height>0</height>
-               </size>
-              </property>
-             </widget>
+             <widget class="TableWidget" name="yaml_tree_widget" native="true"/>
             </item>
            </layout>
           </widget>
@@ -3606,15 +3593,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>DataTreeWidget</class>
-   <extends>QWidget</extends>
-   <header>pyqtgraph</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>expandableTabWidget</class>
    <extends>QTabWidget</extends>
    <header>expandableTabWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TableWidget</class>
+   <extends>QWidget</extends>
+   <header>pyqtgraph.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
