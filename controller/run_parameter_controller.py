@@ -9,7 +9,7 @@ import database.run_parameters_parser as yaml_parser
 from model.local_model import create_yaml_dictionary, Model
 import controller.run_table as run_table
 from controller import database_controller
-import sys, os
+import sys, os, re
 import time
 import collections
 import numpy as np
@@ -248,6 +248,7 @@ class RunParameterController(QObject):
         self.abort_scan = False
         self.run_plots = []
         self.run_plot_colors = {}
+        self.table_match = re.compile(r"\['([a-zA-Z\-0-9]*)'\]")
         start = time.time()
         self.create_datatree_widget()
         self.populate_run_parameters_table()
@@ -275,6 +276,7 @@ class RunParameterController(QObject):
         # layout = self.view.run_splitter
         # layout.addWidget(self.view.yaml_tree_widget)
         table = self.view.run_parameters_table
+        table.clicked.connect(self.show_yaml_in_datatree)
         table.horizontalHeader().setVisible(True)
         table.setSortingEnabled(True)
         # table.horizontalHeader().setResizeMode(QHeaderView.Stretch)
@@ -294,16 +296,19 @@ class RunParameterController(QObject):
         table.setItemDelegateForColumn(2, run_table.PlotCheckboxDelegate(table, self))
         table.setItemDelegateForColumn(3, run_table.PlotColorDelegate(table, self))
 
-    def show_yaml_in_datatree(self, row, col):
+    def show_yaml_in_datatree(self, item):
         """ Update the YAML tree widget based on row and column from the run table """
+        row = item.row()
         table = self.view.run_parameters_table
-        runno = table.item(row, self.run_table_columns['run_id']).text()
+        runno = item.siblingAtColumn(1).data()
         data = self.model.import_yaml(runno)
         guidata = create_yaml_dictionary(self.model.data)
         ddiff = DeepDiff(data, guidata, ignore_order=True, exclude_paths={"root['runs']"})
-        # print(ddiff)
-        self.view.yaml_tree_widget.setData(ddiff)
-        # self.run_id_clicked_signal.emit(runno)
+        table = []
+        for k,v in ddiff['values_changed'].items():
+            split = self.table_match.findall(k)
+            table.append({'Lattice\t': split[0], 'Element\t': split[1], 'Property\t': split[2], 'Run Value\t': v['old_value'], 'Current Value\t': v['new_value']})
+        self.view.yaml_tree_widget.setData(table)
 
     def emit_run_id_clicked_signal(self, row, col):
         """ Emit a signal when a table item is clicked """

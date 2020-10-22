@@ -1307,13 +1307,7 @@ class Ui_MainWindow(object):
         self.yaml_tab.setObjectName("yaml_tab")
         self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.yaml_tab)
         self.verticalLayout_7.setObjectName("verticalLayout_7")
-        self.yaml_tree_widget = DataTreeWidget(self.yaml_tab)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.yaml_tree_widget.sizePolicy().hasHeightForWidth())
-        self.yaml_tree_widget.setSizePolicy(sizePolicy)
-        self.yaml_tree_widget.setMinimumSize(QtCore.QSize(50, 0))
+        self.yaml_tree_widget = TableWidget(self.yaml_tab)
         self.yaml_tree_widget.setObjectName("yaml_tree_widget")
         self.verticalLayout_7.addWidget(self.yaml_tree_widget)
         self.plots_yaml_tab.addTab(self.yaml_tab, "")
@@ -1896,7 +1890,7 @@ class Ui_MainWindow(object):
         self.action_stepsize1_0.setText(_translate("MainWindow", "1"))
 from detachable_tab_widget import DetachableTabWidget
 from expandableTabWidget import expandableTabWidget
-from pyqtgraph import DataTreeWidget, PlotWidget
+from pyqtgraph import DataTreeWidget, PlotWidget, TableWidget
 
 
 if __name__ == "__main__":
@@ -1907,3 +1901,6 @@ if __name__ == "__main__":
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
+
+
+
