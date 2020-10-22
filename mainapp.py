@@ -22,9 +22,16 @@ import argparse
 
 class MainApp(QObject):
 
-    def __init__(self, app, sys_argv):
-
+    def __init__(self, app, sys_argv=None):
         super(MainApp, self).__init__()
+        parser = argparse.ArgumentParser(description='Add Sets.')
+        parser.add_argument('-s', '--server', default=None, type=str)
+        parser.add_argument('-p', '--port', default='8192', type=str)
+        parser.add_argument('-f', '--config', default=None, type=str)
+        parser.add_argument('-d', '--database', default=None, type=str)
+        global args
+        args = parser.parse_args(sys_argv)
+
         self.app = app
         self.view = view.Ui_MainWindow()
         use_server = self.initialise_zeromq()
@@ -184,6 +191,7 @@ class MainApp(QObject):
 
     def get_twiss_object_for_id(self, id):
         self.plot_run_id(id)
+        id = self.DynamicPlotController.basedirectoryname+'/'+id
         twissWidget = self.DynamicPlotController.ompbeam.latticeTwissPlotWidget
         i = 0
         while not id in twissWidget.twissDataObjects and i < 10:
@@ -204,6 +212,7 @@ class MainApp(QObject):
 
     def get_slice_data_for_id(self, id):
         self.plot_run_id(id)
+        id = self.DynamicPlotController.basedirectoryname+'/'+id
         slicedata = {}
         sliceWidget = self.DynamicPlotController.ompbeam.slicePlotWidget
         i = 0
@@ -230,6 +239,7 @@ class MainApp(QObject):
 
     def get_beam_data_for_id(self, id):
         self.plot_run_id(id)
+        id = self.DynamicPlotController.basedirectoryname+'/'+id
         beamdata = {}
         beamWidget = self.DynamicPlotController.ompbeam.beamPlotWidget
         plotdataitem = beamWidget.curves[id]
@@ -248,6 +258,7 @@ class MainApp(QObject):
 
     def get_beam_object_for_id(self, id):
         self.plot_run_id(id)
+        id = self.DynamicPlotController.basedirectoryname+'/'+id
         beamWidget = self.DynamicPlotController.ompbeam.beamPlotWidget
         return beamWidget.beams[id]
 
@@ -261,14 +272,7 @@ class MainApp(QObject):
         self.DatabaseController = database_controller.DatabaseController(database)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Add Sets.')
-    parser.add_argument('-s', '--server', default=None, type=str)
-    parser.add_argument('-p', '--port', default='8192', type=str)
-    parser.add_argument('-f', '--config', default=None, type=str)
-    parser.add_argument('-d', '--database', default=None, type=str)
-    args = parser.parse_args()
-
     app = QApplication(sys.argv)
-    app_object = MainApp(app, sys.argv)
+    app_object = MainApp(app)
     app_object.show()
     sys.exit(app.exec_())

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1102</width>
-    <height>690</height>
+    <height>694</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,8 +23,8 @@
    <enum>QTabWidget::Rounded</enum>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QGridLayout" name="gridLayout">
-    <item row="2" column="1" rowspan="2" colspan="2">
+   <layout class="QVBoxLayout" name="verticalLayout_6">
+    <item>
      <widget class="DetachableTabWidget" name="main_tab_widget">
       <property name="enabled">
        <bool>true</bool>
@@ -46,7 +46,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <property name="tabsClosable">
        <bool>false</bool>
@@ -105,7 +105,7 @@
                <string>Magnets</string>
               </attribute>
               <layout class="QFormLayout" name="formLayout_9">
-               <item row="0" column="0">
+               <item row="1" column="0">
                 <widget class="QLabel" name="ba1_quad1_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -118,7 +118,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1">
+               <item row="1" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_18">
                  <property name="maximumSize">
                   <size>
@@ -149,7 +149,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
+               <item row="2" column="0">
                 <widget class="QLabel" name="ba1_quad2_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -162,7 +162,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="1">
+               <item row="2" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_24">
                  <property name="maximumSize">
                   <size>
@@ -193,7 +193,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0">
+               <item row="3" column="0">
                 <widget class="QLabel" name="ba1_quad3_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -206,7 +206,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
+               <item row="3" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_19">
                  <property name="maximumSize">
                   <size>
@@ -237,7 +237,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="0">
+               <item row="4" column="0">
                 <widget class="QLabel" name="ba1_quad4_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -250,7 +250,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="1">
+               <item row="4" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_20">
                  <property name="maximumSize">
                   <size>
@@ -281,7 +281,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="4" column="0">
+               <item row="5" column="0">
                 <widget class="QLabel" name="ba1_quad5_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -294,7 +294,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="4" column="1">
+               <item row="5" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_21">
                  <property name="maximumSize">
                   <size>
@@ -325,7 +325,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="0">
+               <item row="6" column="0">
                 <widget class="QLabel" name="ba1_quad6_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -338,7 +338,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="1">
+               <item row="6" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_22">
                  <property name="maximumSize">
                   <size>
@@ -369,7 +369,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="6" column="0">
+               <item row="7" column="0">
                 <widget class="QLabel" name="ba1_quad7_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -382,7 +382,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="6" column="1">
+               <item row="7" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_23">
                  <property name="maximumSize">
                   <size>
@@ -413,7 +413,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="7" column="0" colspan="2">
+               <item row="8" column="0" colspan="2">
                 <spacer name="verticalSpacer_4">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -425,6 +425,170 @@
                   </size>
                  </property>
                 </spacer>
+               </item>
+               <item row="0" column="1">
+                <widget class="QFrame" name="frame">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>140</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>140</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>7</pointsize>
+                  </font>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_5">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="margin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_0001_EBT_BA1">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.001</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">EBT_BA1_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_001_EBT_BA1">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.01</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">EBT_BA1_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_01_EBT_BA1">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.1</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">EBT_BA1_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_1_EBT_BA1">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>1.0</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">EBT_BA1_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -590,45 +754,6 @@
                <string>Magnets</string>
               </attribute>
               <layout class="QFormLayout" name="formLayout_6">
-               <item row="2" column="0">
-                <widget class="QLabel" name="s02_quad2_strength_label">
-                 <property name="minimumSize">
-                  <size>
-                   <width>170</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>QUAD2 Strength (k)</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="s02_quad3_strength_label">
-                 <property name="minimumSize">
-                  <size>
-                   <width>170</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>QUAD3 Strength (k)</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0">
-                <widget class="QLabel" name="s02_quad4_strength_label">
-                 <property name="minimumSize">
-                  <size>
-                   <width>170</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>QUAD4 Strength (k)</string>
-                 </property>
-                </widget>
-               </item>
                <item row="1" column="0">
                 <widget class="QLabel" name="s02_quad1_strength_label">
                  <property name="minimumSize">
@@ -673,6 +798,19 @@
                  </property>
                 </widget>
                </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="s02_quad2_strength_label">
+                 <property name="minimumSize">
+                  <size>
+                   <width>170</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>QUAD2 Strength (k)</string>
+                 </property>
+                </widget>
+               </item>
                <item row="2" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_8">
                  <property name="maximumSize">
@@ -701,6 +839,19 @@
                  </property>
                  <property name="value">
                   <double>-1.651000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="0">
+                <widget class="QLabel" name="s02_quad3_strength_label">
+                 <property name="minimumSize">
+                  <size>
+                   <width>170</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>QUAD3 Strength (k)</string>
                  </property>
                 </widget>
                </item>
@@ -735,6 +886,19 @@
                  </property>
                 </widget>
                </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="s02_quad4_strength_label">
+                 <property name="minimumSize">
+                  <size>
+                   <width>170</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>QUAD4 Strength (k)</string>
+                 </property>
+                </widget>
+               </item>
                <item row="4" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
                  <property name="maximumSize">
@@ -766,7 +930,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="0" colspan="2">
+               <item row="5" column="0">
                 <spacer name="verticalSpacer_6">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -778,6 +942,170 @@
                   </size>
                  </property>
                 </spacer>
+               </item>
+               <item row="0" column="1">
+                <widget class="QFrame" name="frame_3">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>140</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>140</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>7</pointsize>
+                  </font>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_7">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="margin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_0001_CLA_S02">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.001</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">CLA_S02_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_001_CLA_S02">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.01</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">CLA_S02_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_01_CLA_S02">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.1</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">CLA_S02_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_1_CLA_S02">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>1.0</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">CLA_S02_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -912,19 +1240,6 @@
           </layout>
          </widget>
         </item>
-        <item row="1" column="3">
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>0</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
         <item row="1" column="1">
          <widget class="QGroupBox" name="vela_parameter_groupbox">
           <property name="sizePolicy">
@@ -965,7 +1280,7 @@
                <string>Magnets</string>
               </attribute>
               <layout class="QFormLayout" name="formLayout_8">
-               <item row="0" column="0">
+               <item row="1" column="0">
                 <widget class="QLabel" name="vela_quad1_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -978,7 +1293,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1">
+               <item row="1" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_13">
                  <property name="maximumSize">
                   <size>
@@ -1009,7 +1324,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
+               <item row="2" column="0">
                 <widget class="QLabel" name="vela_quad2_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -1022,20 +1337,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0">
-                <widget class="QLabel" name="vela_quad3_strength_label">
-                 <property name="minimumSize">
-                  <size>
-                   <width>170</width>
-                   <height>0</height>
-                  </size>
-                 </property>
-                 <property name="text">
-                  <string>QUAD9 Strength (k)</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="1" column="1">
+               <item row="2" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_12">
                  <property name="maximumSize">
                   <size>
@@ -1066,7 +1368,20 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
+               <item row="3" column="0">
+                <widget class="QLabel" name="vela_quad3_strength_label">
+                 <property name="minimumSize">
+                  <size>
+                   <width>170</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>QUAD9 Strength (k)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_15">
                  <property name="maximumSize">
                   <size>
@@ -1097,7 +1412,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="0">
+               <item row="4" column="0">
                 <widget class="QLabel" name="vela_quad4_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -1110,7 +1425,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="1">
+               <item row="4" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_14">
                  <property name="maximumSize">
                   <size>
@@ -1141,7 +1456,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="4" column="0">
+               <item row="5" column="0">
                 <widget class="QLabel" name="vela_quad5_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -1154,7 +1469,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="4" column="1">
+               <item row="5" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_17">
                  <property name="maximumSize">
                   <size>
@@ -1185,7 +1500,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="0">
+               <item row="6" column="0">
                 <widget class="QLabel" name="vela_quad6_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -1198,7 +1513,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="5" column="1">
+               <item row="6" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_16">
                  <property name="maximumSize">
                   <size>
@@ -1229,7 +1544,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="6" column="0" colspan="2">
+               <item row="7" column="0">
                 <spacer name="verticalSpacer_5">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -1241,6 +1556,170 @@
                   </size>
                  </property>
                 </spacer>
+               </item>
+               <item row="0" column="1">
+                <widget class="QFrame" name="frame_4">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>140</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>140</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>7</pointsize>
+                  </font>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_8">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="margin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_0001_EBT_INJ">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.001</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">EBT_INJ_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_001_EBT_INJ">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.01</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">EBT_INJ_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_01_EBT_INJ">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.1</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">EBT_INJ_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_1_EBT_INJ">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>1.0</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">EBT_INJ_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -2127,20 +2606,6 @@
             </widget>
            </item>
            <item>
-            <widget class="QGroupBox" name="tags_groupBox">
-             <property name="minimumSize">
-              <size>
-               <width>150</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="title">
-              <string>Tags</string>
-             </property>
-             <layout class="QGridLayout" name="tags_Layout"/>
-            </widget>
-           </item>
-           <item>
             <widget class="QGroupBox" name="directory_groupBox">
              <property name="title">
               <string>Tracking</string>
@@ -2149,69 +2614,164 @@
               <bool>false</bool>
              </property>
              <layout class="QGridLayout" name="directory_form_layout">
-              <item row="0" column="4">
-               <widget class="QPushButton" name="runButton">
-                <property name="accessibleName">
-                 <string>runButton</string>
-                </property>
-                <property name="text">
-                 <string>Track</string>
-                </property>
-               </widget>
-              </item>
-              <item row="0" column="2">
-               <widget class="QLineEdit" name="directory">
-                <property name="minimumSize">
-                 <size>
-                  <width>225</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="accessibleName">
-                 <string>runs:directory</string>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-                <property name="readOnly">
-                 <bool>true</bool>
-                </property>
-                <property name="placeholderText">
-                 <string>&lt;Run Directory&gt;</string>
-                </property>
-               </widget>
-              </item>
+              <property name="margin">
+               <number>0</number>
+              </property>
+              <property name="spacing">
+               <number>0</number>
+              </property>
               <item row="0" column="0">
-               <widget class="QLabel" name="directory_label">
-                <property name="text">
-                 <string>Directory</string>
+               <widget class="QTabWidget" name="tabWidget_7">
+                <property name="tabPosition">
+                 <enum>QTabWidget::South</enum>
                 </property>
-               </widget>
-              </item>
-              <item row="2" column="1" colspan="4">
-               <widget class="QProgressBar" name="progressBar">
-                <property name="accessibleName">
-                 <string>progressBar</string>
-                </property>
-                <property name="value">
+                <property name="currentIndex">
                  <number>0</number>
                 </property>
-                <property name="textVisible">
+                <property name="usesScrollButtons">
+                 <bool>false</bool>
+                </property>
+                <property name="documentMode">
                  <bool>true</bool>
                 </property>
-                <property name="format">
-                 <string>%p%</string>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="0">
-               <widget class="QCheckBox" name="autoPlotCheckbox">
-                <property name="accessibleName">
-                 <string>runs:autoPlot</string>
-                </property>
-                <property name="text">
-                 <string>Plot?</string>
-                </property>
+                <widget class="QWidget" name="tab_12">
+                 <attribute name="title">
+                  <string>Run</string>
+                 </attribute>
+                 <layout class="QGridLayout" name="gridLayout_2">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="directory_label">
+                    <property name="text">
+                     <string>Directory</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLineEdit" name="directory">
+                    <property name="minimumSize">
+                     <size>
+                      <width>225</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="accessibleName">
+                     <string>runs:directory</string>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="readOnly">
+                     <bool>true</bool>
+                    </property>
+                    <property name="placeholderText">
+                     <string>&lt;Run Directory&gt;</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QPushButton" name="runButton">
+                    <property name="accessibleName">
+                     <string>runButton</string>
+                    </property>
+                    <property name="text">
+                     <string>Track</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QCheckBox" name="autoPlotCheckbox">
+                    <property name="accessibleName">
+                     <string>runs:autoPlot</string>
+                    </property>
+                    <property name="text">
+                     <string>Plot?</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1" colspan="2">
+                   <widget class="QProgressBar" name="progressBar">
+                    <property name="accessibleName">
+                     <string>progressBar</string>
+                    </property>
+                    <property name="value">
+                     <number>0</number>
+                    </property>
+                    <property name="textVisible">
+                     <bool>true</bool>
+                    </property>
+                    <property name="format">
+                     <string>%p%</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+                <widget class="QWidget" name="tab_13">
+                 <attribute name="title">
+                  <string>Settings</string>
+                 </attribute>
+                 <layout class="QGridLayout" name="gridLayout">
+                  <item row="0" column="1">
+                   <widget class="QSpinBox" name="total_threads">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_38">
+                    <property name="text">
+                     <string>Total Number of Threads</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_39">
+                    <property name="text">
+                     <string>WSL ASTRA Threads (Off = 1)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QSpinBox" name="WSL_ASTRA_threads">
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+                <widget class="QWidget" name="tab_14">
+                 <attribute name="title">
+                  <string>Tags</string>
+                 </attribute>
+                 <layout class="QHBoxLayout" name="horizontalLayout_4">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="margin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QWidget" name="tags_widget" native="true">
+                    <property name="minimumSize">
+                     <size>
+                      <width>150</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <layout class="QGridLayout" name="tags_Layout">
+                     <property name="margin">
+                      <number>0</number>
+                     </property>
+                     <property name="spacing">
+                      <number>0</number>
+                     </property>
+                    </layout>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </widget>
               </item>
              </layout>
@@ -2219,6 +2779,19 @@
            </item>
           </layout>
          </widget>
+        </item>
+        <item row="3" column="0" colspan="3">
+         <spacer name="verticalSpacer_8">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item row="0" column="2">
          <widget class="QGroupBox" name="c2v_parameter_groupbox">
@@ -2260,7 +2833,7 @@
                <property name="fieldGrowthPolicy">
                 <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
                </property>
-               <item row="0" column="0">
+               <item row="1" column="0">
                 <widget class="QLabel" name="c2v_quad1_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -2273,7 +2846,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="0" column="1">
+               <item row="1" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_9">
                  <property name="maximumSize">
                   <size>
@@ -2304,7 +2877,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
+               <item row="2" column="0">
                 <widget class="QLabel" name="c2v_quad2_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -2317,7 +2890,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="1">
+               <item row="2" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_10">
                  <property name="maximumSize">
                   <size>
@@ -2348,7 +2921,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="0">
+               <item row="3" column="0">
                 <widget class="QLabel" name="c2v_quad3_strength_label">
                  <property name="minimumSize">
                   <size>
@@ -2361,7 +2934,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
+               <item row="3" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_11">
                  <property name="maximumSize">
                   <size>
@@ -2392,7 +2965,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="0" colspan="2">
+               <item row="4" column="0">
                 <spacer name="verticalSpacer_3">
                  <property name="orientation">
                   <enum>Qt::Vertical</enum>
@@ -2404,6 +2977,170 @@
                   </size>
                  </property>
                 </spacer>
+               </item>
+               <item row="0" column="1">
+                <widget class="QFrame" name="frame_2">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>140</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>140</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <pointsize>7</pointsize>
+                  </font>
+                 </property>
+                 <property name="frameShape">
+                  <enum>QFrame::StyledPanel</enum>
+                 </property>
+                 <property name="frameShadow">
+                  <enum>QFrame::Raised</enum>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_6">
+                  <property name="spacing">
+                   <number>0</number>
+                  </property>
+                  <property name="margin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_0001_CLA_C2V">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.001</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <property name="checked">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">CLA_C2V_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_001_CLA_C2V">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.01</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">CLA_C2V_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_01_CLA_C2V">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>0.1</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">CLA_C2V_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="stepsize_1_CLA_C2V">
+                    <property name="minimumSize">
+                     <size>
+                      <width>35</width>
+                      <height>0</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>10</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="font">
+                     <font>
+                      <pointsize>7</pointsize>
+                     </font>
+                    </property>
+                    <property name="text">
+                     <string>1.0</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <attribute name="buttonGroup">
+                     <string notr="true">CLA_C2V_stepsize</string>
+                    </attribute>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                </item>
               </layout>
              </widget>
@@ -2534,19 +3271,6 @@
            </item>
           </layout>
          </widget>
-        </item>
-        <item row="3" column="0" colspan="3">
-         <spacer name="verticalSpacer_8">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
         </item>
         <item row="0" column="0">
          <widget class="QGroupBox" name="simulation_parameter_groupbox">
@@ -3503,19 +4227,9 @@
     </property>
     <addaction name="actionChange_DB"/>
    </widget>
-   <widget class="QMenu" name="menuStep_Size">
-    <property name="title">
-     <string>Step Size</string>
-    </property>
-    <addaction name="action_stepsize0_001"/>
-    <addaction name="action_stepsize0_01"/>
-    <addaction name="action_stepsize0_1"/>
-    <addaction name="action_stepsize1_0"/>
-   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSettings"/>
    <addaction name="menuDatabase"/>
-   <addaction name="menuStep_Size"/>
   </widget>
   <action name="actionImport_YAML">
    <property name="text">
@@ -3636,8 +4350,6 @@
   <tabstop>doubleSpinBox_21</tabstop>
   <tabstop>doubleSpinBox_22</tabstop>
   <tabstop>doubleSpinBox_23</tabstop>
-  <tabstop>directory</tabstop>
-  <tabstop>runButton</tabstop>
   <tabstop>variables_dyn_plot_combo_box_1</tabstop>
   <tabstop>variables_dyn_plot_combo_box_2</tabstop>
   <tabstop>directory_dyn_plot_line_edit</tabstop>
@@ -3663,4 +4375,10 @@
  </tabstops>
  <resources/>
  <connections/>
+ <buttongroups>
+  <buttongroup name="EBT_INJ_stepsize"/>
+  <buttongroup name="EBT_BA1_stepsize"/>
+  <buttongroup name="CLA_C2V_stepsize"/>
+  <buttongroup name="CLA_S02_stepsize"/>
+ </buttongroups>
 </ui>

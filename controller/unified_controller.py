@@ -18,11 +18,6 @@ class UnifiedController():
             self.rpc.view.actionChange_DB.triggered.connect(self.rpc.change_database)
             # self.rpc.view.actionAuto_load_Settings.toggled.connect(self.rpc.connect_auto_load_settings)
 
-            self.rpc.view.action_stepsize1_0.triggered.connect(lambda: self.rpc.change_step_size(1.0))
-            self.rpc.view.action_stepsize0_1.triggered.connect(lambda: self.rpc.change_step_size(0.1))
-            self.rpc.view.action_stepsize0_01.triggered.connect(lambda: self.rpc.change_step_size(0.01))
-            self.rpc.view.action_stepsize0_001.triggered.connect(lambda: self.rpc.change_step_size(0.001))
-
             # Connects signal from the run controller to add a plot to the plot controller
             self.rpc.add_plot_signal.connect(self.dpc.add_twiss_plot)
             # Connects signal from the run controller to remove a plot to the plot controller
