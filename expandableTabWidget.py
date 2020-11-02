@@ -196,9 +196,10 @@ class expandableTabWidget(QtWidgets.QTabWidget):
         tabs = {}
         for i in range(self.tab.count()):
             v = self.widget(i)
-            v.set_id(i+1)
-            tabs[i+1] = v
-            self.setTabText(i, 'Scan '+str(i+1))
+            if hasattr(v, 'set_id'):
+                v.set_id(i+1)
+                tabs[i+1] = v
+                self.setTabText(i, 'Scan '+str(i+1))
         self.tabs = tabs
 
     # def tab_scan_toggled(self, id, value):

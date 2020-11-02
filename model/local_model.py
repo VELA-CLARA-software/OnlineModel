@@ -134,6 +134,17 @@ class Model(object):
                 self.data.Framework[l].headers['newrun']['h_min'] = self.data.parameterDict['Gun']['h_min']['value']
                 self.data.Framework[l].headers['newrun']['h_max'] = self.data.parameterDict['Gun']['h_max']['value']
 
+    def are_we_using_WSL_ASTRA(self):
+        astra_use_wsl = int(os.environ['WSL_ASTRA'] if 'WSL_ASTRA' in os.environ else 1)
+        if astra_use_wsl > 1:
+            self.yaml = create_yaml_dictionary(self.data)
+            closest_match, lattices_to_be_saved = self.dbcontroller.reader.find_lattices_that_dont_exist(self.yaml)
+            if lattices_to_be_saved is None:
+                return 1
+            elif np.any([self.data.parameterDict[l]['tracking_code']['value'].lower() == 'astra' for l in lattices_to_be_saved]):
+                return astra_use_wsl
+        return 1
+
     def run_script(self):
         success = True
         self.directoryname = ''

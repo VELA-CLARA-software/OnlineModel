@@ -197,7 +197,7 @@ class RunParameterController(QObject):
     add_plot_window_signal = pyqtSignal(int, str)
     run_id_clicked_signal = pyqtSignal(str)
     change_database_signal = pyqtSignal(str)
-    run_finished_signal = pyqtSignal(int, int, str, dict)
+    run_finished_signal = pyqtSignal(int, int, str, dict, int)
 
     tags = ['BA1', 'User Experiment', 'Front End', 'Emittance', 'Energy Spread', 'Commissioning']
 
@@ -219,7 +219,7 @@ class RunParameterController(QObject):
                                self.view.simulation_parameter_groupbox,
                                self.view.scan_groupBox,
                                self.view.directory_groupBox,
-                               self.view.tags_groupBox,
+                               self.view.tags_widget,
                                ]
         self.formLayoutList = [formLayout for layout in self.runParameterLayouts for
                           formLayout in layout.findChildren((QFormLayout,QGridLayout))]
@@ -248,7 +248,7 @@ class RunParameterController(QObject):
         self.abort_scan = False
         self.run_plots = []
         self.run_plot_colors = {}
-        self.table_match = re.compile(r"\['([a-zA-Z\-0-9]*)'\]")
+        self.table_match = re.compile(r"\['([a-zA-Z\-0-9_]*)'\]")
         start = time.time()
         self.create_datatree_widget()
         self.populate_run_parameters_table()
@@ -261,9 +261,23 @@ class RunParameterController(QObject):
         # self.view.run_parameters_table.setRowCount(len(header_label_list))
         # self.view.run_parameters_table.setHorizontalHeaderLabels(header_label_list)
         self.view.run_parameters_table.horizontalHeader().setVisible(visible)
+        self.set_up_step_size_buttons()
         self.threadpool = QThreadPool()
+        self.view.total_threads.setMaximum(self.threadpool.maxThreadCount())
         self.threadpool.setMaxThreadCount(self.threadpool.maxThreadCount()/2)
+        self.view.total_threads.setValue(self.threadpool.maxThreadCount())
         print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
+        astra_use_wsl = int(os.environ['WSL_ASTRA']) if 'WSL_ASTRA' in os.environ else 1
+        self.view.WSL_ASTRA_threads.setValue(astra_use_wsl)
+        self.view.total_threads.valueChanged.connect(self.set_total_threads)
+        self.view.WSL_ASTRA_threads.valueChanged.connect(self.set_WSL_ASTRA_threads)
+
+    def set_total_threads(self, value):
+        self.threadpool.setMaxThreadCount(value)
+
+    def set_WSL_ASTRA_threads(self, value):
+        self.model.data.Framework.global_parameters['astra_use_wsl'] = value
+        self.model.data.Framework.defineASTRACommand()
 
     def set_base_directory(self, directory):
         """ Change the base directory the model starts in """
@@ -305,9 +319,10 @@ class RunParameterController(QObject):
         guidata = create_yaml_dictionary(self.model.data)
         ddiff = DeepDiff(data, guidata, ignore_order=True, exclude_paths={"root['runs']"})
         table = []
-        for k,v in ddiff['values_changed'].items():
-            split = self.table_match.findall(k)
-            table.append({'Lattice\t': split[0], 'Element\t': split[1], 'Property\t': split[2], 'Run Value\t': v['old_value'], 'Current Value\t': v['new_value']})
+        if 'values_changed' in ddiff:
+            for k,v in ddiff['values_changed'].items():
+                split = self.table_match.findall(k)
+                table.append({'Lattice\t': split[0], 'Element\t': split[1], 'Property\t': split[2], 'Run Value\t': v['old_value'], 'Current Value\t': v['new_value']})
         self.view.yaml_tree_widget.setData(table)
 
     def emit_run_id_clicked_signal(self, row, col):
@@ -368,13 +383,15 @@ class RunParameterController(QObject):
 
     def setrunplotcolor(self, row, color):
         """ Update the run table with the correct plotting color """
+        self.update_run_parameters_table()
         table = self.view.run_parameters_table
         run_id = table.model()._data[row]
         self.run_plot_colors[run_id] = color
-        # self.populate_run_parameters_table()
+        self.refresh_run_parameters_table()
 
     def enable_plot_on_id(self, id):
         """ Enable plotting based on a run_id """
+        self.update_run_parameters_table()
         table = self.view.run_parameters_table
         row = table.model()._data.index(id)
         self.emit_plot_signals(row, id, True)
@@ -382,6 +399,7 @@ class RunParameterController(QObject):
 
     def enable_plot_on_row(self, row):
         """ Enable plotting based on a table row number """
+        self.update_run_parameters_table()
         table = self.view.run_parameters_table
         item = table.model()._data[row]
         self.emit_plot_signals(row, item, True)
@@ -599,21 +617,6 @@ class RunParameterController(QObject):
             widget.deleteLater()
             if k in self.accessibleNames:
                 del self.accessibleNames[k]
-
-    def change_step_size(self, step):
-        """ Change the step size of the magnet widgets (only those with k1l parameters) """
-        accessibleNames = {}
-        for layout in self.formLayoutList:
-            childCount = layout.count()
-            for child in range(0,childCount):
-                widget = layout.itemAt(child).widget()
-                if widget is not None and widget.accessibleName() is not None and not widget.accessibleName() == "" and 'k1l' in widget.accessibleName():
-                    accessibleNames[widget.accessibleName()] = widget
-                else:
-                    pass
-        for k, widget in accessibleNames.items():
-            if type(widget) is QDoubleSpinBox:
-                widget.setSingleStep(step)
 
     def initialize_run_parameter_data(self):
         """ Initialise the data object based on available widgets """
@@ -868,7 +871,7 @@ class RunParameterController(QObject):
         # Start the scanning loop
         self.continue_scan()
 
-    def do_scan(self, data, doPlot):
+    def do_scan(self, data, doPlot, nthreads=0):
         """ Perform a scan step in a thread """
         # Instantiate a new Model, setting the data to a copy of the Data class
         localmodel = Model(dataClass=data)
@@ -882,7 +885,7 @@ class RunParameterController(QObject):
         except:
             tracking_success = False
         # Emit signal that the script has finished. This will be connected in the MAIN thread!
-        self.run_finished_signal.emit(tracking_success, doPlot, localmodel.directoryname, localmodel.yaml)
+        self.run_finished_signal.emit(tracking_success, doPlot, localmodel.directoryname, localmodel.yaml, nthreads)
         if tracking_success:
             # If run was successful save the YAML in the thread's model directory
             localmodel.export_parameter_values_to_yaml_file(auto=True)
@@ -924,8 +927,12 @@ class RunParameterController(QObject):
             lattice_is_initial = self.check_lattices_to_be_scanned(current_scan)
             # Make a copy of the data object to pass through to the worker thread (we make a copy so we don't change it when in parallel)
             data = deepcopy(self.model.data)
+            # We need to confirm if we will be running ASTRA using WSL (which may use more threads)
+            nthreads = self.model.are_we_using_WSL_ASTRA() - 1
+            for i in range(nthreads):
+                self.threadpool.reserveThread()
             # Create the worker thread
-            worker = GenericWorker(self.do_scan, data, self.view.autoPlotCheckbox.isChecked())
+            worker = GenericWorker(self.do_scan, data, self.view.autoPlotCheckbox.isChecked(), nthreads)
             # If we have to run an initial run to set-up the database do it here - we don't continue until the "finished" signal is sent
             if lattice_is_initial is False:
                 print('Running initial setup!')
@@ -990,16 +997,22 @@ class RunParameterController(QObject):
             self.view.progressBar.setMinimum(0)
             self.view.progressBar.setMaximum(1)
             self.view.progressBar.setValue(0)
-            # Make a copy of the data object
+            nthreads = self.model.are_we_using_WSL_ASTRA() - 1
+            for i in range(nthreads):
+                self.threadpool.reserveThread()
+        # Make a copy of the data object
             data = deepcopy(self.model.data)
             # Create a single worker
-            worker = GenericWorker(self.do_scan, data, self.view.autoPlotCheckbox.isChecked())
+            worker = GenericWorker(self.do_scan, data, self.view.autoPlotCheckbox.isChecked(), nthreads)
             # Start the worker
             self.threadpool.start(worker)
         return
 
-    def run_finished(self, success, doPlot, directoryname, yaml):
+    def run_finished(self, success, doPlot, directoryname, yaml, nthreads=0):
         """ Check outcome of a worker-thread """
+        # Release any extra threads
+        for i in range(nthreads):
+            self.threadpool.releaseThread()
         # Increment the progress so far
         self.progress += 1
         # Update the progressbar
@@ -1007,14 +1020,16 @@ class RunParameterController(QObject):
         if self.progress >= self.view.progressBar.maximum(): # We have finished all runs
             self.enable_run_button()
             self.reset_progress_bar_timer()
-        print('run_finished!', directoryname)
+        # print('run_finished!', directoryname)
         if success: # The worker thread finished successfully, so save it
             self.model.save_settings_to_database(yaml, directoryname)
             self.update_runs_widget(plot=doPlot, id=directoryname)
+            self.update_directory_widget(dirname=directoryname)
 
-    def update_directory_widget(self):
+    def update_directory_widget(self, dirname=None):
         """ Update the directory widget with a new value """
-        dirname = self.model.get_directory_name()
+        if dirname is None:
+            dirname = self.model.get_directory_name()
         self.update_widgets_with_values('runs:directory', dirname)
 
     def update_runs_widget(self, plot=False, id=None):
@@ -1061,3 +1076,32 @@ class RunParameterController(QObject):
 
     def database_changed(self):
         self.update_run_parameters_table()
+
+    ##### User tags
+
+    def set_up_step_size_buttons(self):
+        buttongroups = {'CLA_S02_stepsize': 'CLA-S02', 'CLA_C2V_stepsize': 'CLA-C2V', 'EBT_INJ_stepsize': 'EBT-INJ', 'EBT_BA1_stepsize': 'EBT-BA1'}
+        for bgname, lattice in buttongroups.items():
+            bg = getattr(self.view, bgname)
+            bg.setProperty('lattice', lattice)
+            bg.buttonClicked.connect(self.stepButtonClicked)
+        for bgname, latt in buttongroups.items():
+            button = getattr(self.view, 'stepsize_0001_'+latt.replace('-','_'))
+            button.click()
+
+    def stepButtonClicked(self, button):
+        # lattice = '-'.join(button.objectName().split('_')[2:])
+        lattice = self.sender().property('lattice')
+        step = float(button.text())
+        """ Change the step size of the magnet widgets (only those with k1l parameters) """
+        accessibleNames = {}
+        for layout in self.formLayoutList:
+            childCount = layout.count()
+            for child in range(0,childCount):
+                widget = layout.itemAt(child).widget()
+                if widget is not None and 'k1l' in widget.accessibleName() and lattice in widget.accessibleName() and isinstance(widget, QDoubleSpinBox):
+                    accessibleNames[widget.accessibleName()] = widget
+                else:
+                    pass
+        for k, widget in accessibleNames.items():
+            widget.setSingleStep(step)
