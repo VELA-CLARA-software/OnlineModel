@@ -78,7 +78,7 @@ class RunModel(QAbstractTableModel):
         self._data = data
         self._timestamps = timestamps
         self.sortOrder = Qt.AscendingOrder
-        self.header_labels = ['Load', 'Run ID', 'Plot', 'Colour']
+        self.header_labels = ['Load', 'Run ID', 'Plot', 'Colour', 'Timestamp']
 
     def update_data(self, data):
         self._data = data
