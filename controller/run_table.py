@@ -21,8 +21,8 @@ class LoadButtonDelegate(QStyledItemDelegate):
         return loadButton
 
     def get_id(self, index):
-        # return self.owner.model()._data[index.row()]
-        return index.siblingAtColumn(1).data()
+        return self.owner.model()._data[index.row()]
+
 
 class PlotCheckboxDelegate(QItemDelegate):
     """
@@ -48,7 +48,6 @@ class PlotCheckboxDelegate(QItemDelegate):
 
     def get_id(self, index):
         return self.owner.model()._data[index.row()]
-        # return index.siblingAtColumn(1).data()
 
     def editorEvent(self, event, model, option, index):
         '''
@@ -74,11 +73,12 @@ class PlotColorDelegate(LoadButtonDelegate):
 class RunModel(QAbstractTableModel):
     ActiveRole = Qt.UserRole + 1
 
-    def __init__(self, data, parent=None):
+    def __init__(self, data, timestamps=None, rpc=None, parent=None):
         super().__init__()
         self._data = data
+        self._timestamps = timestamps
         self.sortOrder = Qt.AscendingOrder
-        self.header_labels = ['Load', 'Run ID', 'Plot', 'Colour']
+        self.header_labels = ['Load', 'Run ID', 'Plot', 'Colour', 'Timestamp']
 
     def update_data(self, data):
         self._data = data
@@ -88,11 +88,35 @@ class RunModel(QAbstractTableModel):
         return len(self._data)
 
     def columnCount(self, parent=QModelIndex()):
-        return 4
+        return 5
+
+    def sort(self, column=None, direction=0):
+        """ 
+            - only able to sort if column = 4 (timestamp) for now.
+            - Direction=0 -> ASCENDING
+            - Direction=1 -> DESCENDING
+        """
+
+        self.layoutAboutToBeChanged.emit()
+        self.currentSortDirection = direction
+        if column == 4:
+            # self._rpc.emit_sort_by_timestamp_signal(column, direction)
+            self._timestamps=dict(sorted(self._timestamps.items(), key=lambda x: x[1],reverse=(not direction)))
+            self._data = list(self._timestamps.keys())
+            self.modelReset.emit()
+        print('SORT CALLED on column: ', column)
+        print('SORT ORDER: ', direction)
+       
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
-            return self._data[index.row()] if index.column() == 1 else None
+            if index.column() == 1:
+                return QVariant(self._data[index.row()])
+            elif index.column() == 4:
+                return QVariant(self._timestamps[self._data[index.row()]]) 
+            else:
+                return None
+
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
@@ -110,3 +134,4 @@ class RunModel(QAbstractTableModel):
         newIndexList = [self.index(self._data.index(olddata[idx.row()]), idx.column(), idx.parent()) for idx in oldIndexList]
         self.changePersistentIndexList(oldIndexList, newIndexList)
         self.modelReset.emit()
+

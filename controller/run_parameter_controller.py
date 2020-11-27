@@ -201,7 +201,7 @@ class RunParameterController(QObject):
 
     tags = ['BA1', 'User Experiment', 'Front End', 'Emittance', 'Energy Spread', 'Commissioning']
 
-    run_table_columns = {'run_id': 1, 'load_run_button': 0, 'plot_checkbox': 2, 'plot_color': 3}
+    run_table_columns = {'run_id': 1, 'load_run_button': 0, 'plot_checkbox': 2, 'plot_color': 3, 'time_stamp':4}
 
     def __init__(self, app, view, model):
         super(RunParameterController, self).__init__()
@@ -254,6 +254,13 @@ class RunParameterController(QObject):
         self.populate_run_parameters_table()
         self.toggle_BSOL_tracking()
         self.toggle_BSOL_tracking()
+        self.set_run_table_column_headers_visibility(True)
+
+    def set_run_table_column_headers_visibility(self, visible):
+        # header_label_list = ["Load", "Run ID", "Plot", "Legend"]
+        # self.view.run_parameters_table.setRowCount(len(header_label_list))
+        # self.view.run_parameters_table.setHorizontalHeaderLabels(header_label_list)
+        self.view.run_parameters_table.horizontalHeader().setVisible(visible)
         self.set_up_step_size_buttons()
         self.threadpool = QThreadPool()
         self.view.total_threads.setMaximum(self.threadpool.maxThreadCount())
@@ -276,6 +283,7 @@ class RunParameterController(QObject):
         """ Change the base directory the model starts in """
         self.model.set_base_directory(directory)
 
+
     def create_datatree_widget(self):
         """ Create the YAML tree widget """
         # self.view.yaml_tree_widget = pg.DataTreeWidget()
@@ -292,8 +300,12 @@ class RunParameterController(QObject):
         table.setColumnWidth(0,10)
         table.setColumnWidth(2,10)
         table.setColumnWidth(3,10)
-        self.tablemodel = run_table.RunModel([], self)
+        self.tablemodel = run_table.RunModel(data=[],timestamps=[], rpc=self)
+        # Doesn't appear 
+        #proxyModel = QSortFilterProxyModel()
+        #proxyModel.setSourceModel(self.tablemodel)
         table.setModel(self.tablemodel)
+        table.setSortingEnabled(True)
         table.setItemDelegateForColumn(0, run_table.LoadButtonDelegate(table, self))
         table.setItemDelegateForColumn(2, run_table.PlotCheckboxDelegate(table, self))
         table.setItemDelegateForColumn(3, run_table.PlotColorDelegate(table, self))
@@ -317,7 +329,13 @@ class RunParameterController(QObject):
         """ Emit a signal when a table item is clicked """
         table = self.view.run_parameters_table
         runno = table.item(row, self.run_table_columns['run_id']).text()
-        self.run_id_clicked_signal.emit(str(runno))
+        self.run_id_clicked.emit(str(runno))
+        
+    def emit_sort_by_timestamp_signal(self, column, order):
+        table = self.view.run_parameters_table
+        if column == 4:
+            table.sortByColumn(column, order)
+
 
     def populate_run_parameters_table(self):
         """ Reset the run table with new data """
@@ -329,12 +347,20 @@ class RunParameterController(QObject):
             table.setModel(None)
             model.deleteLater()
         dirnames = self.model.get_all_directory_names()
-        self.tablemodel = run_table.RunModel(list(reversed(dirnames)), self)
+        timestamps = self.model.get_all_run_timestamps()
+        self.tablemodel = run_table.RunModel(list(reversed(dirnames)),timestamps, self)
         table.setModel(self.tablemodel)
         table.setColumnWidth(0,12)
         table.setColumnWidth(1,228)
         table.setColumnWidth(2,12)
         table.setColumnWidth(3,12)
+        table.setColumnWidth(4,228)
+
+    def refresh_run_parameters_table(self):
+        table = self.view.run_parameters_table
+        model = table.model()
+        model.modelReset.emit()
+        model.sort(4,model.currentSortDirection)
 
     def update_run_parameters_table(self):
         """ Update the run table data and refresh the view """
@@ -353,7 +379,7 @@ class RunParameterController(QObject):
     def delete_run_id(self, run_id):
         """ Delete a run_id """
         self.delete_run_id_signal.emit(run_id)
-        self.update_run_parameters_table()
+        self.refresh_run_parameters_table()
 
     def setrunplotcolor(self, row, color):
         """ Update the run table with the correct plotting color """
@@ -406,7 +432,7 @@ class RunParameterController(QObject):
             del self.run_plot_colors[v]
             self.remove_plot_signal.emit(v)
         self.refresh_run_parameters_table()
-        # self.populate_run_parameters_table()
+
 
     def toggle_BSOL_tracking(self):
         """ Connect/Diconnect the BSOL tracking functions """
