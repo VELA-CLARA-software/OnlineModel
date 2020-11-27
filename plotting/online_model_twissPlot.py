@@ -7,8 +7,8 @@ from PyQt5.QtWidgets import *
 import pyqtgraph as pg
 import numpy as np
 sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
-import SimulationFramework.Modules.read_beam_file as raf
-import SimulationFramework.Modules.read_twiss_file as rtf
+import SimulationFramework.Modules.Beams as raf
+import SimulationFramework.Modules.Twiss as rtf
 from SimulationFramework.Modules.multiPlot import multiPlotWidget
 
 class mainWindow(QMainWindow):
@@ -146,7 +146,7 @@ class twissPlotWidget(multiPlotWidget):
         if twiss is None: # If it doesn't exist need to instantiate a twiss obkject
             twiss = rtf.twiss()
         # print('Loading ASTRA files', astrafiles)
-        twiss.read_astra_emit_files(astrafiles, reset=reset)
+        twiss.read_astra_twiss_files(astrafiles, reset=reset)
         reset = False if len(astrafiles) > 0 else reset # if we have alreay found some ASTRA files, we need to set this to false to append new data, otherwise check input value
         ''' reset=False stops the previously loaded data from being overwritten'''
         # print('Loading Elegant files', elegantfiles)

@@ -11,7 +11,7 @@ except:
 import pyqtgraph as pg
 import numpy as np
 sys.path.append(os.path.abspath(os.path.realpath(__file__)+'/../../../SimFrame'))
-from SimulationFramework.Modules.read_beam_file import beam as rbfBeam
+from SimulationFramework.Modules.Beams import beam as rbfBeam
 sys.path.append(os.path.realpath(__file__)+'/../../../../')
 
 class beamPlotter(QMainWindow):
@@ -163,7 +163,7 @@ class beamPlotWidget(QWidget):
         ''' addbeamData - takes a "read_beam_file" object and add a plotItem to the relevant self.curves '''
         ''' add the beam object into the self.beams dictionary '''
         ''' Requires a reference file name '''
-        if str(type(beamobject)) == "<class 'SimulationFramework.Modules.read_beam_file.beam'>":
+        if str(type(beamobject)) == "<class 'SimulationFramework.Modules.Beams.beam'>":
             self.beams[id] = beamobject
             if color is None:
                 color = self.colors[self.plotColor % len(self.colors)]
@@ -192,7 +192,7 @@ class beamPlotWidget(QWidget):
         if not datafile in self.curves and os.path.isfile(datafile):
             beam = rbfBeam()
             # print('reading beam', datafile)
-            beam.read_HDF5_beam_file(datafile)
+            beam.read_beam_file(datafile)
             # print('plotting beam', datafile)
             color = self.addbeamData(beam, id=id, color=color)
             return color

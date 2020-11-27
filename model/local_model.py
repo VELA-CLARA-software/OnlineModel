@@ -99,11 +99,6 @@ class Model(object):
             for e in elements:
                 e.lsc_enable = lsc
                 e.lsc_bins = lsc_bins
-            #     e.smoothing_half_width = 1
-            #     e.lsc_high_frequency_cutoff_start = -1#0.25
-            #     e.lsc_high_frequency_cutoff_end = -1#0.33
-            # lattice.lsc_high_frequency_cutoff_start = -1#0.25
-            # lattice.lsc_high_frequency_cutoff_end = -1#0.33
             lattice.lsc_bins = lsc_bins
             lattice.lscDrifts = lsc
 
@@ -204,7 +199,7 @@ class Model(object):
                     self.data.Framework.modifyElement(key, 'phase', value['phase'])
                 elif inputdict[key]['type'] == 'solenoid':
                     if 'BSOL' in key:
-                        self.data.Framework.modifyElement(key, 'field_amplitude', 0.3462 * float(value['field_amplitude']))
+                        self.data.Framework.modifyElement(key, 'field_amplitude', -1 * float(value['field_amplitude']))
                     else:
                         self.data.Framework.modifyElement(key, 'field_amplitude', float(value['field_amplitude']))
 
@@ -217,7 +212,7 @@ class Model(object):
         [self.update_framework_elements(self.data.parameterDict[l]) for l in self.data.lattices]
         if self.data.parameterDict[lattices.lattices[0]]['bsol_tracking']['value']:
             # This is the scaling factor for getting (approx) zero field on the cathode from the BSOL = -0.3462 * 90% (gives about 1% error on the emittance)
-            self.data.Framework.modifyElement('CLA-LRG1-MAG-BSOL-01', 'field_amplitude', -0.3462 * 0.9 * self.data.Framework['CLA-LRG1-MAG-SOL-01']['field_amplitude'])
+            self.data.Framework.modifyElement('CLA-LRG1-MAG-BSOL-01', 'field_amplitude', 0.9 * self.data.Framework['CLA-LRG1-MAG-SOL-01']['field_amplitude'])
         if scan==True and type is not None:
             print(self.data.parameterDict[dictname][pv])
         self.update_laser_properties()

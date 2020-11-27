@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import *
 import pyqtgraph as pg
 import numpy as np
 sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
-import SimulationFramework.Modules.read_beam_file as raf
+import SimulationFramework.Modules.Beams as raf
 from SimulationFramework.Modules.multiPlot import multiPlotWidget
 
 class slicePlotter(QMainWindow):
@@ -40,7 +40,7 @@ class slicePlotWidget(multiPlotWidget):
         {'label': 'Slice Horizontal Emittance (normalised)', 'quantity': 'slice_normalized_horizontal_emittance', 'units': 'm-rad', 'name': '&epsilon;<sub>n,x</sub>', 'range': [0,5e-6]},
         {'label': 'Slice Vertical Emittance (normalised)', 'quantity': 'slice_normalized_vertical_emittance', 'units': 'm-rad', 'name': '&epsilon;<sub>n,y</sub>', 'range': [0,5e-6]},
         'next_row',
-        {'label': 'Current', 'quantity': 'slice_peak_current', 'units': 'A', 'text': 'I', 'name': 'I', 'range': [0,100]},
+        {'label': 'Current', 'quantity': 'slice_current', 'units': 'A', 'text': 'I', 'name': 'I', 'range': [0,100]},
         {'label': 'Slice Relative Momentum Spread', 'quantity': 'slice_relative_momentum_spread', 'units': '%', 'name': '&sigma;<sub>cp</sub>/p', 'range': [0,0.2]},
         'next_row',
         {'label': 'Slice Horizontal Beta Function', 'quantity': 'slice_beta_x', 'units': 'm', 'name': '&beta;<sub>x</sub>', 'range': [0,250], 'xlabel': 't (ps)'},
@@ -84,10 +84,10 @@ class slicePlotWidget(multiPlotWidget):
             name -- key index name
         '''
         ''' load the data files into the slice dictionary '''
-        if str(type(beamobject)) == "<class 'SimulationFramework.Modules.read_beam_file.beam'>":
+        if str(type(beamobject)) == "<class 'SimulationFramework.Modules.Beams.beam'>":
             self.beams[id] = beamobject
-            self.beams[id].slices = self.slicePlotSliceWidthWidget.value()
-            beamobject.bin_time()
+            self.beams[id].slice.slices = self.slicePlotSliceWidthWidget.value()
+            beamobject.slice.bin_time()
             if color is None:
                 color = self.colors[self.plotColor % len(self.colors)]
                 if id not in self.curves:
@@ -100,8 +100,8 @@ class slicePlotWidget(multiPlotWidget):
                     label = param['label']
                     # color = self.colors[n]
                     # pen = pg.mkPen(color=color, style=self.styles[self.plotColor % len(self.styles)], width=3)
-                    exponent = np.floor(np.log10(np.abs(beamobject.slice_length)))
-                    x = 1e12 * np.array((beamobject.slice_bins - np.mean(beamobject.slice_bins)))
+                    exponent = np.floor(np.log10(np.abs(beamobject.slice.slice_length)))
+                    x = 1e12 * np.array((beamobject.slice.slice_bins - np.mean(beamobject.slice.slice_bins)))
                     # self.multiPlot.setRange(xRange=[min(x),max(x)])
                     y = getattr(beamobject, param['quantity'])
                     # print('#################################################################')
@@ -145,13 +145,13 @@ class slicePlotWidget(multiPlotWidget):
     def changeSliceLength(self, name):
         ''' change the time slice length for a beam data object and update the plot '''
         beam = self.beams[name]
-        beam.set_slices(self.slicePlotSliceWidthWidget.value())
-        beam.bin_time()
+        beam.slice.set_slices(self.slicePlotSliceWidthWidget.value())
+        beam.slice.bin_time()
         for n, param in enumerate(self.plotParams):
             if not param == 'next_row':
                 label = param['label']
-                exponent = np.floor(np.log10(np.abs(beam.slice_length)))
-                x = 1e12 * np.array((beam.slice_bins - np.mean(beam.slice_bins)))
+                exponent = np.floor(np.log10(np.abs(beam.slice.slice_length)))
+                x = 1e12 * np.array((beam.slice.slice_bins - np.mean(beam.slice.slice_bins)))
                 # self.multiPlotWidgets[label].setRange(xRange=[min(x),max(x)])
                 y = getattr(beam, param['quantity'])
                 if name in self.curves and label in self.curves[name]:
