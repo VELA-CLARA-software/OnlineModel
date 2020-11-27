@@ -301,7 +301,7 @@ class RunParameterController(QObject):
         table.setColumnWidth(2,10)
         table.setColumnWidth(3,10)
         self.tablemodel = run_table.RunModel(data=[],timestamps=[], rpc=self)
-        # Doesn't appear 
+        # Doesn't appear
         #proxyModel = QSortFilterProxyModel()
         #proxyModel.setSourceModel(self.tablemodel)
         table.setModel(self.tablemodel)
@@ -309,6 +309,7 @@ class RunParameterController(QObject):
         table.setItemDelegateForColumn(0, run_table.LoadButtonDelegate(table, self))
         table.setItemDelegateForColumn(2, run_table.PlotCheckboxDelegate(table, self))
         table.setItemDelegateForColumn(3, run_table.PlotColorDelegate(table, self))
+        table.setItemDelegateForColumn(4, run_table.DateDelegate(table, self))
 
     def show_yaml_in_datatree(self, item):
         """ Update the YAML tree widget based on row and column from the run table """
@@ -330,12 +331,11 @@ class RunParameterController(QObject):
         table = self.view.run_parameters_table
         runno = table.item(row, self.run_table_columns['run_id']).text()
         self.run_id_clicked.emit(str(runno))
-        
+
     def emit_sort_by_timestamp_signal(self, column, order):
         table = self.view.run_parameters_table
         if column == 4:
             table.sortByColumn(column, order)
-
 
     def populate_run_parameters_table(self):
         """ Reset the run table with new data """
@@ -367,7 +367,8 @@ class RunParameterController(QObject):
         table = self.view.run_parameters_table
         model = table.model()
         dirnames = self.model.get_all_directory_names()
-        model.update_data(list(reversed(dirnames)))
+        timestamps = self.model.get_all_run_timestamps()
+        model.update_data(list(reversed(dirnames)), timestamps)
         model.modelReset.emit()
 
     def refresh_run_parameters_table(self):

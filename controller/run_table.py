@@ -3,6 +3,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import pyqtgraph as pg
 from copy import copy
+import datetime
+#datetime.datetime.fromtimestamp(float(timestamp)).strftime('%d-%m-%Y %H:%M:%S')
 
 class LoadButtonDelegate(QStyledItemDelegate):
     def __init__(self, owner, rpc):
@@ -22,7 +24,6 @@ class LoadButtonDelegate(QStyledItemDelegate):
 
     def get_id(self, index):
         return self.owner.model()._data[index.row()]
-
 
 class PlotCheckboxDelegate(QItemDelegate):
     """
@@ -70,6 +71,20 @@ class PlotColorDelegate(LoadButtonDelegate):
             return colorWidget
         return None
 
+class DateDelegate(QStyledItemDelegate):
+
+    def __init__(self, owner, rpc):
+        super(DateDelegate, self).__init__(owner)
+        self.owner = owner
+        self.rpc = rpc
+
+    def displayText(self, text, locale):
+        data = datetime.datetime.fromtimestamp(float(text)).strftime('%d-%m-%Y %H:%M:%S')
+        return data
+
+    def get_id(self, index):
+        return self.owner.model()._timestamps[index.row()]
+
 class RunModel(QAbstractTableModel):
     ActiveRole = Qt.UserRole + 1
 
@@ -77,12 +92,13 @@ class RunModel(QAbstractTableModel):
         super().__init__()
         self._data = data
         self._timestamps = timestamps
-        self.sortOrder = Qt.AscendingOrder
+        self.currentSortDirection = Qt.AscendingOrder
         self.header_labels = ['Load', 'Run ID', 'Plot', 'Colour', 'Timestamp']
 
-    def update_data(self, data):
+    def update_data(self, data, timestamps):
         self._data = data
-        self.sort(1, self.sortOrder)
+        self._timestamps = timestamps
+        self.sort(4, self.currentSortDirection)
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._data)
@@ -91,7 +107,7 @@ class RunModel(QAbstractTableModel):
         return 5
 
     def sort(self, column=None, direction=0):
-        """ 
+        """
             - only able to sort if column = 4 (timestamp) for now.
             - Direction=0 -> ASCENDING
             - Direction=1 -> DESCENDING
@@ -99,39 +115,28 @@ class RunModel(QAbstractTableModel):
 
         self.layoutAboutToBeChanged.emit()
         self.currentSortDirection = direction
+        if column == 1:
+            self._data=sorted(self._data, reverse=(not direction))
+            # self._timestamps = {k:self._timestamps[k] for k in self._data.keys()}
+            self.modelReset.emit()
         if column == 4:
             # self._rpc.emit_sort_by_timestamp_signal(column, direction)
             self._timestamps=dict(sorted(self._timestamps.items(), key=lambda x: x[1],reverse=(not direction)))
             self._data = list(self._timestamps.keys())
             self.modelReset.emit()
-        print('SORT CALLED on column: ', column)
-        print('SORT ORDER: ', direction)
-       
+        # print('SORT CALLED on column: ', column)
+        # print('SORT ORDER: ', direction)
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
             if index.column() == 1:
                 return QVariant(self._data[index.row()])
             elif index.column() == 4:
-                return QVariant(self._timestamps[self._data[index.row()]]) 
+                return QVariant(self._timestamps[self._data[index.row()]])
             else:
                 return None
-
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self.header_labels[section]
         return QAbstractTableModel.headerData(self, section, orientation, role)
-
-    def sort(self, col, order=Qt.AscendingOrder):
-        self.sortOrder = order
-        oldIndexList = self.persistentIndexList()
-        olddata = self._data[:]
-        if order == Qt.AscendingOrder:
-            self._data.sort()
-        else:
-            self._data.sort(reverse=True)
-        newIndexList = [self.index(self._data.index(olddata[idx.row()]), idx.column(), idx.parent()) for idx in oldIndexList]
-        self.changePersistentIndexList(oldIndexList, newIndexList)
-        self.modelReset.emit()
-

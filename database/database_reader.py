@@ -65,7 +65,7 @@ class DatabaseReader():
         for run_id, timestamp, prefix, start_lattice, directory in settings_for_run_id:
             run_id_settings_dict[run_id]['runs']['prefix'] = prefix
             run_id_settings_dict[run_id]['runs']['start_lattice'] = start_lattice
-            run_id_settings_dict[run_id]['runs']['timestamp'] = datetime.datetime.fromtimestamp(float(timestamp)).strftime('%d-%m-%Y %H:%M:%S')
+            run_id_settings_dict[run_id]['runs']['timestamp'] = float(timestamp)
             run_id_settings_dict[run_id]['runs']['directory'] = directory
 
 
@@ -261,7 +261,7 @@ class DatabaseReader():
 
     def get_all_run_ids(self):
         return self.run_id_settings_dict.keys()
-        
+
     def get_all_run_timestamps(self):
         run_id_list = self.get_all_run_ids()
         timestamp_dict = dict()
