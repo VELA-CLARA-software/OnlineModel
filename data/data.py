@@ -2,7 +2,6 @@ import collections
 import os, sys
 import re
 import numpy as np
-import ruamel.yaml as yaml
 sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
 sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
 sys.path.append(os.path.abspath(__file__+'/../../'))
@@ -43,21 +42,18 @@ class Data(object):
         self.my_name = "data"
         self.get_data()
         self.initialise_data()
-        # yaml.add_representer(collections.OrderedDict, yaml.representer.SafeRepresenter.represent_dict)
-        # with open('./screen_positions.yaml', 'w') as output_file:
-        #     yaml.dump(self.screenDict, output_file, default_flow_style=False)
 
-    # if sys.version_info < (3,7):
-    def __deepcopy__(self, memo):
-        # create a copy with self.linked_to *not copied*, just referenced.
-        datacopy = type(self)()
-        datacopy.lattices = deepcopy(self.lattices, memo)
-        datacopy.parameterDict = deepcopy(self.parameterDict, memo)
-        datacopy.runsDict = deepcopy(self.runsDict, memo)
-        datacopy.generatorDict = deepcopy(self.generatorDict, memo)
-        datacopy.Framework = Fw.Framework(directory='.', clean=False, verbose=False, delete_output_files=False)
-        datacopy.Framework.loadSettings(lattices.lattice_definition)
-        return datacopy
+    if sys.version_info < (3,7):
+        def __deepcopy__(self, memo):
+            # create a copy with self.linked_to *not copied*, just referenced.
+            datacopy = type(self)()
+            datacopy.lattices = deepcopy(self.lattices, memo)
+            datacopy.parameterDict = deepcopy(self.parameterDict, memo)
+            datacopy.runsDict = deepcopy(self.runsDict, memo)
+            datacopy.generatorDict = deepcopy(self.generatorDict, memo)
+            datacopy.Framework = Fw.Framework(directory='.', clean=False, verbose=False, delete_output_files=False)
+            datacopy.Framework.loadSettings(lattices.lattice_definition)
+            return datacopy
 
     def get_framework(self):
         return self.Framework

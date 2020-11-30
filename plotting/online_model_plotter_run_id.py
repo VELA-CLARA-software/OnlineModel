@@ -362,7 +362,7 @@ def main():
     parser = argparse.ArgumentParser(description='Analyse Online Model Folder')
     parser.add_argument('-d', '--directory', default='.', type=str)
     args = parser.parse_args()
-    import ruamel.yaml as yaml
+    import yaml
     yaml.add_representer(OrderedDict, yaml.representer.SafeRepresenter.represent_dict)
     with open(r'C:\Users\jkj62\Documents\GitHub\ASTRA_COMPARISONRunner-HMCC\screen_positions.yaml', 'r') as stream:
         yaml_parameter_dict = yaml.safe_load(stream)

@@ -1,5 +1,5 @@
-import ruamel.yaml as yaml
-from collections import OrderedDict
+import yaml
+from collections import OrderedDict, defaultdict
 
 
 def parse_parameter_input_file(filename):

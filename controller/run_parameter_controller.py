@@ -5,7 +5,7 @@ except:
     from PyQt5.QtCore import *
     from PyQt5.QtGui import *
     from PyQt5.QtWidgets import *
-import database.run_parameters_parser as yaml_parser
+from . import run_parameters_parser as yaml_parser
 from model.local_model import create_yaml_dictionary, Model
 import controller.run_table as run_table
 from controller import database_controller

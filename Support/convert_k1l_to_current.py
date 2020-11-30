@@ -1,7 +1,7 @@
 import sys, os
 from munch import Munch
 import numpy as np
-import ruamel.yaml as yaml
+import yaml
 sys.path.append(os.path.abspath(__file__+'/../../'))
 import controller.run_parameters_parser as yaml_parser
 import data.lattices as lattices

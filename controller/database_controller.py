@@ -1,7 +1,7 @@
 import sys, os, time
 sys.path.append(os.path.abspath(__file__+'/../../'))
 
-import database.run_parameters_parser as yaml_parser
+from . import run_parameters_parser as yaml_parser
 import database.database_reader as database_reader
 import database.database_writer as database_writer
 import database.database_creator as database_creator
@@ -83,7 +83,7 @@ class DatabaseController():
 
     def get_all_run_ids(self):
         return self.reader.get_all_run_ids()
-        
+
     def get_all_run_timestamps(self):
         return self.reader.get_all_run_timestamps()
 

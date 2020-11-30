@@ -3,7 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import sys, os
 sys.path.append(os.path.abspath(__file__+'/../../'))
-import database.run_parameters_parser as yaml_parser
+from . import run_parameters_parser as yaml_parser
 from plotting.online_model_twissPlot import twissPlotWidget
 from plotting.online_model_plotter_run_id import onlineModelPlotterWidget
 
