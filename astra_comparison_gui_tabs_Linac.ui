@@ -3485,6 +3485,11 @@
                    <string>Gaussian</string>
                   </property>
                  </item>
+                 <item>
+                  <property name="text">
+                   <string>Image</string>
+                  </property>
+                 </item>
                 </widget>
                </item>
                <item row="2" column="0">
@@ -3495,9 +3500,9 @@
                 </widget>
                </item>
                <item row="3" column="0">
-                <widget class="QPushButton" name="pushButton">
+                <widget class="QPushButton" name="laser_image_button">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                  <property name="text">
                   <string>Image File</string>
@@ -3505,9 +3510,15 @@
                 </widget>
                </item>
                <item row="3" column="1">
-                <widget class="QLineEdit" name="lineEdit">
+                <widget class="QLineEdit" name="laser_image_lineedit">
                  <property name="enabled">
-                  <bool>false</bool>
+                  <bool>true</bool>
+                 </property>
+                 <property name="accessibleName">
+                  <string>generator:laser_file:value</string>
+                 </property>
+                 <property name="readOnly">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -3534,6 +3545,72 @@
                  <property name="value">
                   <double>3.000000000000000</double>
                  </property>
+                </widget>
+               </item>
+               <item row="4" column="0" colspan="2">
+                <widget class="QWidget" name="laser_cal_widget" native="true">
+                 <layout class="QGridLayout" name="gridLayout_4">
+                  <property name="margin">
+                   <number>0</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_40">
+                    <property name="text">
+                     <string>Pixels/mm (H/V)</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QSpinBox" name="laser_image_cal_x">
+                    <property name="maximumSize">
+                     <size>
+                      <width>68</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="accessibleName">
+                     <string>generator:laser_cal_x:value</string>
+                    </property>
+                    <property name="suffix">
+                     <string> px</string>
+                    </property>
+                    <property name="maximum">
+                     <number>10000</number>
+                    </property>
+                    <property name="singleStep">
+                     <number>100</number>
+                    </property>
+                    <property name="value">
+                     <number>500</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2">
+                   <widget class="QSpinBox" name="laser_image_cal_y">
+                    <property name="maximumSize">
+                     <size>
+                      <width>68</width>
+                      <height>16777215</height>
+                     </size>
+                    </property>
+                    <property name="accessibleName">
+                     <string>generator:laser_cal_y:value</string>
+                    </property>
+                    <property name="suffix">
+                     <string> px</string>
+                    </property>
+                    <property name="maximum">
+                     <number>10000</number>
+                    </property>
+                    <property name="singleStep">
+                     <number>100</number>
+                    </property>
+                    <property name="value">
+                     <number>500</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
               </layout>

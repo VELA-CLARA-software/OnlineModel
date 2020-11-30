@@ -193,6 +193,15 @@ class Data(object):
         self.laser_values.update({'tracking_code': collections.OrderedDict()})
         self.laser_values['tracking_code'].update({'type': 'generator'})
         self.laser_values['tracking_code'].update({'value': 'ASTRA'})
+        self.laser_values.update({'laser_file': collections.OrderedDict()})
+        self.laser_values['laser_file'].update({'type': 'generator'})
+        self.laser_values['laser_file'].update({'value': ''})
+        self.laser_values.update({'laser_cal_x': collections.OrderedDict()})
+        self.laser_values['laser_cal_x'].update({'type': 'generator'})
+        self.laser_values['laser_cal_x'].update({'value': ''})
+        self.laser_values.update({'laser_cal_y': collections.OrderedDict()})
+        self.laser_values['laser_cal_y'].update({'type': 'generator'})
+        self.laser_values['laser_cal_y'].update({'value': ''})
         self.simulation_parameters = {'tracking_code': 'elegant', 'csr': True, 'csr_bins': 200, 'lsc': True, 'lsc_bins': 200}
 
     def get_pv_alias(self, dict, name, param=None, rf_type=None):

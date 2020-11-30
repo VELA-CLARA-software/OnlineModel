@@ -171,13 +171,13 @@ class Model(object):
                 self.data.Framework.setSubDirectory(os.path.relpath(self.data.runsDict['directory']))
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
-                # try:
-                self.data.Framework.track(startfile=start_lattice)#, endfile='CLA-S02')
-                # except Exception as e:
-                #     print('!!!! Error in Tracking - settings not saved !!!!')
-                #     print(e)
-                #     print('!!!!', self.directoryname, '!!!!')
-                #     success = False
+                try:
+                    self.data.Framework.track(startfile=start_lattice)#, endfile='CLA-S02')
+                except Exception as e:
+                    print('!!!! Error in Tracking - settings not saved !!!!')
+                    print(e)
+                    print('!!!!', self.directoryname, '!!!!')
+                    success = False
         return success
 
     def get_directory_name(self):
@@ -221,7 +221,10 @@ class Model(object):
         self.update_laser_properties()
 
     def update_laser_properties(self):
-        self.data.Framework.change_generator(str(self.data.generatorDict['tracking_code']['value']))
+        if str(self.data.generatorDict['transverse_distribution']['value']) == "Image":
+            self.data.Framework.change_generator('GPT')
+        else:
+            self.data.Framework.change_generator(str(self.data.generatorDict['tracking_code']['value']))
         self.data.Framework.generator.number_of_particles = int(2**(3*int(self.data.generatorDict['number_of_particles']['value'])))
         # Convert to nC
         self.data.Framework.generator.charge = 1e-12*float(self.data.generatorDict['charge']['value'])
@@ -254,6 +257,12 @@ class Model(object):
             self.data.Framework.generator.distribution_type_y = "radial"
             self.data.Framework.generator.lx = self.data.generatorDict['spot_size']['value'] * 1e-3
             self.data.Framework.generator.ly = self.data.generatorDict['spot_size']['value'] * 1e-3
+        elif str(self.data.generatorDict['transverse_distribution']['value']) == "Image":
+            self.data.Framework.generator.distribution_type_x = "image"
+            self.data.Framework.generator.distribution_type_y = "image"
+            self.data.Framework.generator.image_filename = str(self.data.generatorDict['laser_file']['value'])
+            self.data.Framework.generator.image_calibration_x = int(int(self.data.generatorDict['laser_cal_x']['value'])  * 1e3)
+            self.data.Framework.generator.image_calibration_y = int(int(self.data.generatorDict['laser_cal_y']['value'])  * 1e3)
         self.data.Framework.generator.sigma_x = self.data.generatorDict['spot_size']['value'] * 1e-3
         self.data.Framework.generator.sigma_y = self.data.generatorDict['spot_size']['value'] * 1e-3
         ### Thermal Emittance in radians ###

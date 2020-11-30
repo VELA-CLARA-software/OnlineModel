@@ -220,6 +220,7 @@ class RunParameterController(QObject):
                                self.view.scan_groupBox,
                                self.view.directory_groupBox,
                                self.view.tags_widget,
+                               self.view.laser_cal_widget,
                                ]
         self.formLayoutList = [formLayout for layout in self.runParameterLayouts for
                           formLayout in layout.findChildren((QFormLayout,QGridLayout))]
@@ -255,6 +256,8 @@ class RunParameterController(QObject):
         self.toggle_BSOL_tracking()
         self.toggle_BSOL_tracking()
         self.set_run_table_column_headers_visibility(True)
+
+        self.view.laser_image_button.clicked.connect(self.load_laser_image)
 
     def set_run_table_column_headers_visibility(self, visible):
         # header_label_list = ["Load", "Run ID", "Plot", "Legend"]
@@ -880,10 +883,10 @@ class RunParameterController(QObject):
         # Ensure model directory location is consistent
         localmodel.basedirectoryname = self.model.basedirectoryname
         # Run the model script
-        # try:
-        tracking_success = localmodel.run_script()
-        # except:
-        #     tracking_success = False
+        try:
+            tracking_success = localmodel.run_script()
+        except:
+            tracking_success = False
         # Emit signal that the script has finished. This will be connected in the MAIN thread!
         self.run_finished_signal.emit(tracking_success, doPlot, localmodel.directoryname, localmodel.yaml, nthreads)
         if tracking_success:
@@ -1105,3 +1108,13 @@ class RunParameterController(QObject):
                     pass
         for k, widget in accessibleNames.items():
             widget.setSingleStep(step)
+
+#####  Laser button widget
+
+    def load_laser_image(self, button):
+        dialog = QFileDialog()
+        filename = QFileDialog.getOpenFileName(dialog, caption='Open file',
+                                                     directory='.',
+                                                     filter="BMP files (*.bmp)")
+        filename = os.path.relpath(filename[0]) if isinstance(filename,tuple) else filename
+        self.view.laser_image_lineedit.setText(filename)
