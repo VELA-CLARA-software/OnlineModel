@@ -3,7 +3,7 @@ import glob
 
 sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
 sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
-import SimulationFramework.Modules.read_twiss_file as rtf
+import SimulationFramework.Modules.Twiss as rtf
 
 class twissData(object):
 

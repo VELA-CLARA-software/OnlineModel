@@ -283,7 +283,6 @@ class RunParameterController(QObject):
         """ Change the base directory the model starts in """
         self.model.set_base_directory(directory)
 
-
     def create_datatree_widget(self):
         """ Create the YAML tree widget """
         # self.view.yaml_tree_widget = pg.DataTreeWidget()
@@ -309,7 +308,7 @@ class RunParameterController(QObject):
         table.setItemDelegateForColumn(0, run_table.LoadButtonDelegate(table, self))
         table.setItemDelegateForColumn(2, run_table.PlotCheckboxDelegate(table, self))
         table.setItemDelegateForColumn(3, run_table.PlotColorDelegate(table, self))
-        table.setItemDelegateForColumn(4, run_table.DateDelegate(table, self))
+        table.setItemDelegateForColumn(4, run_table.DateDelegate(table))
 
     def show_yaml_in_datatree(self, item):
         """ Update the YAML tree widget based on row and column from the run table """
@@ -323,7 +322,7 @@ class RunParameterController(QObject):
         if 'values_changed' in ddiff:
             for k,v in ddiff['values_changed'].items():
                 split = self.table_match.findall(k)
-                table.append({'Lattice\t': split[0], 'Element\t': split[1], 'Property\t': split[2], 'Run Value\t': v['old_value'], 'Current Value\t': v['new_value']})
+                table.append({'Lattice\t': split[0], 'Element\t': split[1], 'Property\t': split[2], 'Run Value\t': str(v['old_value']), 'Current Value\t': str(v['new_value'])})
         self.view.yaml_tree_widget.setData(table)
 
     def emit_run_id_clicked_signal(self, row, col):
@@ -881,10 +880,10 @@ class RunParameterController(QObject):
         # Ensure model directory location is consistent
         localmodel.basedirectoryname = self.model.basedirectoryname
         # Run the model script
-        try:
-            tracking_success = localmodel.run_script()
-        except:
-            tracking_success = False
+        # try:
+        tracking_success = localmodel.run_script()
+        # except:
+        #     tracking_success = False
         # Emit signal that the script has finished. This will be connected in the MAIN thread!
         self.run_finished_signal.emit(tracking_success, doPlot, localmodel.directoryname, localmodel.yaml, nthreads)
         if tracking_success:

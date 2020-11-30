@@ -2,6 +2,8 @@
 
 block_cipher = None
 
+import sys
+sys.modules['FixTk'] = None
 
 a = Analysis(['.\\mainapp.py'],
              pathex=['.\\', '..\\SimFrame'],
@@ -22,10 +24,10 @@ a = Analysis(['.\\mainapp.py'],
 				('..\\SimFrame\\MasterLattice\\Data_Files\\SwissFEL_linac_sols.dat', 'MasterLattice\\Data_Files'),
 				('.\\data\\CLA10-BA1_OM.def', 'MasterLattice\\data'),
 			],
-             hiddenimports=['scipy.special.cython_special', 'munch'],
+             hiddenimports=['munch', 'ruamel.yaml'],
              hookspath=['.\\hooks'],
              runtime_hooks=[],
-             excludes=[],
+             excludes=['notebook', 'matplotlib', 'FixTk', 'tcl', 'tk', '_tkinter', 'tkinter', 'Tkinter', 'scipy'],
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher,

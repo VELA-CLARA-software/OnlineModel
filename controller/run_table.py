@@ -73,17 +73,11 @@ class PlotColorDelegate(LoadButtonDelegate):
 
 class DateDelegate(QStyledItemDelegate):
 
-    def __init__(self, owner, rpc):
+    def __init__(self, owner):
         super(DateDelegate, self).__init__(owner)
-        self.owner = owner
-        self.rpc = rpc
 
     def displayText(self, text, locale):
-        data = datetime.datetime.fromtimestamp(float(text)).strftime('%d-%m-%Y %H:%M:%S')
-        return data
-
-    def get_id(self, index):
-        return self.owner.model()._timestamps[index.row()]
+        return datetime.datetime.fromtimestamp(float(text)).strftime('%d-%m-%Y %H:%M:%S')
 
 class RunModel(QAbstractTableModel):
     ActiveRole = Qt.UserRole + 1
@@ -92,13 +86,14 @@ class RunModel(QAbstractTableModel):
         super().__init__()
         self._data = data
         self._timestamps = timestamps
+        self.currentSortColumn = 4
         self.currentSortDirection = Qt.AscendingOrder
         self.header_labels = ['Load', 'Run ID', 'Plot', 'Colour', 'Timestamp']
 
     def update_data(self, data, timestamps):
         self._data = data
         self._timestamps = timestamps
-        self.sort(4, self.currentSortDirection)
+        self.sort(self.currentSortColumn, self.currentSortDirection)
 
     def rowCount(self, parent=QModelIndex()):
         return len(self._data)
@@ -116,16 +111,14 @@ class RunModel(QAbstractTableModel):
         self.layoutAboutToBeChanged.emit()
         self.currentSortDirection = direction
         if column == 1:
+            self.currentSortColumn = 1
             self._data=sorted(self._data, reverse=(not direction))
-            # self._timestamps = {k:self._timestamps[k] for k in self._data.keys()}
             self.modelReset.emit()
         if column == 4:
-            # self._rpc.emit_sort_by_timestamp_signal(column, direction)
+            self.currentSortColumn = 4
             self._timestamps=dict(sorted(self._timestamps.items(), key=lambda x: x[1],reverse=(not direction)))
             self._data = list(self._timestamps.keys())
             self.modelReset.emit()
-        # print('SORT CALLED on column: ', column)
-        # print('SORT ORDER: ', direction)
 
     def data(self, index, role):
         if role == Qt.DisplayRole:

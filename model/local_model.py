@@ -64,7 +64,7 @@ class Model(object):
 
     def get_all_directory_names(self):
         return list(self.dbcontroller.get_all_run_ids())
-        
+
     def get_all_run_timestamps(self):
         return self.dbcontroller.get_all_run_timestamps()
 
@@ -171,13 +171,13 @@ class Model(object):
                 self.data.Framework.setSubDirectory(os.path.relpath(self.data.runsDict['directory']))
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
-                try:
-                    self.data.Framework.track(startfile=start_lattice)#, endfile='CLA-S02')
-                except Exception as e:
-                    print('!!!! Error in Tracking - settings not saved !!!!')
-                    print(e)
-                    print('!!!!', self.directoryname, '!!!!')
-                    success = False
+                # try:
+                self.data.Framework.track(startfile=start_lattice)#, endfile='CLA-S02')
+                # except Exception as e:
+                #     print('!!!! Error in Tracking - settings not saved !!!!')
+                #     print(e)
+                #     print('!!!!', self.directoryname, '!!!!')
+                #     success = False
         return success
 
     def get_directory_name(self):
