@@ -17,7 +17,7 @@ class Data(object):
     def __getitem__(self, key):
         return getattr(self, key)
 
-    def __init__(self):
+    def __init__(self, directory='.', settings_directory=None):
         super(Data, self).__init__()
         self.my_name = "data"
         self.parser = DBURT_Parser()
@@ -38,7 +38,10 @@ class Data(object):
         self.runsDict = self.parameterDict['runs']
         self.scannableParametersDict = collections.OrderedDict()
         self.Framework = Fw.Framework(directory='.', clean=False, verbose=False, delete_output_files=False)
-        self.Framework.loadSettings(lattices.lattice_definition)
+        if settings_directory:
+            self.Framework.loadSettings(settings_directory+'/'+lattices.lattice_definition)
+        else:
+            self.Framework.loadSettings(directory+'/'+lattices.lattice_definition)
         self.my_name = "data"
         self.get_data()
         self.initialise_data()
