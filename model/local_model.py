@@ -172,7 +172,7 @@ class Model(object):
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
                 try:
-                    self.data.Framework.track(startfile=start_lattice)#, endfile='CLA-S02')
+                    self.data.Framework.track(startfile=start_lattice, save_summary=False)#, endfile='CLA-S02')
                 except Exception as e:
                     print('!!!! Error in Tracking - settings not saved !!!!')
                     print(e)

@@ -9,6 +9,7 @@ from . import run_parameters_parser as yaml_parser
 from model.local_model import create_yaml_dictionary, Model
 import controller.run_table as run_table
 from controller import database_controller
+from Support.OMDirectory import save_summary_files
 import sys, os, re
 import time
 import collections
@@ -1028,6 +1029,7 @@ class RunParameterController(QObject):
             self.model.save_settings_to_database(yaml, directoryname)
             self.update_runs_widget(plot=doPlot, id=directoryname)
             self.update_directory_widget(dirname=directoryname)
+            save_summary_files(directoryname, directory='.', database=self.model.dbcontroller.database, twiss=True, beams=True)
 
     def update_directory_widget(self, dirname=None):
         """ Update the directory widget with a new value """

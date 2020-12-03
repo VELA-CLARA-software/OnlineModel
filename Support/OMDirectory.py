@@ -6,7 +6,7 @@ import glob
 from munch import Munch
 from controller.database_controller import DatabaseController
 from data.data import Data as OMData
-from SimulationFramework.Framework import Framework
+from SimulationFramework.Framework import Framework, frameworkDirectory
 import SimulationFramework.Modules.Beams as rbf
 import SimulationFramework.Modules.Twiss as rtf
 try:
@@ -125,17 +125,20 @@ class OM_Twiss():
         twiss = self.addTwissDirectory(twissList)
         return twiss
 
-class OMDirectory(Munch):
+class OMDirectory(frameworkDirectory):
 
     def __init__(self, id, directory='.', database='SimulationDatabase.db', twiss=True, beams=False, verbose=False):
-        super(OMDirectory, self).__init__()
+        # super(OMDirectory, self).__init__()
         self.dbc = DatabaseController(directory+'/'+database, verbose=False)
         self.runs = list(self.dbc.get_all_run_ids())
         self.prefixes = self.dbc.find_run_id_for_each_lattice(id)
         subdirectory = os.path.relpath(list(self.prefixes.items())[-1][-1])
         settingsfile = os.path.join(subdirectory,'settings.def')
+        changesfile = os.path.join(subdirectory,'changes.yaml')
         self.framework = Framework(subdirectory, clean=False, verbose=verbose)
         self.framework.loadSettings(settingsfile)
+        if os.path.exists(changesfile):
+            self.framework.load_changes_file(changesfile)
         self.screens = None
         if twiss:
             twiss = OM_Twiss(directory=directory, dbc=self.dbc, runs=self.runs)
@@ -149,16 +152,6 @@ class OMDirectory(Munch):
         else:
             self.beams = None
 
-    if use_matplotlib:
-        def plot(self, *args, **kwargs):
-            return groupplot.plot(self, *args, **kwargs)
-
-    def __repr__(self):
-        return repr({'framework': self.framework, 'twiss': self.twiss, 'beams': self.beams})
-
-    def getScreen(self, screen):
-        if self.beams:
-            return self.beams.getScreen(screen)
 
 def load_directory(id, directory='.', database='SimulationDatabase.db', twiss=True, beams=True, **kwargs):
     fw = OMDirectory(id, directory=directory, database=database, twiss=twiss, beams=beams, verbose=True, **kwargs)
@@ -167,3 +160,15 @@ def load_directory(id, directory='.', database='SimulationDatabase.db', twiss=Tr
 def get_runs(directory='.', database='SimulationDatabase.db'):
     dbc = DatabaseController(directory+'/'+database, verbose=False)
     return list(dbc.get_all_run_ids())
+
+def save_summary_files(id, directory='.', database='SimulationDatabase.db', twiss=True, beams=True):
+    omd = OMDirectory(id, directory, database, twiss=True, beams=False)
+    if twiss:
+        omd.twiss.save_HDF5_twiss_file(omd.framework.subdirectory+'/'+'Twiss_Summary.hdf5')
+    if beams:
+        omd.beams = OM_Beams(directory=directory, dbc=omd.dbc, runs=omd.runs)
+        omd.beams.prefixes = omd.beams.dbc.find_run_id_for_each_lattice(id)
+        beams = []
+        for s in omd.beams.allscreens:
+            beams.append(os.path.relpath(omd.beams.get_directory(s), omd.framework.subdirectory))
+        rbf.hdf5.write_HDF5_summary_file(omd.framework.subdirectory+'/'+'Beam_Summary.hdf5', beams, clean=True)
