@@ -1,3 +1,5 @@
+image: mattkingastec/hls_env:latest
+
 stages:
 - list_tools
 - check_server
