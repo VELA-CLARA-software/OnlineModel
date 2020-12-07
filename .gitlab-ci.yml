@@ -10,5 +10,7 @@ list_tools:
 
 pylint:
   stage: pylint
-  script: "pylint *.py"
-  only:v1.5
+  script:
+    - "pylint *.py"
+  only:
+    - v1.5
