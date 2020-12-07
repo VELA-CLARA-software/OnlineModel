@@ -46,7 +46,7 @@ class Model(object):
     def __init__(self, dataClass=None):
         self.path_exists = False
         if dataClass is None:
-            self.data = data.Data()
+            self.data = data.Data(settings_directory=os.path.relpath(__file__+'/../../'))
         else:
             self.data = dataClass
         self.generator_params = ['number_of_particles', 'dist_x', 'dist_y', 'dist_z', 'sig_x', 'sig_y', 'sig_z']

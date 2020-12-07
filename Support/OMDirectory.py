@@ -129,6 +129,7 @@ class OMDirectory(frameworkDirectory):
 
     def __init__(self, id, directory='.', database='SimulationDatabase.db', twiss=True, beams=False, verbose=False):
         # super(OMDirectory, self).__init__()
+        self.id = id
         self.dbc = DatabaseController(directory+'/'+database, verbose=False)
         self.runs = list(self.dbc.get_all_run_ids())
         self.prefixes = self.dbc.find_run_id_for_each_lattice(id)
@@ -146,12 +147,16 @@ class OMDirectory(frameworkDirectory):
         else:
             self.twiss = None
         if beams:
-            beams = OM_Beams(directory=directory, dbc=self.dbc, runs=self.runs)
-            self.screens = beams.screens
-            self.beams = beams.get_beams(id)
+            self.OMbeams = OM_Beams(directory=directory, dbc=self.dbc, runs=self.runs)
+            self.screens = self.OMbeams.screens
+            self.beams = self.OMbeams.get_beams(id)
         else:
             self.beams = None
 
+    def save_summary_files(self):
+        twiss = False if self.twiss is None else True
+        beams = False if self.beams is None else True
+        save_summary_files(self.id, twiss=twiss, beams=beams, omd=self)
 
 def load_directory(id, directory='.', database='SimulationDatabase.db', twiss=True, beams=True, **kwargs):
     fw = OMDirectory(id, directory=directory, database=database, twiss=twiss, beams=beams, verbose=True, **kwargs)
@@ -161,14 +166,14 @@ def get_runs(directory='.', database='SimulationDatabase.db'):
     dbc = DatabaseController(directory+'/'+database, verbose=False)
     return list(dbc.get_all_run_ids())
 
-def save_summary_files(id, directory='.', database='SimulationDatabase.db', twiss=True, beams=True):
-    omd = OMDirectory(id, directory, database, twiss=True, beams=False)
+def save_summary_files(id, directory='.', database='SimulationDatabase.db', twiss=True, beams=True, omd=None):
+    if not omd:
+        omd = OMDirectory(id, directory, database, twiss=twiss, beams=beams)
     if twiss:
         omd.twiss.save_HDF5_twiss_file(omd.framework.subdirectory+'/'+'Twiss_Summary.hdf5')
     if beams:
-        omd.beams = OM_Beams(directory=directory, dbc=omd.dbc, runs=omd.runs)
-        omd.beams.prefixes = omd.beams.dbc.find_run_id_for_each_lattice(id)
+        omd.OMbeams.prefixes = omd.OMbeams.dbc.find_run_id_for_each_lattice(id)
         beams = []
-        for s in omd.beams.allscreens:
-            beams.append(os.path.relpath(omd.beams.get_directory(s), omd.framework.subdirectory))
+        for s in omd.OMbeams.allscreens:
+            beams.append(os.path.relpath(omd.OMbeams.get_directory(s), omd.framework.subdirectory))
         rbf.hdf5.write_HDF5_summary_file(omd.framework.subdirectory+'/'+'Beam_Summary.hdf5', beams, clean=True)
