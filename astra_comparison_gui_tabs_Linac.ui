@@ -4303,13 +4303,13 @@
   <customwidget>
    <class>DetachableTabWidget</class>
    <extends>QTabWidget</extends>
-   <header>detachable_tab_widget</header>
+   <header>widgets/detachable_tab_widget</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>expandableTabWidget</class>
    <extends>QTabWidget</extends>
-   <header>expandableTabWidget.h</header>
+   <header>widgets/expandableTabWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -4377,8 +4377,8 @@
  <connections/>
  <buttongroups>
   <buttongroup name="EBT_INJ_stepsize"/>
-  <buttongroup name="EBT_BA1_stepsize"/>
-  <buttongroup name="CLA_C2V_stepsize"/>
   <buttongroup name="CLA_S02_stepsize"/>
+  <buttongroup name="CLA_C2V_stepsize"/>
+  <buttongroup name="EBT_BA1_stepsize"/>
  </buttongroups>
 </ui>

@@ -1,7 +1,8 @@
 import re
 
 class DBURT_Parser(dict):
-
+    """Parser object for DBURT files."""
+    
     def __init__(self):
         super(DBURT_Parser, self).__init__()
         # set up regular expressions

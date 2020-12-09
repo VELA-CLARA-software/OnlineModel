@@ -14,12 +14,19 @@ from data.DBURT_parser import DBURT_Parser
 from copy import deepcopy
 
 class Data(object):
+    """Data object to hold all of the parameters and interface to the SimFrame framework."""
 
     def __getitem__(self, key):
         return getattr(self, key)
 
     def __init__(self):
         super(Data, self).__init__()
+        """Initialise the Data object:
+              - Create required dictionaries
+              - Initialise the SimFrame framework object
+              - Extract element data from the framework
+              - Initialise dictionaries with the specified values
+        """
         self.my_name = "data"
         self.parser = DBURT_Parser()
         self.screenDict = collections.OrderedDict()
@@ -49,6 +56,7 @@ class Data(object):
 
     # if sys.version_info < (3,7):
     def __deepcopy__(self, memo):
+        """Cannot deepcopy the framework object, so initialise a new one for the copy."""
         # create a copy with self.linked_to *not copied*, just referenced.
         datacopy = type(self)()
         datacopy.lattices = deepcopy(self.lattices, memo)
@@ -60,9 +68,11 @@ class Data(object):
         return datacopy
 
     def get_framework(self):
+        """Return the framework object."""
         return self.Framework
 
     def initialise_data(self):
+        """Initialise the element dictionaries and keys with data from the framework."""
         # [self.runParameterDict.update({key: value}) for key, value in zip(data_keys, data_v)]
         self.parameterDict['Gun']['h_min'] = {'value': 0.0001, 'type': 'simulation'}
         self.parameterDict['Gun']['h_max'] = {'value': 0.0001, 'type': 'simulation'}
@@ -91,17 +101,21 @@ class Data(object):
         self.update_mag_field_coefficients()
 
     def initialise_scan(self, id):
+        """Initialise the scan dictionary with relevant parameters."""
         self.scanDict[str(id)] = {}
         [self.scanDict[str(id)].update({key: None}) for key in ['scan', 'parameter', 'scan_from_value', 'scan_to_value', 'scan_step_size']]
 
     def initialise_scan_parameters(self):
+        """Update the scan_parameter dictionary with relevant parameters."""
         [self.scan_parameter.update({key: value}) for key, value in zip(scan_keys, scan_v)]
 
     def get_element_length(self, dict, key):
+        """Get the length of a given element and update the dictionary."""
         length = self.Framework.getElement(key)['position_end'][2] - self.Framework.getElement(key)['position_start'][2]
         dict[key].update({'length': length})
 
     def get_data(self):
+        """Initialise element dictionaries and prepare them for the framework values."""
         self.scan_values = collections.OrderedDict()
         self.scan_parameter = collections.OrderedDict()
         self.screen_values = collections.OrderedDict()
@@ -200,6 +214,7 @@ class Data(object):
         self.simulation_parameters = {'tracking_code': 'elegant', 'csr': True, 'csr_bins': 200, 'lsc': True, 'lsc_bins': 200}
 
     def get_pv_alias(self, dict, name, param=None, rf_type=None):
+        """Return the PV alias for a given dictionary entry."""
         if dict[name]['type'] == 'quadrupole':
             dict[name].update({"pv_suffix_alias": "SETI"})
             return "SETI"
@@ -220,6 +235,7 @@ class Data(object):
                 return "Q"
 
     def read_values_from_archiver(self, pv_name, time_from=None, time_to=None):
+        """Extract values from the archiver for a given PV."""
         # NOTE: time_from and time_to must be in ISO 1806 format!!
         # see http://claraserv2.dl.ac.uk/cssi_wiki/doku.php/archiver:pulling_data?s[]=archiver
         if time_from is None:
@@ -235,6 +251,7 @@ class Data(object):
         return value
 
     def get_energy_gain(self, time_from=None, time_to=None):
+        """Return the calculated energy gain for an RF structure based on timstamps in the archiver."""
         for l in self.lattices:
             for key, value in self.parameterDict[l].items():
                 if value['type'] == 'cavity':
@@ -260,6 +277,7 @@ class Data(object):
         return total_energy_gain
 
     def generate_magnet_name(self, name):
+        """Return fully formed magnet name based on the framework element name."""
         name_number = re.compile(r'(?P<name>[a-zA-Z]+)(?P<number>\d+)')
         name_nonumber = re.compile(r'(?P<name>[a-zA-Z]+)')
         split = name.split('-')
@@ -288,6 +306,7 @@ class Data(object):
         return None, None
 
     def read_values_from_DBURT(self, dburt):
+        """Extrtact values from a DBURT file and update the dictionaries."""
         data = self.parser.parse_DBURT(dburt)
         magnetdata = {}
         speed_of_light = scipy.constants.speed_of_light / 1e6
@@ -332,6 +351,7 @@ class Data(object):
         return magnetdata
 
     def read_values_from_epics(self, dict, time_from=None, time_to=None):
+        """Extrtact values from an EPICS PV and update the dictionary."""
         self.total_energy_gain = self.get_energy_gain(time_from, time_to)
         speed_of_light = scipy.constants.speed_of_light / 1e6
         for key, value in dict.items():
@@ -359,6 +379,7 @@ class Data(object):
                     value['value'] = charge * 1e-3
 
     def get_energy_from_rf(self, klystron_power, phase, pulse_length):
+        """Return the estimated energy gain from an RF cavity for the given RF parameters."""
         bestcase = 0.407615 + 1.94185 * (((1 - math.exp((-1.54427 * 10 ** 6 * pulse_length * 10 ** -6))) * (
                     0.0331869 + 6.05422 * 10 ** -7 * klystron_power)) * numpy.cos(phase)) ** 0.5
         worstcase = 0.377 + 1.81689 * (((1 - math.exp((-1.54427 * 10 ** 6 * pulse_length * 10 ** -6))) * (
@@ -366,6 +387,7 @@ class Data(object):
         return numpy.mean([bestcase, worstcase])
 
     def update_mag_field_coefficients(self):
+        """Update magnet field coefficients in the relevant dictionaries."""
         s02ficq1 = [-2.23133410405682E-10, 4.5196171252132E-08, -3.46208258004659E-06, 1.11195870210961E-04,
                     2.38129337415767E-02, 9.81229429460256E-03]
         s02ficq2 = [-4.69068497199892E-10, 7.81236692669882E-08, -4.99557108021749E-06, 1.39687166906618E-04,

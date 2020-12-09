@@ -10,7 +10,10 @@ import SimulationFramework.Modules.Beams as raf
 from SimulationFramework.Modules.multiPlot import multiPlotWidget
 
 class slicePlotter(QMainWindow):
+    """QMainWindow class to demonstrate slicePlot."""
+
     def __init__(self):
+        """Initialise a slicePlotter window."""
         super(slicePlotter, self).__init__()
         self.resize(1800,900)
         self.centralWidget = QWidget()
@@ -35,7 +38,8 @@ class slicePlotter(QMainWindow):
         fileMenu.addAction(exitAction)
 
 class slicePlotWidget(multiPlotWidget):
-    # Layout oder for the individual Tiwss plot items
+    """Plot object for slice parameters."""
+
     plotParams = [
         {'label': 'Slice Horizontal Emittance (normalised)', 'quantity': 'slice_normalized_horizontal_emittance', 'units': 'm-rad', 'name': '&epsilon;<sub>n,x</sub>', 'range': [0,5e-6]},
         {'label': 'Slice Vertical Emittance (normalised)', 'quantity': 'slice_normalized_vertical_emittance', 'units': 'm-rad', 'name': '&epsilon;<sub>n,y</sub>', 'range': [0,5e-6]},
@@ -48,6 +52,7 @@ class slicePlotWidget(multiPlotWidget):
     ]
 
     def __init__(self, **kwargs):
+        """Initialise a slice plot object."""
         super(slicePlotWidget, self).__init__(setTitles=False,**kwargs)
         self.beams = {}
         # self.set_horizontal_axis_label('t','ps')
@@ -159,13 +164,16 @@ class slicePlotWidget(multiPlotWidget):
                 # self.curves[datafile][label].setData(x=x, y=y)
 
     def clear(self):
+        """Clear all sice plots and remove beam objects."""
         self.beams = {}
-        super(slicePlotWidget, self).clear()
+        super().clear()
 
     def removeData(self, id):
+        """Remove a specific beam object based on run ID."""
         del self.beams[id]
 
 def main():
+    """Main application."""
     app = QApplication(sys.argv)
     pg.setConfigOptions(antialias=True)
     pg.setConfigOption('background', 'w')

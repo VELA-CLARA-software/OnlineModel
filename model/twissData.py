@@ -6,8 +6,10 @@ sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
 import SimulationFramework.Modules.Twiss as rtf
 
 class twissData(object):
+    """The twissData obect is used to extract twiss parameters and display them in the twissTable."""
 
     def __init__(self, directory, name):
+        """Initialise the twissData object."""
         super(twissData, self).__init__()
         self.directory = directory
         self.name = name

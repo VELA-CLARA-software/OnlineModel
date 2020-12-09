@@ -18,8 +18,10 @@ from collections import defaultdict, OrderedDict
 ### can simply compare dictionaries when they are in the same form.
 
 class DatabaseReader():
+    """Database object to manage reading of database files."""
 
     def __init__(self, database='SimulationDatabase.db', verbose=True, *args, **kwargs):
+        """Initialise a DB reader object and load existing data into the object."""
         start = time.time()
         self.args = args
         self.kwargs = kwargs
@@ -220,6 +222,7 @@ class DatabaseReader():
         return null_result
 
     def get_run_id_for_lattice(self, run_id, t):
+        """Return the run ID for a lattice taking into account prefix runs"""
         table_idx = self.table_name_list.index(t)
         if self.run_id_settings_dict[run_id]['runs']['prefix'] is not None:
             start_lattice_idx = self.table_name_list.index(self.run_id_settings_dict[run_id]['runs']['start_lattice'])
@@ -240,13 +243,10 @@ class DatabaseReader():
         # We only want to lattice information for the dictionary!
         for table in self.table_name_list:
             settings_to_check[table] = settings_to_save[table]
-        # if 'scan' in settings_to_check:
-        #    del settings_to_check['scan']
-        # if 'runs' in settings_to_check:
-        #    del settings_to_check['runs']
         return settings_to_check
 
     def prepare_dict_for_checking(self, settings_to_save):
+        """Return a formatted dictionary for checking."""
         return self.get_settings_dict_to_check(settings_to_save)
 
     def are_settings_in_database(self, yaml_settings):
@@ -260,9 +260,11 @@ class DatabaseReader():
         return run_id
 
     def get_all_run_ids(self):
+        """Return all run IDs in the DB."""
         return self.run_id_settings_dict.keys()
 
     def get_all_run_timestamps(self):
+        """Return all run timestamps in the DB."""
         run_id_list = self.get_all_run_ids()
         timestamp_dict = dict()
         for id in run_id_list:
