@@ -3,12 +3,14 @@ from collections import OrderedDict, defaultdict
 
 
 def parse_parameter_input_file(filename):
+    """Return a dictionary of the specified YAML file."""
     with open(filename, 'r') as stream:
         yaml_parameter_dict = yaml.safe_load(stream)
         return yaml_parameter_dict
 
 
 def write_parameter_output_file(filename, parameter_dict):
+    """Write a dictionary to a specified YAML file."""
     # This representer tells pyYaml to treat an OrderedDict as it would a regular dict.
     yaml.add_representer(OrderedDict, yaml.representer.SafeRepresenter.represent_dict)
     with open(filename, 'w') as output_file:

@@ -7,8 +7,10 @@ sys.path.append(os.path.abspath(__file__+'/../../'))
 import data.lattices as lattices
 
 class DatabaseCreator():
+    """Database object to manage creation of database files."""
 
     def __init__(self, database='SimulationDatabase.db', *args, **kwargs):
+        """Initialise database creator."""
         self.args = args
         self.kwargs = kwargs
         self.database = database
@@ -16,6 +18,7 @@ class DatabaseCreator():
         self.sql_cursor = self.sql_connection.cursor()
 
     def create_simulation_database(self, clean=False, tables=None):
+        """Create Simulations database."""
         if tables is None:
             tables = ['generator'] + lattices.lattices + ['runs', 'scan']
         elif not isinstance(tables, (list, tuple)) and isinstance(tables, str):
@@ -31,6 +34,7 @@ class DatabaseCreator():
                 self.create_table(t, clean)
 
     def create_runs_table(self, clean=False):
+        """Create Runs table in the DB."""
         sql = '''CREATE TABLE IF NOT EXISTS "runs" (
                 	"run_id"	TEXT UNIQUE,
                 	"timestamp"	TEXT,
@@ -47,6 +51,7 @@ class DatabaseCreator():
         self.sql_connection.commit()
 
     def create_scan_table(self, clean=False):
+        """Create Scan table in the DB."""
         sql = '''CREATE TABLE IF NOT EXISTS "scan" (
                 	"run_id"	TEXT,
                 	"area"	TEXT,
@@ -68,6 +73,7 @@ class DatabaseCreator():
 
 
     def create_table(self, table_name, clean=False):
+        """Create generic table in the DB."""
         sql = 'CREATE TABLE IF NOT EXISTS \'' + table_name +'\' ( \
             run_id TEXT,\
             component TEXT,\
@@ -86,6 +92,7 @@ class DatabaseCreator():
 
 if __name__ == '__main__':
     def str2bool(v):
+        """Convert strings to booleans."""
         if isinstance(v, bool):
            return v
         if v.lower() in ('yes', 'true', 't', 'y', '1'):

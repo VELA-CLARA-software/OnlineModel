@@ -9,8 +9,10 @@ import collections
 import json
 
 class DatabaseWriter():
+    """Database object to manage writing of database files."""
 
     def __init__(self, database='SimulationDatabase.db', *args, **kwargs):
+        """Initialise a DB writer object."""
         self.args = args
         self.kwargs = kwargs
         self.database = database
@@ -18,9 +20,11 @@ class DatabaseWriter():
         self.sql_cursor = self.sql_connection.cursor()
 
     def tempname(self):
+        """Return a random uuid."""
         return str(uuid.uuid4())
 
     def flatten(self, d, parent_key='', sep='£'):
+        """Return a flattened dictionary."""
         items = []
         for k, v in d.items():
             new_key = parent_key + sep + str(k) if parent_key else str(k)
@@ -31,6 +35,7 @@ class DatabaseWriter():
         return dict(items)
 
     def save_dict_to_db(self, settings_dict_to_save, run_id=None, lattices=None):
+        """Save a run dictionary to the DB."""
         ### NEEDS TO CHECK THE STATE OF RESULTS IN TABLE ###
         ### AS SOON AS AN ENTRY DOES NOT EXIST, WRITE IT TO TABLE ###
         # converting the dictionary to flattened form to save to db
@@ -76,6 +81,7 @@ class DatabaseWriter():
         self.sql_connection.commit()
 
     def save_entry_to_machine_area_table(self, run_id, table_name, component, parameter, value):
+        """Save an entry into each machine area table in the DB."""
         columnstring = '(run_id,component,parameter,value)'
         valuestring =  '(?, ?, ?, ?)'
         sql = ''' INSERT INTO \'''' + table_name + '''\' '''+columnstring+'''
@@ -83,6 +89,7 @@ class DatabaseWriter():
         self.sql_cursor.execute(sql, [run_id] + [component] + [parameter] + [json.dumps(value)])
 
     def split_accessible_name(self, aname):
+        """Return the accessible name split into name, pv, param."""
         if len((aname.split(':'))) == 3:
             dictname, pv, param = map(str, aname.split(':'))
         else:
@@ -91,6 +98,7 @@ class DatabaseWriter():
         return dictname, pv, param
 
     def save_entry_to_scan_table(self, run_id, parameter=None, parameter_scan_step_size=None, parameter_scan_from_value=None, parameter_scan_to_value=None, value=None, **kwargs):
+        """Save an entry into the scan table - CURRENTLY NOT WORKING."""
         pass
         # area, component, parameter = self.split_accessible_name(parameter)
         # columnstring = '(run_id, area, component, parameter, parameter_scan_from_value, parameter_scan_to_value, parameter_scan_step_size, value)'
@@ -99,12 +107,14 @@ class DatabaseWriter():
         # self.sql_cursor.execute(sql, [run_id, area, component, parameter, parameter_scan_from_value, parameter_scan_to_value, parameter_scan_step_size, value])
 
     def save_entry_to_simulation_table(self, run_id, component, parameter, value):
+        """Save an entry into the simulation table."""
         columnstring = '(run_id, component, parameter, value)'
         valuestring = '(?,?,?,?)'
         sql = '''INSERT INTO simulation ''' + columnstring + '''VALUES''' + valuestring
         self.sql_cursor.execute(sql, [run_id] + [component] + [parameter] + [json.dumps(value)])
 
     def save_entry_to_runs_table(self, run_id, timestamp=None, username=None, tags=None, prefix=None, start_lattice=None, directory=None, **kwargs):
+        """Save an entry into the runs table."""
         columnstring = '(run_id, timestamp, username, tags, prefix, start_lattice, directory)'
         valuestring = '(?,?,?,?,?,?,?)'
         sql = '''INSERT OR IGNORE INTO runs ''' + columnstring + '''VALUES''' + valuestring

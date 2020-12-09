@@ -2,11 +2,11 @@ import os
 import sys
 import time
 import stat
-
-sys.path.append(os.path.abspath(__file__+'/../../'))
 from data import data
 
 class Model(object):
+    """Remote model class."""
+
     def __init__(self, socket):
         self.socket = socket
         self.data = data.Data()
@@ -16,6 +16,7 @@ class Model(object):
         self.directoryname = None
 
     def run_script(self):
+        """Run the main tracking script for the model."""
         self.progress = 0
         data_dict = {}
         data_dict['parameterDict'] = self.data.parameterDict
@@ -39,23 +40,24 @@ class Model(object):
         print('Progress: ', response)
         return True
 
-    def get_directory_name(self):
-        return self.directoryname
-
     def export_parameter_values_to_yaml_file(self, *args, **kwargs):
+        """Over-ridden function for remote model."""
         pass
 
     def import_yaml(self, runno=None):
+        """Import YAML file on the server."""
         if runno is None:
             runno = self.directoryname
         response = self.socket.send_pyobj(['import_yaml', runno])
         return self.socket.recv_pyobj()
 
     def get_all_directory_names(self):
+        """Get all directory names from the server."""
         response = self.socket.send_pyobj(['get_all_directory_names'])
         return self.socket.recv_pyobj()
 
     def run_twiss(self, id):
+        """Initialise loading twiss files on the server."""
         self.socket.send_pyobj(['do_twiss_run',id])
         run_number = self.socket.recv_pyobj()
         response = self.socket.send_pyobj(['get_twiss_status', run_number])
@@ -67,9 +69,11 @@ class Model(object):
         return response
 
     def save_settings_to_database(self, *args, **kwargs):
+        """Over-ridden function for remote model."""
         pass
 
     def get_absolute_folder_location(self, dir):
+        """Return the folder location on the server."""
         response = self.socket.send_pyobj(['get_absolute_folder_location', dir])
         return self.socket.recv_pyobj()
 
