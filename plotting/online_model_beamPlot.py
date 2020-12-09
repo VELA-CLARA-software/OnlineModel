@@ -1,22 +1,21 @@
 import sys, os, time, math, datetime, copy, re,  h5py
 from collections import OrderedDict
 import glob
-try:
-    from PyQt4.QtCore import *
-    from PyQt4.QtGui import *
-except:
-    from PyQt5.QtCore import *
-    from PyQt5.QtGui import *
-    from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
 import pyqtgraph as pg
 import numpy as np
 sys.path.append(os.path.abspath(os.path.realpath(__file__)+'/../../../SimFrame'))
 from SimulationFramework.Modules.Beams import beam as rbfBeam
-sys.path.append(os.path.realpath(__file__)+'/../../../../')
+# sys.path.append(os.path.realpath(__file__)+'/../../../../')
 
 class beamPlotter(QMainWindow):
+    """QMainWindow class to demonstrate beamPlot."""
+
     def __init__(self):
-        super(beamPlotter, self).__init__()
+        """Initialise a beamPlotter window."""
+        super().__init__()
         self.resize(1800,900)
         self.centralWidget = QWidget()
         self.layout = QVBoxLayout()
@@ -40,7 +39,8 @@ class beamPlotter(QMainWindow):
         fileMenu.addAction(exitAction)
 
 class beamPlotWidget(QWidget):
-    # Styles for the plot lines
+    """Plot object for beam parameters."""
+
     colors = [QColor('#F5973A'),QColor('#A95AA1'),QColor('#85C059'),QColor('#0F2080'),QColor('#BDB8AD'), 'r', 'k', 'm', 'g']
 
     beamParams = OrderedDict([
@@ -57,7 +57,8 @@ class beamPlotWidget(QWidget):
     unHighlightCurveSignal = pyqtSignal(str)
 
     def __init__(self, **kwargs):
-        super(beamPlotWidget, self).__init__(**kwargs)
+        """Initialise a beam plot object."""
+        super().__init__(**kwargs)
         ''' These are for reading data files from ASTRA and Elegant '''
         self.beams = {}
 
@@ -156,6 +157,7 @@ class beamPlotWidget(QWidget):
         self._histogram_bins = 20
 
     def addbeamDataFiles(self, dicts):
+        """Add beam data files based on a dictionary of directories and filenames."""
         for d in dicts:
             self.addbeamDataFile(**d)
 
@@ -178,6 +180,7 @@ class beamPlotWidget(QWidget):
         return color
 
     def add_projected_curves(self, id):
+        """Initialise the marginal plot curves for a new plot."""
         self.bottomcurves[id] = self.bottomBeamPlotWidget.plot([])
         self.bottomcurves[id].rotate(180)
         self.rightcurves[id] = self.rightBeamPlotWidget.plot([])
@@ -199,12 +202,15 @@ class beamPlotWidget(QWidget):
         return None
 
     def get_horizontal_variable(self):
+        """Return the x-axis variable name."""
         return self.beamParams[str(self.beamPlotXAxisCombo.currentText())]
 
     def get_vertical_variable(self):
+        """Return the y-axis variable name."""
         return self.beamParams[str(self.beamPlotYAxisCombo.currentText())]
 
     def updateBeamPlot(self, updatebeam=True, updateprojections=True, updateCurveHighlights=True):
+        """Update the main plot and, optionally, marginal plots and curve highlights."""
         xdict = self.beamParams[str(self.beamPlotXAxisCombo.currentText())]
         ydict = self.beamParams[str(self.beamPlotYAxisCombo.currentText())]
         # if updateprojections:
@@ -248,6 +254,7 @@ class beamPlotWidget(QWidget):
             self.updateCurveHighlights()
 
     def projection(self, data, xmult=1, ymult=1, range=None):
+        """Create projection histogram data."""
         # range[0] = range[0] if range[0] > min(data) else min(data)
         # range[1] = range[1] if range[1] < max(data) else max(data)
         # range[1] = range[1] if range [1] > range[0] else range[0] + 1e-6
@@ -257,6 +264,7 @@ class beamPlotWidget(QWidget):
         return xmult*x, ymult*y
 
     def set_histogram_bins(self, bins):
+        """Change the number of bins used for generating histogram data."""
         self._histogram_bins = bins
         self.updateBeamPlot(updatebeam=False, updateprojections=True, updateCurveHighlights=False)
 
@@ -277,14 +285,17 @@ class beamPlotWidget(QWidget):
         self.removeData(id)
 
     def removeData(self, id):
+        """Remove a specific beam data object."""
         del self.beams[id]
 
     def changePointSize(self, size):
+        """Change the point size of the main plot."""
         self.pointSize = int(size)
         for d in self.curves.values():
             d.scatter.setSize(int(size))
 
     def curveClicked(self, name):
+        """If a curve is clicked emit the relevant signal."""
         if name in self.shadowCurves:
             self.unHighlightPlot(name)
             self.unHighlightCurveSignal.emit(name)
@@ -311,6 +322,7 @@ class beamPlotWidget(QWidget):
         self.updateCurveHighlights()
 
     def updateCurveHighlights(self):
+        """If the main plot is changed, update the plot highlights."""
         for n in self.curves.keys():
             if n in self.shadowCurves or not len(self.shadowCurves) > 0:
                 self.setPenAlpha(self.curves, n, 255, 3)
@@ -323,15 +335,17 @@ class beamPlotWidget(QWidget):
         self.updateBeamPlot(updatebeam=False, updateprojections=True, updateCurveHighlights=False)
 
     def addShadowPen(self, name):
-        # curve = self.curves[name]
+        """Add a curve the list of highlighted plots."""
         if not name in self.shadowCurves:
             self.shadowCurves.append(name)
 
     def removeShadowPen(self, name):
+        """Remove a curve from the list of highlighted plots."""
         if name in self.shadowCurves:
             self.shadowCurves.remove(name)
 
     def setPenAlpha(self, curves, name, alpha=255, width=3):
+        """Set the pen alpha value of a specific curve."""
         curve = curves[name]
         pen = curve.opts['symbolBrush']
         pencolor = pen.color()
@@ -340,9 +354,11 @@ class beamPlotWidget(QWidget):
         curve.setSymbolBrush(color=pencolor, width=width, style=pen.style())
 
     def setFillAlpha(self, curves, name, alpha=255):
+        """Set the fill alpha value of a specific curve."""
         self.fillAlpha[name] = alpha
 
     def clear(self):
+        """Remove all plots and reset variables."""
         self.mainBeamPlotWidget.clear()
         self.bottomBeamPlotWidget.clear()
         self.rightBeamPlotWidget.clear()
@@ -354,6 +370,7 @@ class beamPlotWidget(QWidget):
         self.beams = {}
 
 def main():
+    """Main application."""
     app = QApplication(sys.argv)
     # pg.setConfigOptions(antialias=True)
     pg.setConfigOption('background', 'w')

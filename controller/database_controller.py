@@ -1,6 +1,4 @@
 import sys, os, time
-sys.path.append(os.path.abspath(__file__+'/../../'))
-
 import database.run_parameters_parser as yaml_parser
 import database.database_reader as database_reader
 import database.database_writer as database_writer
@@ -17,6 +15,7 @@ class DatabaseController():
         self.settings_dict = None
 
     def change_database(self, database=None):
+        """Change the database and re-initialise the reader and writer objects."""
         self.database = database
         self.creator = database_creator.DatabaseCreator(self.database)
         self.creator.create_simulation_database(clean=False)
@@ -54,9 +53,6 @@ class DatabaseController():
             settings = settings_to_read.copy()
             return self.reader.get_run_id_for_settings(settings)
 
-    def load_yaml_settings(self, yaml_filename):
-        self.settings_dict = yaml_parser.parse_parameter_input_file(yaml_filename)
-
     def save_settings_to_database(self, settings_to_save=None, run_id=None):
         """Save the settings YAML file to the DB."""
         # I'm not sure we need this top bit??
@@ -82,26 +78,33 @@ class DatabaseController():
                 # self.save_scan_information(run_id, **settings_to_save['scan'])
 
     def get_all_run_ids(self):
+        """Return all run IDs."""
         return self.reader.get_all_run_ids()
-        
+
     def get_all_run_timestamps(self):
+        """Return all run timestamps."""
         return self.reader.get_all_run_timestamps()
 
     def save_scan_information(self, *args, **kwargs):
+        """Save scan information to the DB."""
         self.writer.save_entry_to_scan_table(*args, **kwargs)
 
     def save_run_information(self, *args):
+        """Save run information to the DB."""
         self.writer.save_entry_to_run_table(*args)
 
     def clean_database(self, tables=None):
+        """Clean the DB."""
         self.creator.create_simulation_database(clean=True, tables=tables)
 
     def delete_run_id_from_database(self, run_id):
+        """Delete a run from the DB."""
         print('Attempting to delete', run_id,'from the DB!')
         self.writer.delete_run_id(run_id)
         self.reader.delete_run_id_from_settings_dict(run_id)
 
     def find_run_id_for_each_lattice(self, run_id=''):
+        """Return the run IDs for each lattice of a run."""
         return self.reader.get_run_id_for_each_lattice(run_id)
 
 if __name__ == '__main__':

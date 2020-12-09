@@ -10,11 +10,14 @@ from plotting.online_model_slicePlot import slicePlotWidget
 from plotting.online_model_beamPlot import beamPlotWidget
 
 class online_model_plotter(QMainWindow):
+    """QMainWindow object to show onlineModelPlotterWidget."""
+
     def __init__(self, screenpositions, parent = None, directory='.'):
+        """Initialise the online_model_plotter object passing in a list of screen z-positions from SimFrame."""
         super(online_model_plotter, self).__init__(parent)
         self.resize(1200,900)
 
-        self.setWindowTitle("ASTRA Data Plotter")
+        self.setWindowTitle("OM Data Plotter")
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&File')
 
@@ -29,12 +32,14 @@ class online_model_plotter(QMainWindow):
         exitAction.triggered.connect(self.close)
         fileMenu.addAction(exitAction)
 
-
         self.onlineModelPlotter = onlineModelPlotterWidget(screenpositions, directory=directory)
         self.setCentralWidget(self.onlineModelPlotter)
 
 class HTMLDelegate(QStyledItemDelegate):
+    """QStyledItemDelegate for managing HTML-formatted text."""
+
     def paint(self, painter, option, index):
+        """Sub-classed paint method for HTML-formatted text."""
         self.initStyleOption(option,index)
         painter.save()
         doc = QTextDocument()
@@ -48,6 +53,7 @@ class HTMLDelegate(QStyledItemDelegate):
         painter.restore()
 
     def sizeHint(self, option, index):
+        """Sub-classed sizeHint method for HTML-formatted text."""
         self.initStyleOption(option,index)
         doc = QTextDocument()
         doc.setHtml(option.text)
@@ -55,6 +61,7 @@ class HTMLDelegate(QStyledItemDelegate):
         return QSize(doc.idealWidth(), doc.size().height())
 
 class onlineModelPlotterWidget(QWidget):
+    """QWidget control object to hold various plot widgets."""
 
     colors = [QColor('#F5973A'),QColor('#A95AA1'),QColor('#85C059'),QColor('#0F2080'),QColor('#BDB8AD'), 'r', 'k', 'm', 'g']
     twissFunctions = [
@@ -84,6 +91,12 @@ class onlineModelPlotterWidget(QWidget):
                 ]
 
     def __init__(self, screenpositions, parent = None, directory='.'):
+        """Initialise a onlineModelPlotterWidget passing in screen z-positions from SimFrame:
+             - Create some Twiss plots
+             - Create a beam scatter plot
+             - Create a slice plot
+             - Create a Twiss Table
+        """
         super(onlineModelPlotterWidget, self).__init__()
         self.screenpositions = screenpositions
         self.directory = directory
@@ -158,6 +171,7 @@ class onlineModelPlotterWidget(QWidget):
         self.fileSelector.currentIndexChanged.connect(self.loadTwissTable)
 
     def connect_plot_signals(self):
+        """When any subplot highlights a plot, connect it to the other plots and the listWidget."""
         return
         # When either subplot highlights a plot, connect it to the other plot and the listWidget
         self.globalTwissPlotWidget.highlightCurveSignal.connect(self.subplotHighlighted)
@@ -172,11 +186,13 @@ class onlineModelPlotterWidget(QWidget):
         self.beamPlotWidget.unHighlightCurveSignal.connect(self.subplotUnHighlighted)
 
     def loadBeamDataFile(self, directory, beamFileName, color, id):
+        """Load a beam data file and connect it to the beam plot and slice plots."""
         if os.path.isfile(directory+'/'+beamFileName):
             self.beamPlotWidget.addbeamDataFile(directory, beamFileName, id=id, color=color)
             self.slicePlotWidget.addsliceDataObject(self.beamPlotWidget.beams[id], id=id, color=color)
 
     def addRunIDToListWidget(self, run_id, prefixes, color=None):
+        """Add a run ID to the list of runs, and load the beam and twiss data files."""
         self.run_id_prefixes[run_id] = prefixes
         if color is None:
             color = self.colors[self.plotColor % len(self.colors)]
@@ -191,6 +207,7 @@ class onlineModelPlotterWidget(QWidget):
         return color
 
     def removeRunIDFromListWidget(self, run_id):
+        """Remove a run ID from the list of runs and remove the relevant data from the plots."""
         del self.run_id_prefixes[run_id]
         self.globalTwissPlotWidget.removeCurve(run_id)
         self.latticeTwissPlotWidget.removeCurve(run_id)
@@ -200,6 +217,7 @@ class onlineModelPlotterWidget(QWidget):
         self.loadTwissTable()
 
     def changeTab(self, i):
+        """When changing tabs, modify which control widgets are visible."""
         if self.tabWidget.tabText(i) == 'Scatter Plots':
             self.plotType = 'Beam'
             self.pointSizeWidget.setVisible(True)
@@ -214,10 +232,12 @@ class onlineModelPlotterWidget(QWidget):
             self.sliceWidget.setVisible(False)
 
     def changeDirectory(self, directory=None, id=None):
+        """Change the current directory, and update the file list."""
         self.currentFileText = self.fileSelector.currentText()
         self.updateFileCombo()
 
     def updateFileCombo(self):
+        """Update the file list QComboBox with the relevant values."""
         self.fileSelector.clear()
         i = -1
         self.allscreens = []
@@ -238,6 +258,7 @@ class onlineModelPlotterWidget(QWidget):
             self.fileSelector.setCurrentIndex(3)
 
     def loadTwiss(self, id):
+        """Populate a dict of directories and lattices for a given run ID and update the twiss plots."""
         prefixes = self.run_id_prefixes[id]
         twissList = []
         for s, d in prefixes.items():
@@ -247,6 +268,7 @@ class onlineModelPlotterWidget(QWidget):
         self.beamTwissPlotWidget.addtwissDataObject(twiss, id, color=color)
 
     def label_widget(self, text=''):
+        """Return a QWidget with a QLabel inside it."""
         label = QLabel(text)
         label.setAlignment(Qt.AlignCenter)
         label.setEnabled(False)
@@ -259,6 +281,7 @@ class onlineModelPlotterWidget(QWidget):
         return widget
 
     def loadTwissTable(self):
+        """Fill out the twiss table with the relevant data."""
         self.twissTableWidget.clearContents()
         self.twissTableWidget.setColumnCount(len(self.run_id_prefixes) + 1)
         self.twissTableWidget.setRowCount(len(self.twissFunctions))
@@ -277,7 +300,7 @@ class onlineModelPlotterWidget(QWidget):
                     self.twissTableWidget.setItem(row, 1+col, QTableWidgetItem(str(round(twiss[2]*twissData.get_parameter_at_z(twiss[0], zpos),2))))
 
     def loadScreen(self, run_id):
-        # self.clearBeamScreens()
+        """Load a beam data file for a given run ID based on the current screen selection."""
         if len(self.screenpositions) > 0 and not self.fileSelector.currentText() == '':
             beamfilename = str(self.fileSelector.currentData()[0])+'.hdf5'
             screens, positions, lattices = list(zip(*self.allscreens))
@@ -293,6 +316,7 @@ class onlineModelPlotterWidget(QWidget):
                     self.loadBeamDataFile(directory, beamfilename, color, run)
 
     def updateScreens(self):
+        """Update all of the beam data files based on the current screen selection."""
         self.clearBeamScreens()
         if len(self.screenpositions) > 0 and not self.fileSelector.currentText() == '':
             beamfilename = str(self.fileSelector.currentData()[0])+'.hdf5'
@@ -307,6 +331,7 @@ class onlineModelPlotterWidget(QWidget):
                 self.loadBeamDataFile(directory, beamfilename, color, run)
 
     def curveClicked(self, item):
+        """If a curve is clicked, emit a signal to highlight/un-highlight in the sub plots."""
         if isinstance(item, str):
             name = item
         else:
@@ -318,6 +343,7 @@ class onlineModelPlotterWidget(QWidget):
                 self.unHighlightPlot(item)
 
     def get_run_id_directory(self, run_id):
+        """Return the correct run directory for a given run ID and for the current screen selection."""
         beamfilename = str(self.fileSelector.currentData()[0])+'.hdf5'
         screens, positions, lattices = list(zip(*self.allscreens))
         screen_idx = screens.index(self.fileSelector.currentData()[0])
@@ -327,6 +353,7 @@ class onlineModelPlotterWidget(QWidget):
         return directory+'/'+run_id
 
     def highlightPlot(self, name):
+        """Highlight a specific plot in all of the sub-plots."""
         if name in self.run_id_prefixes and not name in self.shadowCurves:
             self.shadowCurves.append(name)
         self.globalTwissPlotWidget.highlightPlot(name)
@@ -336,6 +363,7 @@ class onlineModelPlotterWidget(QWidget):
         self.beamPlotWidget.highlightPlot(name)
 
     def unHighlightPlot(self, name):
+        """Stop highlighting a specific plot in all of the sub-plots."""
         if name in self.run_id_prefixes and name in self.shadowCurves:
             self.shadowCurves.remove(name)
         self.globalTwissPlotWidget.unHighlightPlot(name)
@@ -345,18 +373,22 @@ class onlineModelPlotterWidget(QWidget):
         self.beamPlotWidget.unHighlightPlot(name)
 
     def subplotHighlighted(self, name):
+        """Split the plot name correctly, and call highlightPlot on the new name."""
         subname = name.split('/')[-1]
         self.highlightPlot(subname)
 
     def subplotUnHighlighted(self, name):
+        """Split the plot name correctly, and call unHighlightPlot on the new name."""
         subname = name.split('/')[-1]
         self.unHighlightPlot(subname)
 
     def clearBeamScreens(self):
+        """Clear all of the beam and slice plots."""
         self.beamPlotWidget.clear()
         self.slicePlotWidget.clear()
 
 def main():
+    """Main application."""
     # global app
     import argparse
     parser = argparse.ArgumentParser(description='Analyse Online Model Folder')

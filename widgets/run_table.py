@@ -1,36 +1,41 @@
-from PyQt5.QtCore import *
-from PyQt5.QtGui import *
-from PyQt5.QtWidgets import *
-import pyqtgraph as pg
-from copy import copy
 import datetime
-#datetime.datetime.fromtimestamp(float(timestamp)).strftime('%d-%m-%Y %H:%M:%S')
+from PyQt5.QtCore import QAbstractTableModel, Qt, QModelIndex, QVariant, QEvent
+from PyQt5.QtWidgets import QStyledItemDelegate, QItemDelegate, QAbstractItemView, QPushButton, QCheckBox
+import pyqtgraph as pg
 
 class LoadButtonDelegate(QStyledItemDelegate):
+    """
+    A delegate that places a fully functioning QPushButton cell of the column to which it's applied.
+    """
     def __init__(self, owner, rpc):
         super().__init__(owner)
         self.owner = owner
         self.rpc = rpc
 
     def paint(self, painter, option, index):
+        """
+        Paint a "load" pushbutton.
+        """
         if isinstance(self.parent(), QAbstractItemView):
             self.parent().openPersistentEditor(index)
-        super(LoadButtonDelegate, self).paint(painter, option, index)
+        super().paint(painter, option, index)
 
     def createEditor(self, parent, option, index):
+        """Create the pushbutton and connect it to the load signal."""
         loadButton = QPushButton('Load', parent)
         loadButton.clicked.connect(lambda: self.rpc.load_yaml_from_db(self.get_id(index)))
         return loadButton
 
     def get_id(self, index):
-        return self.owner.model()._data[index.row()]
+        """Get the run ID of the current row."""
+        return self.owner.model().get_run_id(index.row())
 
 class PlotCheckboxDelegate(QItemDelegate):
     """
     A delegate that places a fully functioning QCheckBox cell of the column to which it's applied.
     """
     def __init__(self, parent, rpc):
-        QItemDelegate.__init__(self, parent)
+        super().__init__(parent)
         self.owner = parent
         self.rpc = rpc
 
@@ -48,7 +53,8 @@ class PlotCheckboxDelegate(QItemDelegate):
         self.drawCheck(painter, option, option.rect.translated(-10,0), Qt.Checked if self.get_id(index) in self.rpc.run_plots else Qt.Unchecked)
 
     def get_id(self, index):
-        return self.owner.model()._data[index.row()]
+        """Get the run ID of the current row."""
+        return self.owner.model().get_run_id(index.row())
 
     def editorEvent(self, event, model, option, index):
         '''
@@ -61,8 +67,11 @@ class PlotCheckboxDelegate(QItemDelegate):
         return False
 
 class PlotColorDelegate(LoadButtonDelegate):
-
+    """
+    A delegate that places a plot colorWidget cell of the column to which it's applied.
+    """
     def createEditor(self, parent, option, index):
+        """Create the plot color widget."""
         # print(index.row(), index.siblingAtColumn(1).data(), index.siblingAtColumn(1).data() in self.rpc.run_plots)
         if index.siblingAtColumn(1).data() in self.rpc.run_plots:
             colorWidget = pg.ColorButton(parent)
@@ -72,17 +81,20 @@ class PlotColorDelegate(LoadButtonDelegate):
         return None
 
 class DateDelegate(QStyledItemDelegate):
-
-    def __init__(self, owner):
-        super(DateDelegate, self).__init__(owner)
-
+    """
+    A delegate that returns a date formatted string cell of the column to which it's applied.
+    """
     def displayText(self, text, locale):
+        """Return date formatted string."""
         return datetime.datetime.fromtimestamp(float(text)).strftime('%d-%m-%Y %H:%M:%S')
 
 class RunModel(QAbstractTableModel):
+    """QAbstractTableModel for storing run IDs and timestamps."""
+
     ActiveRole = Qt.UserRole + 1
 
     def __init__(self, data, timestamps=None, rpc=None, parent=None):
+        """Initialise the table model object."""
         super().__init__()
         self._data = data
         self._timestamps = timestamps
@@ -90,20 +102,28 @@ class RunModel(QAbstractTableModel):
         self.currentSortDirection = Qt.AscendingOrder
         self.header_labels = ['Load', 'Run ID', 'Plot', 'Colour', 'Timestamp']
 
+    def get_run_id(self, row):
+        """Return the correct row from the data object."""
+        return self._data[row]
+
     def update_data(self, data, timestamps):
+        """Update the run ID and timestamp data objects, and re-sort the data."""
         self._data = data
         self._timestamps = timestamps
         self.sort(self.currentSortColumn, self.currentSortDirection)
 
     def rowCount(self, parent=QModelIndex()):
+        """Return the number of rows, which is equal to the length of the run ID object."""
         return len(self._data)
 
     def columnCount(self, parent=QModelIndex()):
-        return 5
+        """Return the number of columns, which is equal to the length of the header labels."""
+        return len(self.header_labels)
 
     def sort(self, column=None, direction=0):
         """
-            - only able to sort if column = 4 (timestamp) for now.
+            Sort the run ID and timestamp data objects.
+            - only able to sort if column = 4 (timestamp) or coumn = 1 (run ID) for now.
             - Direction=0 -> ASCENDING
             - Direction=1 -> DESCENDING
         """
@@ -121,15 +141,16 @@ class RunModel(QAbstractTableModel):
             self.modelReset.emit()
 
     def data(self, index, role):
+        """Return the correct data for a given row-column index."""
         if role == Qt.DisplayRole:
             if index.column() == 1:
                 return QVariant(self._data[index.row()])
-            elif index.column() == 4:
+            if index.column() == 4:
                 return QVariant(self._timestamps[self._data[index.row()]])
-            else:
-                return None
+        return None
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
+        """Return the header data based on the header labels defined."""
         if role == Qt.DisplayRole and orientation == Qt.Horizontal:
             return self.header_labels[section]
         return QAbstractTableModel.headerData(self, section, orientation, role)

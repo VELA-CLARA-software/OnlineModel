@@ -3,10 +3,11 @@ from PyQt5 import QtGui, QtCore, QtWidgets
 from collections import OrderedDict
 
 class clickableQLabel(QtWidgets.QLabel):
-
+    """Label object that can be clicked and emit a clicked signal."""
     clicked = QtCore.pyqtSignal()
 
     def mousePressEvent(self, event):
+        """Emit a clicked signal."""
         if (event.buttons() & QtCore.Qt.LeftButton):
             self.clicked.emit()
 
@@ -61,18 +62,22 @@ class scanningTab(QtWidgets.QWidget):
         self._hiddenItems = hiddenItems
 
     def emit_index_changed(self, text):
+        """Emit a textChanged signal for the current tab ID."""
         self.textChanged.emit(self.id, text)
 
     def addItems(self, dict):
+        """Add a new tab to the widget."""
         self._items = dict
         self.update_displayable_values()
 
     def hideItem(self, id, item):
+        """Hide an item in the tabs list of parameters."""
         if not id == self.id:
             self._hiddenItems[id] = item
         self.update_displayable_values()
 
     def update_displayable_values(self):
+        """Update the list of parameters shown in the tab."""
         index = self.scanSelectionWidget.currentIndex()
         text = self.scanSelectionWidget.currentText()
         index = index if index >= 0 else 0
@@ -92,6 +97,7 @@ class scanningTab(QtWidgets.QWidget):
             self.emit_index_changed(self.scanSelectionWidget.currentText())
 
     def set_id(self, id):
+        """Set the run ID of the tab, and update the relevant parameters."""
         self.id = id
         self.scanCheckbox.setAccessibleName("scan:"+str(id)+":scan")
         self.scanSelectionLabel.setText('Scan Parameter ' + str(id))
@@ -101,9 +107,11 @@ class scanningTab(QtWidgets.QWidget):
         self.scanStepWidget.setAccessibleName("scan:"+str(id)+":scan_step_size")
 
     def toggle_scanCheckbox_state(self):
+        """Toggle the scan checkbox checked state."""
         self.scanCheckbox.setChecked(not self.scanCheckbox.isChecked())
 
     def toggle_scan_parameters_state(self):
+        """Toggle the enabled/disabled state of the tab objects."""
         if self.scanCheckbox.isChecked():
             self.scanSelectionWidget.setEnabled(True)
             self.scanFromWidget.setEnabled(True)
@@ -118,11 +126,14 @@ class scanningTab(QtWidgets.QWidget):
             # self.scanToggled.emit(self.id, 1)
 
 class middleClickTabBar(QtWidgets.QTabBar):
+    """QTabBar with middle-click to close functionality."""
 
     def __init__(self, parent=None):
+        """Initialise the tab bar."""
         super(middleClickTabBar, self).__init__(parent)
 
     def mouseReleaseEvent(self, event):
+        """When mouse button is released, if it is the middle mouse button, send a close signal."""
         if event.button() == QtCore.Qt.MidButton:
             self.tabCloseRequested.emit(self.tabAt(event.pos()))
         super(QtWidgets.QTabBar, self).mouseReleaseEvent(event)
@@ -135,6 +146,7 @@ class expandableTabWidget(QtWidgets.QTabWidget):
     scanTabRemoved = QtCore.pyqtSignal(object)
 
     def __init__(self, parent=None):
+        """Initialise the tab widget."""
         super(expandableTabWidget, self).__init__(parent)
         self.id = 1
         self.tabs = OrderedDict()
@@ -174,6 +186,7 @@ class expandableTabWidget(QtWidgets.QTabWidget):
         self.tab.tabCloseRequested.connect(self.removeScanTab)
 
     def addScanTab(self):
+        """Add a new scan tab to the widget."""
         tab = scanningTab(0, self._hiddenItems)
         self.addTab(tab,'')
         self.setCurrentWidget(tab)
@@ -183,6 +196,7 @@ class expandableTabWidget(QtWidgets.QTabWidget):
         self.scanTabAdded.emit(tab.id)
 
     def removeScanTab(self, index):
+        """Remove a scan tab from the widget."""
         id = self.widget(index).id
         tab = self.widget(index)
         self.removeTab(index)
@@ -193,6 +207,7 @@ class expandableTabWidget(QtWidgets.QTabWidget):
             self.addScanTab()
 
     def relabel_tabs(self):
+        """Modify the tab names if a tab has been added or removed."""
         tabs = {}
         for i in range(self.tab.count()):
             v = self.widget(i)
@@ -211,6 +226,7 @@ class expandableTabWidget(QtWidgets.QTabWidget):
     #         self.tab.setTabTextColor(id, QtGui.QColor(0,0,0));
 
     def tabTextChanged(self, id, text):
+        """If a tab has changed the selected parameter, signal the other tabs."""
         if text is not '':
             self._hiddenItems[id] = text
             print(id, text)
@@ -220,10 +236,12 @@ class expandableTabWidget(QtWidgets.QTabWidget):
                     tab.update_displayable_values()
 
     def clearScans(self):
+        """Un-check the scan checkbox for all the scan tabs in the widget."""
         for id, tab in self.tabs.items():
             tab.scanCheckbox.setCheckState(QtCore.Qt.Unchecked)
 
 class TabExample(QtWidgets.QMainWindow):
+    """Example script to demonstrate expandable tabs."""
     def __init__(self):
         super(TabExample, self).__init__()
         self.setWindowTitle("Tab example")

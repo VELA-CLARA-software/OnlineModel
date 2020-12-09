@@ -12,6 +12,7 @@ import SimulationFramework.Modules.Twiss as rtf
 from SimulationFramework.Modules.multiPlot import multiPlotWidget
 
 class mainWindow(QMainWindow):
+    """MainWindow object for testing twissPlot."""
     def __init__(self):
         super(mainWindow, self).__init__()
         self.resize(1800,900)
@@ -37,6 +38,7 @@ class mainWindow(QMainWindow):
         fileMenu.addAction(exitAction)
 
 class twissPlotWidget(multiPlotWidget):
+    """Plot object for standard twiss parameters."""
     # Layout oder for the individual Tiwss plot items
 
     plotParams = [
@@ -58,7 +60,8 @@ class twissPlotWidget(multiPlotWidget):
                   ]
 
     def __init__(self, **kwargs):
-        super(twissPlotWidget, self).__init__(xmin=0, **kwargs)
+        """Initialise a twiss plot object."""
+        super().__init__(xmin=0, **kwargs)
         self.twissDataObjects = {}
         # self.set_horizontal_axis_label('s','m')
 
@@ -154,10 +157,11 @@ class twissPlotWidget(multiPlotWidget):
         return twiss
 
     def removeData(self, id):
+        """Remove a run ID from the list of data objects."""
         del self.twissDataObjects[id]
 
 class globalTwissPlotWidget(twissPlotWidget):
-    # Layout oder for the individual Tiwss plot items
+    """Plot object for common twiss parameters."""
 
     plotParams = [
                   {'label': 'Horizontal Beam Size', 'name': '&sigma;<sub>x</sub>', 'quantity': 'sigma_x', 'range': [0,3e-3], 'units': 'm', 'ymin': 0},
@@ -171,11 +175,12 @@ class globalTwissPlotWidget(twissPlotWidget):
                   ]
 
     def __init__(self, **kwargs):
-        super(globalTwissPlotWidget, self).__init__(setTitles=False,**kwargs)
+        """Initialise a global twiss plot object."""
+        super().__init__(setTitles=False,**kwargs)
 
 
 class latticeTwissPlotWidget(twissPlotWidget):
-    # Layout oder for the individual Tiwss plot items
+    """Plot object for lattice twiss parameters."""
 
     plotParams = [
                 {'label': 'Horizontal Emittance (normalised)', 'name': '&epsilon;<sub>n,x</sub>', 'quantity': 'enx', 'range': [0.,10e-6], 'units': 'm-rad', 'ymin': 0},
@@ -189,11 +194,12 @@ class latticeTwissPlotWidget(twissPlotWidget):
                   ]
 
     def __init__(self, **kwargs):
-        super(latticeTwissPlotWidget, self).__init__(setTitles=False,**kwargs)
+        """Initialise a lattice twiss plot object."""
+        super().__init__(setTitles=False,**kwargs)
 
 
 class beamTwissPlotWidget(twissPlotWidget):
-    # Layout oder for the individual Tiwss plot items
+    """Plot object for beam twiss parameters."""
 
     plotParams = [
                    {'label': 'Horizontal Emittance (corrected)', 'name': '&epsilon;<sub>n,x</sub>', 'quantity': 'ecnx', 'range': [0.,10e-6], 'units': 'm-rad', 'ymin': 0},
@@ -207,13 +213,15 @@ class beamTwissPlotWidget(twissPlotWidget):
                   ]
 
     def __init__(self, **kwargs):
-        super(beamTwissPlotWidget, self).__init__(setTitles=False,**kwargs)
+        """ Initialise a beam twiss plot object."""
+        super().__init__(setTitles=False,**kwargs)
 
 
 pg.setConfigOptions(antialias=True)
 pg.setConfigOption('background', 'w')
 pg.setConfigOption('foreground', 'k')
 def main():
+    """Main application."""
     app = QApplication(sys.argv)
     pg.setConfigOptions(antialias=True)
     pg.setConfigOption('background', 'w')

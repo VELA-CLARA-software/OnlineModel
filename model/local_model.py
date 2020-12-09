@@ -7,14 +7,13 @@ from copy import deepcopy
 import collections
 import uuid
 
-sys.path.append(os.path.abspath(__file__+'/../../'))
 from data import data
-import controller.run_parameters_parser as yaml_parser
-# import controller.database_controller as dbc
+import database.run_parameters_parser as yaml_parser
 import model.twissData as twissData
 import data.lattices as lattices
 
 def convert_data_types( export_dict={}, data_dict={}, keyname=None):
+    """for values in a dictionary, convert data types to the correct format for saving to a YAML file."""
     if keyname is not None:
         export_dict[keyname] = dict()
         edict = export_dict[keyname]
@@ -31,6 +30,7 @@ def convert_data_types( export_dict={}, data_dict={}, keyname=None):
     return export_dict
 
 def create_yaml_dictionary(data):
+    """Create a dictionary for saving to YAML."""
     export_dict = dict()
     data_dicts = ['generator'] + lattices.lattices + ['runs']
     # if data['scanDict']['parameter_scan']:
@@ -40,10 +40,10 @@ def create_yaml_dictionary(data):
     return export_dict
 
 class Model(object):
-    output_directory = 'C:/Users/ujo48515/Documents/'
-    width = 1000
-    height = 600
+    """The Model object runs the SimFrame model based on settings from the GUI."""
+
     def __init__(self, dataClass=None):
+        """Initialise a model object with optional data object."""
         self.path_exists = False
         if dataClass is None:
             self.data = data.Data()
@@ -51,33 +51,35 @@ class Model(object):
             self.data = dataClass
         self.generator_params = ['number_of_particles', 'dist_x', 'dist_y', 'dist_z', 'sig_x', 'sig_y', 'sig_z']
         self.scan_progress = -1
-        # self.dbcontroller = dbc.DatabaseController()
         self.directoryname = ''
 
     def set_base_directory(self, directory):
+        """Update the model basedirectoryname."""
         self.basedirectoryname = directory
 
     def run_twiss(self, directory):
+        """Initialise a twissData object for the twiss table."""
         twiss_model = twissData.twissData(directory=self.basedirectoryname+'/'+directory, name=directory)
         twiss = twiss_model.run_script()
         return twiss
 
     def get_all_directory_names(self):
+        """Return all the directory names in the DB."""
         return list(self.dbcontroller.get_all_run_ids())
 
     def get_all_run_timestamps(self):
+        """Return all the timestamps in the DB."""
         return self.dbcontroller.get_all_run_timestamps()
 
-    def close_connection(self):
-        return self.client.close()
-
     def update_tracking_codes(self):
+        """Update the lattice code in the framework for each lattice."""
         for l in self.data.lattices:
             code = self.data.parameterDict[l]['tracking_code']['value']
             # print('Setting',l,'to',code)
             self.data.Framework.change_Lattice_Code(l, code)
 
     def update_CSR(self):
+        """Update the CSR variables in the framework for each lattice."""
         for l in self.data.lattices:
             csr = self.data.parameterDict[l]['csr']['value']
             csr_bins = self.data.parameterDict[l]['csr_bins']['value']
@@ -94,6 +96,7 @@ class Model(object):
             lattice.csrDrifts = csr
 
     def update_LSC(self):
+        """Update the LSC variables in the framework for each lattice."""
         for l in self.data.lattices:
             lsc = self.data.parameterDict[l]['lsc']['value']
             lsc_bins = self.data.parameterDict[l]['lsc_bins']['value']
@@ -106,6 +109,7 @@ class Model(object):
             lattice.lscDrifts = lsc
 
     def update_Wakefields(self):
+        """Update the wakefield variables in the framework for each lattice."""
         npart = int(self.data.parameterDict['generator']['number_of_particles']['value'])
         for l in self.data.lattices:
             if 'zwake' in self.data.parameterDict[l]:
@@ -119,10 +123,12 @@ class Model(object):
                     e.allow_long_beam = True
 
     def clear_prefixes(self):
+        """Clear the prefix variable in the framework for each lattice."""
         for l in self.data.lattices:
             self.data.Framework[l].prefix = ''
 
     def update_astra_parameters(self):
+        """Update the ASTRA specific variables in the framework for each lattice."""
         for l in self.data.lattices:
             latt = self.data.Framework[l]
             if latt.code == 'astra':
@@ -130,6 +136,7 @@ class Model(object):
                 self.data.Framework[l].headers['newrun']['h_max'] = self.data.parameterDict['Gun']['h_max']['value']
 
     def are_we_using_WSL_ASTRA(self):
+        """Check if we are using the WSL linux parallel ASTRA."""
         astra_use_wsl = int(os.environ['WSL_ASTRA'] if 'WSL_ASTRA' in os.environ else 1)
         if astra_use_wsl > 1:
             self.yaml = create_yaml_dictionary(self.data)
@@ -141,6 +148,7 @@ class Model(object):
         return 1
 
     def run_script(self):
+        """Run the main tracking script for the model."""
         success = True
         self.directoryname = ''
         # print('+++++++++++++++++ Start the script ++++++++++++++++++++++')
@@ -171,20 +179,22 @@ class Model(object):
                 self.data.Framework.setSubDirectory(os.path.relpath(self.data.runsDict['directory']))
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
-                # try:
-                self.data.Framework.track(startfile=start_lattice)#, endfile='CLA-S02')
-                # except Exception as e:
-                #     print('!!!! Error in Tracking - settings not saved !!!!')
-                #     print(e)
-                #     print('!!!!', self.directoryname, '!!!!')
-                #     success = False
+                try:
+                    self.data.Framework.track(startfile=start_lattice)#, endfile='CLA-S02')
+                except Exception as e:
+                    print('!!!! Error in Tracking - settings not saved !!!!')
+                    print(e)
+                    print('!!!!', self.directoryname, '!!!!')
+                    success = False
         return success
 
     def get_directory_name(self):
+        """Return the current directory name."""
         return self.directoryname
 
     ##### Find Starting Filename based on z-position ####
     def find_starting_lattice(self, z):
+        """Find the starting lattice based on z-position."""
         lattices = self.data.Framework.latticeObjects.values()
         for l in lattices:
             for e in l.elements:
@@ -193,6 +203,7 @@ class Model(object):
         return 'generator'
 
     def update_framework_elements(self, inputdict):
+        """Update element properties in the framework based on values in the Data object."""
         for key, value in inputdict.items():
             if isinstance(value, dict):
                 if inputdict[key]['type'] == 'quadrupole':
@@ -207,6 +218,7 @@ class Model(object):
                         self.data.Framework.modifyElement(key, 'field_amplitude', float(value['field_amplitude']))
 
     def modify_framework(self, scan=False, type=None, modify=None, cavity_params=None, generator_param=None):
+        """Modify the framework definitions based on values in the Data object."""
         self.data.Framework.defineASTRACommand(scaling=int(self.data.generatorDict['number_of_particles']['value']))
         if not os.name == 'nt':
             self.data.Framework.defineCSRTrackCommand(scaling=int(self.data.generatorDict['number_of_particles']['value']))
@@ -221,6 +233,7 @@ class Model(object):
         self.update_laser_properties()
 
     def update_laser_properties(self):
+        """Modify the framework LASER definitions based on values in the Data object."""
         self.data.Framework.change_generator(str(self.data.generatorDict['tracking_code']['value']))
         self.data.Framework.generator.number_of_particles = int(2**(3*int(self.data.generatorDict['number_of_particles']['value'])))
         # Convert to nC
@@ -263,31 +276,38 @@ class Model(object):
         self.data.Framework.generator.offset_y = self.data.generatorDict['offset_y']['value'] * 1e-3
 
     def create_random_directory_name(self):
+        """Return random UUID."""
         dirname = str(uuid.uuid4())
         # while dirname in self.dirnames.values():
         #     dirname = 'test/'+str(uuid.uuid4())
         return dirname
 
     def save_settings_to_database(self, yaml, directoryname):
+        """Save current settings to the DB."""
         self.dbcontroller.save_settings_to_database(yaml, directoryname)
 
     def are_settings_in_database(self, yaml):
+        """Check if current settings are in the DB."""
         return self.dbcontroller.are_settings_in_database(yaml)
 
     def get_run_id_for_settings(self, yaml):
+        """If current settings are in the DB, return the relevant run ID."""
         if self.are_settings_in_database(yaml):
             return self.dbcontroller.get_run_id_for_settings(yaml)
         else:
             return None
 
     def get_absolute_folder_location(self, directoryname):
+        """Return the absolute path of the current directory."""
         return os.path.abspath(__file__+'/../../'+self.basedirectoryname+'/'+directoryname)
 
     def create_subdirectory(self, dir):
+        """Create a subdirectory if it does not exist."""
         if not os.path.exists(dir):
             os.makedirs(dir, exist_ok=True)
 
     def export_parameter_values_to_yaml_file(self, auto=False, filename=None, directory="."):
+        """Export current settings to a YAML file."""
         if auto is True:
             filename = 'settings.yaml'
             directory = self.basedirectoryname+'/'+self.directoryname
@@ -304,9 +324,11 @@ class Model(object):
             exit()
 
     def import_yaml(self, directoryname):
+        """Import the default settings.yaml file from the specified directory."""
         return self.import_parameter_values_from_yaml_file(self.basedirectoryname+'/'+directoryname+'/settings.yaml')
 
     def import_parameter_values_from_yaml_file(self, filename):
+        """Import settings from a specified YAML file."""
         filename = filename[0] if isinstance(filename,tuple) else filename
         filename = str(filename)
         if not filename == '' and not filename is None and (filename[-4:].lower() == '.yml' or filename[-5:].lower() == '.yaml'):
