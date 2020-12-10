@@ -1,14 +1,16 @@
+image: mattkingastec/hls_env:latest
+
 stages:
 - list_tools
-- check_server
+- pylint
 
 list_tools:
   stage: list_tools
   script: "which python3"
 
-check_server:
-  stage: check_server
+pylint:
+  stage: pylint
   script:
-  - cd ~/test_scripts
-  - python3 zeromq_test.py
-
+    - "pylint *.py"
+  only:
+    - v1.5
