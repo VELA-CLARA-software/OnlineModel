@@ -4,7 +4,6 @@ from . import lattices
 from .elements.generator import generator
 from .elements.quadrupole import quadrupole
 from .elements.cavity import cavity
-from .elements.simulations import simulation_parameters
 from .elements.field_coefficients import field_coefficients
 from .elements.magnetic_lengths import magnetic_lengths
 
