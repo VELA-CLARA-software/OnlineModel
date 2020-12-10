@@ -28,3 +28,4 @@ SimulationDatabase.db
 Split_Lattice_LSC/
 *.exe
 *dist/
+.ipynb_checkpoints/*
