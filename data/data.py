@@ -13,6 +13,9 @@ import data.lattices as lattices
 from data.DBURT_parser import DBURT_Parser
 from copy import deepcopy
 
+from .parameters import parameterDict
+from .parameters import screenDict
+
 class Data(object):
     """Data object to hold all of the parameters and interface to the SimFrame framework."""
 
@@ -27,27 +30,16 @@ class Data(object):
               - Extract element data from the framework
               - Initialise dictionaries with the specified values
         """
-        self.my_name = "data"
         self.parser = DBURT_Parser()
-        self.screenDict = collections.OrderedDict()
-        self.parameterDict = collections.OrderedDict()
-        self.lattices = lattices.lattices
-        [self.parameterDict.update({l:collections.OrderedDict()}) for l in self.lattices]
-        [self.screenDict.update({l:collections.OrderedDict()}) for l in self.lattices]
-        self.parameterDict['astra'] = collections.OrderedDict()
-        self.parameterDict['scan'] = collections.OrderedDict()
-        self.scanDict = self.parameterDict['scan']
-        # self.scanDict['parameter_scan'] = False
-        # self.parameterDict['simulation'] = collections.OrderedDict()
-        # self.simulationDict = self.parameterDict['simulation']
-        self.parameterDict['generator'] = collections.OrderedDict()
-        self.generatorDict = self.parameterDict['generator']
-        self.parameterDict['runs'] = collections.OrderedDict()
-        self.runsDict = self.parameterDict['runs']
-        self.scannableParametersDict = collections.OrderedDict()
         self.Framework = Fw.Framework(directory='.', clean=False, verbose=False, delete_output_files=False)
         self.Framework.loadSettings(lattices.lattice_definition)
-        self.my_name = "data"
+
+        self.parameterDict = parameterDict()
+        self.generatorDict = self.parameterDict['generator']
+        self.runsDict = self.parameterDict['runs']
+        self.scanDict = self.parameterDict['scan']
+        self.screenDict = screenDict(self.Framework)
+
         self.get_data()
         self.initialise_data()
         # yaml.add_representer(collections.OrderedDict, yaml.representer.SafeRepresenter.represent_dict)
@@ -59,45 +51,29 @@ class Data(object):
         """Cannot deepcopy the framework object, so initialise a new one for the copy."""
         # create a copy with self.linked_to *not copied*, just referenced.
         datacopy = type(self)()
-        datacopy.lattices = deepcopy(self.lattices, memo)
+        # datacopy.lattices = deepcopy(self.lattices, memo)
         datacopy.parameterDict = deepcopy(self.parameterDict, memo)
-        datacopy.runsDict = deepcopy(self.runsDict, memo)
-        datacopy.generatorDict = deepcopy(self.generatorDict, memo)
+        datacopy.generatorDict = datacopy.parameterDict['generator']
+        datacopy.runsDict = datacopy.parameterDict['runs']
         datacopy.Framework = Fw.Framework(directory='.', clean=False, verbose=False, delete_output_files=False)
         datacopy.Framework.loadSettings(lattices.lattice_definition)
+        print('Finished data copy!')
         return datacopy
 
     def get_framework(self):
         """Return the framework object."""
         return self.Framework
 
+    def get_data(self):
+        """Initialise element dictionaries and prepare them for the framework values."""
+        self.scan_parameter = collections.OrderedDict()
+        self.parameterDict.get_data(self.Framework)
+
     def initialise_data(self):
         """Initialise the element dictionaries and keys with data from the framework."""
-        # [self.runParameterDict.update({key: value}) for key, value in zip(data_keys, data_v)]
-        self.parameterDict['Gun']['h_min'] = {'value': 0.0001, 'type': 'simulation'}
-        self.parameterDict['Gun']['h_max'] = {'value': 0.0001, 'type': 'simulation'}
-        [[self.screenDict[l].update({key: value}) for key, value in self.screen_values.items() if l == key[:len(l)]] for l in self.lattices]
-        [self.screenDict['Gun'].update({key: value}) for key, value in self.screen_values.items() if 'CLA-S01' == key[:len('CLA-S01')]]
-        [self.screenDict['Linac'].update({key: value}) for key, value in self.screen_values.items() if 'CLA-L01' == key[:len('CLA-L01')]]
-        self.screenDict['generator'] = {}
-        self.screenDict['generator'].update({'Laser': {'type': 'screen', 'position': 0.0}})
-        [[self.parameterDict[l].update({key: value}) for key, value in self.quad_values.items() if l == key[:len(l)]] for l in self.lattices]
-        [self.parameterDict[self.lattices[0]].update({key: value}) for key, value in self.rf_values.items() if 'LRG' in key]
-        [self.parameterDict[self.lattices[1]].update({key: value}) for key, value in self.rf_values.items() if 'L01' in key]
-        [self.generatorDict.update({key: value}) for key, value in self.laser_values.items()]
-        [self.generatorDict.update({key: value}) for key, value in self.charge_values.items()]
-        [self.generatorDict.update({key: value}) for key, value in self.number_of_particles.items()]
-        [self.generatorDict.update({key: value}) for key, value in self.cathode.items()]
-        self.parameterDict[self.lattices[0]]['bsol_tracking'] = {'value': True, 'type': 'simulation'}
-        # Add linac wakefields parameters
-        if 'Linac' in self.parameterDict:
-            self.parameterDict['Linac']['zwake'] = {'value': True, 'type': 'simulation'}
-            self.parameterDict['Linac']['trwake'] = {'value': True, 'type': 'simulation'}
-        for l in self.lattices:
-            for key, value in self.simulation_parameters.items():
-                self.parameterDict[l][key] = collections.OrderedDict()
-                self.parameterDict[l][key]['value'] = value
-                self.parameterDict[l][key]['type'] = 'simulation'
+        self.parameterDict.initialise_data()
+        self.quad_values = self.parameterDict.quad_values
+        self.rf_values = self.parameterDict.rf_values
         self.update_mag_field_coefficients()
 
     def initialise_scan(self, id):
@@ -108,110 +84,6 @@ class Data(object):
     def initialise_scan_parameters(self):
         """Update the scan_parameter dictionary with relevant parameters."""
         [self.scan_parameter.update({key: value}) for key, value in zip(scan_keys, scan_v)]
-
-    def get_element_length(self, dict, key):
-        """Get the length of a given element and update the dictionary."""
-        length = self.Framework.getElement(key)['position_end'][2] - self.Framework.getElement(key)['position_start'][2]
-        dict[key].update({'length': length})
-
-    def get_data(self):
-        """Initialise element dictionaries and prepare them for the framework values."""
-        self.scan_values = collections.OrderedDict()
-        self.scan_parameter = collections.OrderedDict()
-        self.screen_values = collections.OrderedDict()
-        self.quad_values = collections.OrderedDict()
-        self.rf_values = collections.OrderedDict()
-        self.dipole_values = collections.OrderedDict()
-        self.kicker_values = collections.OrderedDict()
-        self.screen_values = collections.OrderedDict()
-        self.solenoid_values = collections.OrderedDict()
-        self.charge_values = collections.OrderedDict()
-        self.laser_values = collections.OrderedDict()
-        self.number_of_particles = collections.OrderedDict()
-        self.cathode = collections.OrderedDict()
-        self.space_charge = collections.OrderedDict()
-        self.astra_run_number = collections.OrderedDict()
-        self.tracking_code = collections.OrderedDict()
-        self.simulation_parameters = collections.OrderedDict()
-
-        for screen in self.Framework.getElementType(['screen', 'watch_point', 'monitor', 'beam_arrival_monitor', 'marker']):
-            name = screen['objectname'].replace('-W','')
-            self.screen_values.update({name: collections.OrderedDict()})
-            self.screen_values[name].update({'type': screen['objecttype']})
-            self.screen_values[name].update({'position': float(screen.middle[2])})
-        for quad in self.Framework.getElementType('quadrupole'):
-            self.quad_values.update({quad['objectname']: collections.OrderedDict()})
-            self.quad_values[quad['objectname']].update({'type': quad['objecttype']})
-            self.quad_values[quad['objectname']].update({'k1l': quad['k1l']})
-            self.quad_values[quad['objectname']].update({'pv_suffix_alias': "SETI"})
-        for cavity in self.Framework.getElementType('cavity'):
-            self.rf_values.update({cavity['objectname']: collections.OrderedDict()})
-            self.rf_values[cavity['objectname']].update({'type': cavity['objecttype']})
-            self.rf_values[cavity['objectname']].update({'phase': cavity['phase']})
-            self.rf_values[cavity['objectname']].update({'pv_root_alias': cavity['PV']})
-            self.rf_values[cavity['objectname']].update({'controller_name': cavity['Controller_Name']})
-            self.get_element_length(self.rf_values, cavity['objectname'])
-            self.rf_values[cavity['objectname']].update({'field_amplitude': cavity['field_amplitude']})
-            self.rf_values[cavity['objectname']].update({'pv_field_amplitude_alias': "ad1:ch6:power_remote_s.POWER"})
-            self.rf_values[cavity['objectname']].update({'pv_phase_alias': "vm:dsp:sp_ph:phase"})
-            for key, value in cavity['sub_elements'].items():
-                if value['type'] == "solenoid":
-                    self.rf_values.update({key: collections.OrderedDict()})
-                    self.rf_values[key].update({'type': 'solenoid'})
-                    self.rf_values[key].update({'cavity': cavity['objectname']})
-                    self.rf_values[key].update({'field_amplitude': value['field_amplitude']})
-                    self.rf_values[key].update({'pv_suffix_alias': "SETI"})
-        self.charge_values.update({'charge': collections.OrderedDict()})
-        self.charge_values['charge'].update({'type': 'generator'})
-        self.charge_values['charge'].update({'value': self.Framework.generator.charge})
-        self.charge_values['charge'].update({'pv_root_alias': 'CLA-S01-DIA-WCM-01'})
-        self.charge_values['charge'].update({'pv_suffix_alias': 'Q'})
-        self.number_of_particles.update({'number_of_particles': collections.OrderedDict()})
-        self.number_of_particles['number_of_particles'].update({'value': self.Framework.generator.particles})
-        self.number_of_particles['number_of_particles'].update({'type': 'generator'})
-        self.cathode.update({'cathode': collections.OrderedDict()})
-        self.cathode['cathode'].update({'type': 'generator'})
-        self.cathode['cathode'].update({'value': self.Framework.generator['cathode']})
-        self.space_charge.update({'space_charge': collections.OrderedDict()})
-        self.space_charge['space_charge'].update({'type': 'generator'})
-        self.space_charge['space_charge'].update({'value': False})
-        self.laser_values.update({'transverse_distribution': collections.OrderedDict()})
-        self.laser_values['transverse_distribution'].update({'type': 'generator'})
-        self.laser_values['transverse_distribution'].update({'value': self.Framework.generator['distribution_type_x']})
-        self.laser_values.update({'transverse_cutoff': collections.OrderedDict()})
-        self.laser_values['transverse_cutoff'].update({'type': 'generator'})
-        self.laser_values['transverse_cutoff'].update({'value': self.Framework.generator['guassian_cutoff_x']})
-        self.laser_values.update({'longitudinal_distribution': collections.OrderedDict()})
-        self.laser_values['longitudinal_distribution'].update({'type': 'generator'})
-        self.laser_values['longitudinal_distribution'].update({'value': self.Framework.generator['distribution_type_z']})
-        self.laser_values.update({'longitudinal_cutoff': collections.OrderedDict()})
-        self.laser_values['longitudinal_cutoff'].update({'type': 'generator'})
-        self.laser_values['longitudinal_cutoff'].update({'value': self.Framework.generator['guassian_cutoff_z']})
-        self.laser_values.update({'sig_x': collections.OrderedDict()})
-        self.laser_values['sig_x'].update({'type': 'generator'})
-        self.laser_values['sig_x'].update({'value': self.Framework.generator['sigma_x']})
-        self.laser_values.update({'spot_size': collections.OrderedDict()})
-        self.laser_values['spot_size'].update({'type': 'generator'})
-        self.laser_values['spot_size'].update({'value': self.Framework.generator['sigma_x']})
-        self.laser_values.update({'sig_clock': collections.OrderedDict()})
-        self.laser_values['sig_clock'].update({'type': 'generator'})
-        self.laser_values['sig_clock'].update({'value': self.Framework.generator['sigma_t']})
-        self.laser_values.update({'offset_x': collections.OrderedDict()})
-        self.laser_values['offset_x'].update({'type': 'generator'})
-        self.laser_values['offset_x'].update({'value': self.Framework.generator['offset_x']})
-        self.laser_values.update({'offset_y': collections.OrderedDict()})
-        self.laser_values['offset_y'].update({'type': 'generator'})
-        self.laser_values['offset_y'].update({'value': self.Framework.generator['offset_y']})
-        self.laser_values.update({'plateau_rise_time': collections.OrderedDict()})
-        self.laser_values['plateau_rise_time'].update({'type': 'generator'})
-        self.laser_values['plateau_rise_time'].update({'value': 0})
-        self.laser_values.update({'thermal_emittance': collections.OrderedDict()})
-        self.laser_values['thermal_emittance'].update({'type': 'generator'})
-        self.laser_values['thermal_emittance'].update({'value': self.Framework.generator['thermal_emittance']})
-        self.laser_values.update({'tracking_code': collections.OrderedDict()})
-        self.laser_values['tracking_code'].update({'type': 'generator'})
-        self.laser_values['tracking_code'].update({'value': 'ASTRA'})
-        self.simulation_parameters = {'tracking_code': 'elegant', 'csr': True, 'csr_bins': 200, 'lsc': True, 'lsc_bins': 200}
 
     def get_pv_alias(self, dict, name, param=None, rf_type=None):
         """Return the PV alias for a given dictionary entry."""
