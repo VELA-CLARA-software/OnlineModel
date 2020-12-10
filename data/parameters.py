@@ -4,6 +4,9 @@ from . import lattices
 from .elements.generator import generator
 from .elements.quadrupole import quadrupole
 from .elements.cavity import cavity
+from .elements.simulations import simulation_parameters
+from .elements.field_coefficients import field_coefficients
+from .elements.magnetic_lengths import magnetic_lengths
 
 class parameterDict(OrderedDict):
 
@@ -27,36 +30,47 @@ class parameterDict(OrderedDict):
         self.rf_values = cavity(Framework)
         self.generator = generator(Framework)
 
-        # self.tracking_code = OrderedDict()
         self.simulation_parameters = {'tracking_code': 'elegant', 'csr': True, 'csr_bins': 200, 'lsc': True, 'lsc_bins': 200}
+        self.update_mag_field_coefficients()
 
     def initialise_data(self):
-        self['Gun']['h_min'] = {'value': 0.0001, 'type': 'simulation'}
-        self['Gun']['h_max'] = {'value': 0.0001, 'type': 'simulation'}
+        gun = lattices.lattices[0]
+        linac1 = lattices.lattices[1]
+        self[gun]['bsol_tracking'] = {'value': True, 'type': 'simulation'}
+        self[gun]['h_min'] = {'value': 0.0001, 'type': 'simulation'}
+        self[gun]['h_max'] = {'value': 0.0001, 'type': 'simulation'}
+        self[linac1]['zwake'] = {'value': True, 'type': 'simulation'}
+        self[linac1]['trwake'] = {'value': True, 'type': 'simulation'}
 
-        for l in lattices.lattices:
+        for latt in lattices.lattices:
             for key, value in self.quad_values.items():
-                if l == key[:len(l)]:
-                    self[l].update({key: value})
+                if latt == key[:len(latt)]:
+                    self[latt].update({key: value})
 
             for key, value in self.simulation_parameters.items():
-                self[l][key] = OrderedDict()
-                self[l][key]['value'] = value
-                self[l][key]['type'] = 'simulation'
+                self[latt][key] = OrderedDict()
+                self[latt][key]['value'] = value
+                self[latt][key]['type'] = 'simulation'
 
         for key, value in self.rf_values.items():
             if 'LRG' in key:
-                self[lattices.lattices[0]].update({key: value})
+                self[gun].update({key: value})
             if 'L01' in key:
-                self[lattices.lattices[1]].update({key: value})
+                self[linac1].update({key: value})
 
         for key, value in self.generator.items():
             self['generator'].update({key: value})
 
-        self['Linac']['zwake'] = {'value': True, 'type': 'simulation'}
-        self['Linac']['trwake'] = {'value': True, 'type': 'simulation'}
 
-        self[lattices.lattices[0]]['bsol_tracking'] = {'value': True, 'type': 'simulation'}
+    def update_mag_field_coefficients(self):
+        """Update magnet field coefficients in the relevant dictionaries."""
+
+        for key in field_coefficients.keys():
+            for k,v in field_coefficients[key].items():
+                getattr(self, key)[k].update({'field_integral_coefficients': v})
+        for key in magnetic_lengths.keys():
+            for k,v in magnetic_lengths[key].items():
+                getattr(self, key)[k].update({'magnetic_length': v})
 
 class screenDict(OrderedDict):
 

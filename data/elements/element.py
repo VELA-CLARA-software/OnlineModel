@@ -5,7 +5,7 @@ class element(OrderedDict):
     parameters = {
     }
 
-    def __init__(self, framework):
+    def __init__(self, framework=None):
         super().__init__()
         self.Framework = framework
         self.Framework_key = None
