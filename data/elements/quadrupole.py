@@ -14,7 +14,7 @@ class quadrupole(element):
 
         for quad in self.Framework.getElementType('quadrupole'):
             self.Framework_key = quad['objectname']
-            self.update_parameters(key=quad['objectname'])
+            self.update_element(key=quad['objectname'])
 
 
         # for quad in self.Framework.getElementType('quadrupole'):

@@ -1,5 +1,5 @@
 import collections
-import os, sys
+import os, sys, time
 import re
 import numpy as np
 import ruamel.yaml as yaml
@@ -11,7 +11,7 @@ import SimulationFramework.Modules.constants
 import requests, json, datetime, math, numpy
 import data.lattices as lattices
 from data.DBURT_parser import DBURT_Parser
-from copy import deepcopy
+from copy import copy, deepcopy
 
 from .parameters import parameterDict
 from .parameters import screenDict
@@ -22,7 +22,7 @@ class Data(object):
     def __getitem__(self, key):
         return getattr(self, key)
 
-    def __init__(self):
+    def __init__(self, initialise=True):
         super(Data, self).__init__()
         """Initialise the Data object:
               - Create required dictionaries
@@ -33,31 +33,26 @@ class Data(object):
         self.parser = DBURT_Parser()
         self.Framework = Fw.Framework(directory='.', clean=False, verbose=False, delete_output_files=False)
         self.Framework.loadSettings(lattices.lattice_definition)
+        self.lattices = lattices.lattices
 
-        self.parameterDict = parameterDict()
-        self.generatorDict = self.parameterDict['generator']
-        self.runsDict = self.parameterDict['runs']
-        self.scanDict = self.parameterDict['scan']
-        self.screenDict = screenDict(self.Framework)
+        if initialise:
+            self.parameterDict = parameterDict()
+            self.generatorDict = self.parameterDict['generator']
+            self.runsDict = self.parameterDict['runs']
+            self.scanDict = self.parameterDict['scan']
+            self.screenDict = screenDict(self.Framework)
 
-        self.get_data()
-        self.initialise_data()
-        # yaml.add_representer(collections.OrderedDict, yaml.representer.SafeRepresenter.represent_dict)
-        # with open('./screen_positions.yaml', 'w') as output_file:
-        #     yaml.dump(self.screenDict, output_file, default_flow_style=False)
+            self.get_data()
+            self.initialise_data()
 
-    # if sys.version_info < (3,7):
     def __deepcopy__(self, memo):
-        """Cannot deepcopy the framework object, so initialise a new one for the copy."""
-        # create a copy with self.linked_to *not copied*, just referenced.
-        datacopy = type(self)()
-        # datacopy.lattices = deepcopy(self.lattices, memo)
+        """Only copy required objects."""
+        start = time.time()
+        datacopy = type(self)(initialise=False)
+        start = time.time()
         datacopy.parameterDict = deepcopy(self.parameterDict, memo)
         datacopy.generatorDict = datacopy.parameterDict['generator']
         datacopy.runsDict = datacopy.parameterDict['runs']
-        datacopy.Framework = Fw.Framework(directory='.', clean=False, verbose=False, delete_output_files=False)
-        datacopy.Framework.loadSettings(lattices.lattice_definition)
-        print('Finished data copy!')
         return datacopy
 
     def get_framework(self):

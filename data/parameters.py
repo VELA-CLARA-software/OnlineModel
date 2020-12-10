@@ -18,9 +18,7 @@ class parameterDict(OrderedDict):
         """Copy only key-value pairs."""
         datacopy = type(self)()
         for k, v in self.items():
-            print(k)
             datacopy.update({k: deepcopy(v, memo)})
-        print('finished!')
         return datacopy
 
     def get_data(self, Framework):
@@ -70,6 +68,12 @@ class screenDict(OrderedDict):
 
         self.update()
 
+    def __deepcopy__(self, memo):
+        """Copy only key-value pairs."""
+        datacopy = type(self)()
+        for k, v in self.items():
+            datacopy.update({k: deepcopy(v, memo)})
+        return datacopy
 
     def update_screen_values(self):
         for screen in self.Framework.getElementType(['screen', 'watch_point', 'monitor', 'beam_arrival_monitor', 'marker']):

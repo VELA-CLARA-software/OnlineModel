@@ -26,13 +26,13 @@ class cavity(element):
         for cavity in self.Framework.getElementType('cavity'):
             self.Framework_key = cavity['objectname']
             self.parameters = self.rf_parameters
-            self.update_parameters(key=cavity['objectname'])
+            self.update_element(key=cavity['objectname'])
             self.get_element_length(self.Framework_key)
 
             for key, value in cavity['sub_elements'].items():
                 if value['type'] == "solenoid":
                     self.parameters = self.solenoid_parameters
-                    self.update_parameters(key=key)
+                    self.update_element(key=key)
 
     def get_element_length(self, key):
         """Get the length of a given element and update the dictionary."""

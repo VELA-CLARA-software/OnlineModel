@@ -23,3 +23,15 @@ class element(OrderedDict):
                 dic[k].update({'value': self.Framework[self.Framework_key][v['key']]})
             elif 'value' in v:
                 dic[k].update({'value': v['value']})
+
+    def update_element(self, key=None):
+        if key is not None:
+            self[key] = OrderedDict()
+            dic = self[key]
+        else:
+            dic = self
+        for k, v in self.parameters.items():
+            if 'key' in v:
+                dic.update({k: self.Framework[self.Framework_key][v['key']]})
+            elif 'value' in v:
+                dic.update({k: v['value']})
