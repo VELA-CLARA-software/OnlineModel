@@ -7,24 +7,8 @@ from .elements.cavity import cavity
 from .elements.field_coefficients import field_coefficients
 from .elements.magnetic_lengths import magnetic_lengths
 from .elements.simulation import simulation
-
-def findDiff( d1, d2, path=""):
-    """Compare two dictionaries and print the differences."""
-    for k in d1:
-        if (k not in d2):
-            print ('findDiff:', path, ":")
-            print ('findDiff:', k + " as key not in d2", "\n")
-        else:
-            if type(d1[k]) is dict:
-                if path == "":
-                    path = k
-                else:
-                    path = path + "->" + k
-                findDiff(d1[k],d2[k], path)
-            else:
-                if d1[k] != d2[k]:
-                    print('findDiff:', path+":"+k,':',d1[k],'=!=',d2[k])
-
+from .elements.gun import gun
+from .elements.linac import linac
 
 class parameterDict(OrderedDict):
 
@@ -43,23 +27,47 @@ class parameterDict(OrderedDict):
         return datacopy
 
     def get_data(self, Framework):
-        # NEW FORMAT
+        """Get GUI dictionary key/values."""
         self.quad_values = quadrupole(Framework)
         self.rf_values = cavity(Framework)
         self.generator = generator(Framework)
-
         self.simulation_parameters = simulation()
-        self.update_mag_field_coefficients()
+        self.gun_parameters = gun()
+        self.linac1_parameters = linac()
 
     def initialise_data(self):
-        gun = lattices.lattices[0]
-        linac1 = lattices.lattices[1]
-        self[gun]['bsol_tracking'] = {'value': True, 'type': 'simulation'}
-        self[gun]['h_min'] = {'value': 0.0001, 'type': 'simulation'}
-        self[gun]['h_max'] = {'value': 0.0001, 'type': 'simulation'}
-        self[linac1]['zwake'] = {'value': True, 'type': 'simulation'}
-        self[linac1]['trwake'] = {'value': True, 'type': 'simulation'}
+        """Update dictionary with required GUI key/value pairs and default values."""
+        self.update_gun()
+        self.update_linac1()
+        self.update_quads()
+        self.update_simulations()
+        self.update_generator()
+        self.update_mag_field_coefficients()
 
+    def update_gun(self):
+        """Update gun parameters in dictionary."""
+        gun_lattice = lattices.lattices[0]
+        for key, value in self.gun_parameters.items():
+            self[gun_lattice][key] = OrderedDict()
+            for k,v in value.items():
+                self[gun_lattice][key][k] = v
+        for key, value in self.rf_values.items():
+            if 'LRG' in key:
+                self[gun_lattice].update({key: value})
+
+    def update_linac1(self):
+        """Update linac1 parameters in dictionary."""
+        linac1_lattice = lattices.lattices[1]
+        for key, value in self.linac1_parameters.items():
+            self[linac1_lattice][key] = OrderedDict()
+            for k,v in value.items():
+                self[linac1_lattice][key][k] = v
+        for key, value in self.rf_values.items():
+            if 'L01' in key:
+                self[linac1_lattice].update({key: value})
+
+    def update_quads(self):
+        """Update quadrupole parameters in dictionary."""
         for latt in lattices.lattices:
             for key, value in self.quad_values.items():
                 if latt == key[:len(latt)]:
@@ -67,17 +75,16 @@ class parameterDict(OrderedDict):
                     for k,v in value.items():
                         self[latt][key][k] = v
 
+    def update_simulations(self):
+        """Update simulation parameters in dictionary."""
+        for latt in lattices.lattices:
             for key, value in self.simulation_parameters.items():
                 self[latt][key] = OrderedDict()
                 for k,v in value.items():
                     self[latt][key][k] = v
 
-        for key, value in self.rf_values.items():
-            if 'LRG' in key:
-                self[gun].update({key: value})
-            if 'L01' in key:
-                self[linac1].update({key: value})
-
+    def update_generator(self):
+        """Update generator parameters in dictionary."""
         for key, value in self.generator.items():
             self['generator'].update({key: value})
 
@@ -110,6 +117,7 @@ class screenDict(OrderedDict):
         return datacopy
 
     def update_screen_values(self):
+        """Extract screen positions from the Framework."""
         for screen in self.Framework.getElementType(['screen', 'watch_point', 'monitor', 'beam_arrival_monitor', 'marker']):
             name = screen['objectname'].replace('-W','')
             type = screen['objecttype']
@@ -117,6 +125,7 @@ class screenDict(OrderedDict):
             self.screen_values.update({name: {'type': type, 'position': position}})
 
     def update(self):
+        """Update dictionary with key/value pairs and add on laser screen."""
         for l in lattices.lattices:
             dic = OrderedDict()
             for key, value in self.screen_values.items():
