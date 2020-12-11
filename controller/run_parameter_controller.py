@@ -884,10 +884,10 @@ class RunParameterController(QObject):
         # Ensure model directory location is consistent
         localmodel.basedirectoryname = self.model.basedirectoryname
         # Run the model script
-        try:
-            tracking_success = localmodel.run_script()
-        except:
-            tracking_success = False
+        # try:
+        tracking_success = localmodel.run_script()
+        # except:
+        #     tracking_success = False
         # Emit signal that the script has finished. This will be connected in the MAIN thread!
         self.run_finished_signal.emit(tracking_success, doPlot, localmodel.directoryname, localmodel.yaml, nthreads)
         if tracking_success:
