@@ -6,6 +6,25 @@ from .elements.quadrupole import quadrupole
 from .elements.cavity import cavity
 from .elements.field_coefficients import field_coefficients
 from .elements.magnetic_lengths import magnetic_lengths
+from .elements.simulation import simulation
+
+def findDiff( d1, d2, path=""):
+    """Compare two dictionaries and print the differences."""
+    for k in d1:
+        if (k not in d2):
+            print ('findDiff:', path, ":")
+            print ('findDiff:', k + " as key not in d2", "\n")
+        else:
+            if type(d1[k]) is dict:
+                if path == "":
+                    path = k
+                else:
+                    path = path + "->" + k
+                findDiff(d1[k],d2[k], path)
+            else:
+                if d1[k] != d2[k]:
+                    print('findDiff:', path+":"+k,':',d1[k],'=!=',d2[k])
+
 
 class parameterDict(OrderedDict):
 
@@ -29,7 +48,7 @@ class parameterDict(OrderedDict):
         self.rf_values = cavity(Framework)
         self.generator = generator(Framework)
 
-        self.simulation_parameters = {'tracking_code': 'elegant', 'csr': True, 'csr_bins': 200, 'lsc': True, 'lsc_bins': 200}
+        self.simulation_parameters = simulation()
         self.update_mag_field_coefficients()
 
     def initialise_data(self):
@@ -44,12 +63,14 @@ class parameterDict(OrderedDict):
         for latt in lattices.lattices:
             for key, value in self.quad_values.items():
                 if latt == key[:len(latt)]:
-                    self[latt].update({key: value})
+                    self[latt][key] = OrderedDict()
+                    for k,v in value.items():
+                        self[latt][key][k] = v
 
             for key, value in self.simulation_parameters.items():
                 self[latt][key] = OrderedDict()
-                self[latt][key]['value'] = value
-                self[latt][key]['type'] = 'simulation'
+                for k,v in value.items():
+                    self[latt][key][k] = v
 
         for key, value in self.rf_values.items():
             if 'LRG' in key:

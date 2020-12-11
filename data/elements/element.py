@@ -18,11 +18,11 @@ class element(OrderedDict):
             dic = self
         for k, v in self.parameters.items():
             dic.update({k: OrderedDict()})
-            dic[k].update({'type': self.Framework_key})
             if 'key' in v:
                 dic[k].update({'value': self.Framework[self.Framework_key][v['key']]})
             elif 'value' in v:
                 dic[k].update({'value': v['value']})
+            dic[k].update({'type': self.Framework_key})
 
     def update_element(self, key=None):
         if key is not None:
