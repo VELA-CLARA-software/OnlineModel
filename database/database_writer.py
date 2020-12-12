@@ -17,6 +17,9 @@ class DatabaseWriter():
         self.sql_connection = sqlite3.connect(self.database)
         self.sql_cursor = self.sql_connection.cursor()
 
+    def close(self):
+        self.sql_connection.close()
+        
     def tempname(self):
         return str(uuid.uuid4())
 

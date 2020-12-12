@@ -9,7 +9,7 @@ import database.database_creator as database_creator
 class DatabaseController():
     """Top-level controller for DB operations."""
 
-    def __init__(self, database='SimulationDatabase.db', verbose=True):
+    def __init__(self, database='./SimulationDatabase.db', verbose=True):
         self.database = database
         self.verbose = verbose
         ### Check/Create database
@@ -17,6 +17,9 @@ class DatabaseController():
         self.settings_dict = None
 
     def change_database(self, database=None):
+        if hasattr(self, 'creator'): self.creator.close()
+        if hasattr(self, 'reader'): self.reader.close()
+        if hasattr(self, 'writer'): self.writer.close()
         self.database = database
         self.creator = database_creator.DatabaseCreator(self.database)
         self.creator.create_simulation_database(clean=False)

@@ -166,9 +166,9 @@ class Model(object):
                     self.data.runsDict['prefix'] = closest_match
                     # print('Setting',start_lattice,'prefix = ', closest_match)
                     self.data.runsDict['start_lattice'] = start_lattice
-                self.data.runsDict['directory'] = os.path.abspath(self.basedirectoryname+'/'+self.directoryname)
+                self.data.runsDict['directory'] = os.path.relpath(self.basedirectoryname+'/'+self.directoryname, os.path.dirname(self.dbcontroller.database))
                 self.yaml = create_yaml_dictionary(self.data)
-                self.data.Framework.setSubDirectory(os.path.relpath(self.data.runsDict['directory']))
+                self.data.Framework.setSubDirectory(os.path.relpath(self.basedirectoryname+'/'+self.directoryname))
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
                 # try:

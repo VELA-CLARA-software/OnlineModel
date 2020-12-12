@@ -284,7 +284,7 @@ class RunParameterController(QObject):
         self.model.data.Framework.defineASTRACommand()
 
     def set_base_directory(self, directory):
-        """ Change the base directory the model starts in """
+        """ Change the base directory the model starts in - this is where the DB is"""
         self.model.set_base_directory(directory)
 
     def create_datatree_widget(self):
@@ -1004,7 +1004,7 @@ class RunParameterController(QObject):
             nthreads = self.model.are_we_using_WSL_ASTRA() - 1
             for i in range(nthreads):
                 self.threadpool.reserveThread()
-        # Make a copy of the data object
+            # Make a copy of the data object
             data = deepcopy(self.model.data)
             # Create a single worker
             worker = GenericWorker(self.do_scan, data, self.view.autoPlotCheckbox.isChecked(), nthreads)
@@ -1029,7 +1029,8 @@ class RunParameterController(QObject):
             self.model.save_settings_to_database(yaml, directoryname)
             self.update_runs_widget(plot=doPlot, id=directoryname)
             self.update_directory_widget(dirname=directoryname)
-            save_summary_files(directoryname, directory='.', database=self.model.dbcontroller.database, twiss=True, beams=True)
+            # print('run_finished', os.path.abspath(self.model.dbcontroller.database))
+            save_summary_files(directoryname, database=os.path.abspath(self.model.dbcontroller.database), twiss=True, beams=True)
 
     def update_directory_widget(self, dirname=None):
         """ Update the directory widget with a new value """

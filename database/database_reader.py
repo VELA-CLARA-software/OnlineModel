@@ -39,6 +39,9 @@ class DatabaseReader():
             print('       Number of entries in database = ', len(self.run_id_settings_dict))
             print('###### Database Loaded ######')
 
+    def close(self):
+        self.sql_connection.close()
+
     def update_lattice_tables_from_sql(self, table_name, lattice_id_settings_dict):
         """Take an SQL cursor and iteratively add elements to the lattice dictionary."""
         # It's faster to do this in chunks (not sure why, might be an SQLite issue?)

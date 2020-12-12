@@ -15,6 +15,9 @@ class DatabaseCreator():
         self.sql_connection = sqlite3.connect(self.database)
         self.sql_cursor = self.sql_connection.cursor()
 
+    def close(self):
+        self.sql_connection.close()
+
     def create_simulation_database(self, clean=False, tables=None):
         if tables is None:
             tables = ['generator'] + lattices.lattices + ['runs', 'scan']

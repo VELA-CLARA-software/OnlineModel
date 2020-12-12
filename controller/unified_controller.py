@@ -37,7 +37,7 @@ class UnifiedController():
             self.change_database_folder(database)
 
         def change_database_folder(self, database):
-            foldername = 'output/'+os.path.splitext(os.path.basename(database))[0]
+            foldername =os.path.join(os.path.dirname(database),'output',os.path.splitext(os.path.basename(database))[0])
             self.dpc.set_base_directory(foldername)
             self.rpc.set_base_directory(foldername)
 
