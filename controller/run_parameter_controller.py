@@ -996,7 +996,8 @@ class RunParameterController(QObject):
                 print('Error in scan parameters - aborting!')
                 return
         else:
-            self.disable_run_button(scan=False)
+            # self.disable_run_button(scan=False)
+            print('Tracking')
             # Reset progressbar
             self.view.progressBar.setMinimum(0)
             self.view.progressBar.setMaximum(1)

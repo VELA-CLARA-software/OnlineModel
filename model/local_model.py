@@ -172,7 +172,7 @@ class Model(object):
                 self.modify_framework(scan=False)
                 self.data.Framework.save_changes_file(filename=self.data.Framework.subdirectory+'/changes.yaml')
                 # try:
-                self.data.Framework.track(startfile=start_lattice, save_summary=False)#, endfile='CLA-S02')
+                self.data.Framework.track(startfile=start_lattice, save_summary=False)#, endfile='generator')
                 # except Exception as e:
                 #     print('!!!! Error in Tracking - settings not saved !!!!')
                 #     print(e)
@@ -255,16 +255,16 @@ class Model(object):
             # If we are in uniform or plateau we need to set the correct ASTRA parameter
             self.data.Framework.generator.distribution_type_x = "radial"
             self.data.Framework.generator.distribution_type_y = "radial"
-            self.data.Framework.generator.lx = self.data.generatorDict['spot_size']['value'] * 1e-3
-            self.data.Framework.generator.ly = self.data.generatorDict['spot_size']['value'] * 1e-3
+            self.data.Framework.generator.lx = self.data.generatorDict['spot_size_x']['value'] * 1e-3
+            self.data.Framework.generator.ly = self.data.generatorDict['spot_size_y']['value'] * 1e-3
         elif str(self.data.generatorDict['transverse_distribution']['value']) == "Image":
             self.data.Framework.generator.distribution_type_x = "image"
             self.data.Framework.generator.distribution_type_y = "image"
             self.data.Framework.generator.image_filename = str(self.data.generatorDict['laser_file']['value'])
             self.data.Framework.generator.image_calibration_x = int(int(self.data.generatorDict['laser_cal_x']['value'])  * 1e3)
             self.data.Framework.generator.image_calibration_y = int(int(self.data.generatorDict['laser_cal_y']['value'])  * 1e3)
-        self.data.Framework.generator.sigma_x = self.data.generatorDict['spot_size']['value'] * 1e-3
-        self.data.Framework.generator.sigma_y = self.data.generatorDict['spot_size']['value'] * 1e-3
+        self.data.Framework.generator.sigma_x = self.data.generatorDict['spot_size_x']['value'] * 1e-3
+        self.data.Framework.generator.sigma_y = self.data.generatorDict['spot_size_y']['value'] * 1e-3
         ### Thermal Emittance in radians ###
         self.data.Framework.generator.thermal_emittance = self.data.generatorDict['thermal_emittance']['value'] * 1e-3
         ### Offsets in X and Y ###

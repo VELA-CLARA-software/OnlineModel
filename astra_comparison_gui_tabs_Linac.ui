@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1102</width>
-    <height>694</height>
+    <height>697</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -3434,7 +3434,7 @@
                   </size>
                  </property>
                  <property name="text">
-                  <string>Spot Size (sigma)</string>
+                  <string>Horizontal Spot Size (sigma)</string>
                  </property>
                 </widget>
                </item>
@@ -3447,7 +3447,7 @@
                   </size>
                  </property>
                  <property name="accessibleName">
-                  <string>generator:spot_size:value</string>
+                  <string>generator:spot_size_x:value</string>
                  </property>
                  <property name="suffix">
                   <string> mm</string>
@@ -3463,14 +3463,14 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
+               <item row="2" column="0">
                 <widget class="QLabel" name="label_27">
                  <property name="text">
                   <string>Profile</string>
                  </property>
                 </widget>
                </item>
-               <item row="1" column="1">
+               <item row="2" column="1">
                 <widget class="QComboBox" name="comboBox">
                  <property name="accessibleName">
                   <string>generator:transverse_distribution:value</string>
@@ -3492,14 +3492,14 @@
                  </item>
                 </widget>
                </item>
-               <item row="2" column="0">
+               <item row="3" column="0">
                 <widget class="QLabel" name="label_32">
                  <property name="text">
                   <string>Cut-offs</string>
                  </property>
                 </widget>
                </item>
-               <item row="3" column="0">
+               <item row="4" column="0">
                 <widget class="QPushButton" name="laser_image_button">
                  <property name="enabled">
                   <bool>true</bool>
@@ -3509,7 +3509,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="3" column="1">
+               <item row="4" column="1">
                 <widget class="QLineEdit" name="laser_image_lineedit">
                  <property name="enabled">
                   <bool>true</bool>
@@ -3522,7 +3522,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="2" column="1">
+               <item row="3" column="1">
                 <widget class="QDoubleSpinBox" name="doubleSpinBox_10">
                  <property name="toolTip">
                   <string>Only for Gaussian distributions</string>
@@ -3547,7 +3547,7 @@
                  </property>
                 </widget>
                </item>
-               <item row="4" column="0" colspan="2">
+               <item row="5" column="0" colspan="2">
                 <widget class="QWidget" name="laser_cal_widget" native="true">
                  <layout class="QGridLayout" name="gridLayout_4">
                   <property name="margin">
@@ -3611,6 +3611,38 @@
                    </widget>
                   </item>
                  </layout>
+                </widget>
+               </item>
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_41">
+                 <property name="text">
+                  <string>Vertical Spot Size (sigma)</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="1" column="1">
+                <widget class="QDoubleSpinBox" name="doubleSpinBox_31">
+                 <property name="maximumSize">
+                  <size>
+                   <width>150</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <property name="accessibleName">
+                  <string>generator:spot_size_y:value</string>
+                 </property>
+                 <property name="suffix">
+                  <string> mm</string>
+                 </property>
+                 <property name="maximum">
+                  <double>1.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.010000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>0.250000000000000</double>
+                 </property>
                 </widget>
                </item>
               </layout>
@@ -3746,6 +3778,9 @@
                  </property>
                  <property name="suffix">
                   <string> mrad</string>
+                 </property>
+                 <property name="minimum">
+                  <double>0.100000000000000</double>
                  </property>
                  <property name="maximum">
                   <double>5.000000000000000</double>
@@ -4454,8 +4489,8 @@
  <connections/>
  <buttongroups>
   <buttongroup name="EBT_INJ_stepsize"/>
-  <buttongroup name="EBT_BA1_stepsize"/>
-  <buttongroup name="CLA_C2V_stepsize"/>
   <buttongroup name="CLA_S02_stepsize"/>
+  <buttongroup name="CLA_C2V_stepsize"/>
+  <buttongroup name="EBT_BA1_stepsize"/>
  </buttongroups>
 </ui>
