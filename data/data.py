@@ -3,11 +3,9 @@ import os, sys, time
 import re
 import numpy as np
 import ruamel.yaml as yaml
-sys.path.append(os.path.abspath(__file__+'/../../../OnlineModel/'))
-sys.path.append(os.path.abspath(__file__+'/../../../SimFrame/'))
-sys.path.append(os.path.abspath(__file__+'/../../'))
-import SimulationFramework.Framework as Fw
-import SimulationFramework.Modules.constants
+sys.path.append(os.path.abspath(__file__+'/../../../'))
+import SimFrame.SimulationFramework.Framework as Fw
+import SimFrame.SimulationFramework.Modules.constants
 import requests, json, datetime, math, numpy
 import data.lattices as lattices
 from copy import copy, deepcopy
