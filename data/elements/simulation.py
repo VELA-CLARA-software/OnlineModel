@@ -14,5 +14,3 @@ class simulation(element):
         super().__init__(None)
         self.Framework_key = 'simulation'
         self.update_parameters()
-
-#         self.simulation_parameters = {'tracking_code': 'elegant', 'csr': True, 'csr_bins': 200, 'lsc': True, 'lsc_bins': 200}

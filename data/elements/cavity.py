@@ -38,22 +38,3 @@ class cavity(element):
         """Get the length of a given element and update the dictionary."""
         length = self.Framework.getElement(key)['position_end'][2] - self.Framework.getElement(key)['position_start'][2]
         self[key].update({'length': length})
-
-
-        # for cavity in self.Framework.getElementType('cavity'):
-        #     self.rf_values.update({cavity['objectname']: collections.OrderedDict()})
-        #     self.rf_values[cavity['objectname']].update({'type': cavity['objecttype']})
-        #     self.rf_values[cavity['objectname']].update({'phase': cavity['phase']})
-        #     self.rf_values[cavity['objectname']].update({'pv_root_alias': cavity['PV']})
-        #     self.rf_values[cavity['objectname']].update({'controller_name': cavity['Controller_Name']})
-        #     self.get_element_length(self.rf_values, cavity['objectname'])
-        #     self.rf_values[cavity['objectname']].update({'field_amplitude': cavity['field_amplitude']})
-        #     self.rf_values[cavity['objectname']].update({'pv_field_amplitude_alias': "ad1:ch6:power_remote_s.POWER"})
-        #     self.rf_values[cavity['objectname']].update({'pv_phase_alias': "vm:dsp:sp_ph:phase"})
-        #     for key, value in cavity['sub_elements'].items():
-        #         if value['type'] == "solenoid":
-        #             self.rf_values.update({key: collections.OrderedDict()})
-        #             self.rf_values[key].update({'type': 'solenoid'})
-        #             self.rf_values[key].update({'cavity': cavity['objectname']})
-        #             self.rf_values[key].update({'field_amplitude': value['field_amplitude']})
-        #             self.rf_values[key].update({'pv_suffix_alias': "SETI"})

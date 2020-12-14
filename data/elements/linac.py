@@ -11,6 +11,3 @@ class linac(element):
         super().__init__(None)
         self.Framework_key = 'simulation'
         self.update_parameters()
-
-        # self[linac1]['zwake'] = {'value': True, 'type': 'simulation'}
-        # self[linac1]['trwake'] = {'value': True, 'type': 'simulation'}

@@ -612,14 +612,14 @@ class RunParameterController(QObject):
         if DBURT is None or DBURT is False:
             DBURT = "//fed.cclrc.ac.uk/Org/NLab/ASTeC/Projects/VELA/Snapshots/DBURT/CLARA_2_BA1_BA2_2020-03-09-1602_5.5MeV Beam Transport.dburt"
         print('reading DBURT ', DBURT)
-        data = self.model.data.read_values_from_DBURT(DBURT)
+        data = self.model.data.DBURT_data.read_values_from_DBURT(DBURT)
         for key, magnet in data.items():
             value = magnet['value']
             if value['type'] == "quadrupole":
-                print(magnet['lattice'] + ':' + magnet['fullname'] + ':k1l', value['k1l'])
+                # print(magnet['lattice'] + ':' + magnet['fullname'] + ':k1l', value['k1l'])
                 self.update_widgets_with_values(magnet['lattice'] + ':' + magnet['fullname'] + ':k1l', value['k1l'])
             if value['type'] == "solenoid":
-                print(magnet['lattice'] + ':' + magnet['fullname'] + ':field_amplitude', value['field_amplitude'])
+                # print(magnet['lattice'] + ':' + magnet['fullname'] + ':field_amplitude', value['field_amplitude'])
                 self.update_widgets_with_values(magnet['lattice'] + ':' + magnet['fullname'] + ':field_amplitude', value['field_amplitude'])
             if value['type'] == "cavity":
                 self.update_widgets_with_values(magnet['fullname'] + ':phase', value['phase'])

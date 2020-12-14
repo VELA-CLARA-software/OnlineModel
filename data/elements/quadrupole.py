@@ -5,7 +5,7 @@ class quadrupole(element):
     parameters = {
     'type':             {'key': 'objecttype'},
     'k1l':              {'key': 'k1l'},
-    'pv_suffix_alias':  {'key': 'SETI'},
+    'pv_suffix_alias':  {'value': 'SETI'},
     }
 
     def __init__(self, framework):
@@ -15,10 +15,3 @@ class quadrupole(element):
         for quad in self.Framework.getElementType('quadrupole'):
             self.Framework_key = quad['objectname']
             self.update_element(key=quad['objectname'])
-
-
-        # for quad in self.Framework.getElementType('quadrupole'):
-        #     self.quad_values.update({quad['objectname']: collections.OrderedDict()})
-        #     self.quad_values[quad['objectname']].update({'type': quad['objecttype']})
-        #     self.quad_values[quad['objectname']].update({'k1l': quad['k1l']})
-        #     self.quad_values[quad['objectname']].update({'pv_suffix_alias': "SETI"})
