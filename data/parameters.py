@@ -11,7 +11,9 @@ from .elements.gun import gun
 from .elements.linac import linac
 
 class parameterDict(OrderedDict):
-
+    """This is an :class:`OrderedDict` class representing the various parameters used in
+    the OnlineModel.
+    """
     def __init__(self):
         for l in lattices.lattices:
             self.update({l: OrderedDict()})
@@ -20,14 +22,22 @@ class parameterDict(OrderedDict):
         self['runs'] = OrderedDict()
 
     def __deepcopy__(self, memo):
-        """Copy only key-value pairs."""
+        """Copy only key-value pairs.
+
+        :param memo: deepcopy memo dictionary.
+        :type memo: dictionary
+        """
         datacopy = type(self)()
         for k, v in self.items():
             datacopy.update({k: deepcopy(v, memo)})
         return datacopy
 
     def get_data(self, Framework):
-        """Get GUI dictionary key/values."""
+        """Get GUI dictionary key/values.
+
+        :param Framework: SimFrame class object
+        :type Framework: :class:`SimulationFramework.Framework`
+        """
         self.quad_values = quadrupole(Framework)
         self.rf_values = cavity(Framework)
         self.generator = generator(Framework)

@@ -20,7 +20,17 @@ class DBURT_to_data(object):
         self.parser = DBURT_Parser()
 
     def get_pv_alias(self, dict, name, param=None, rf_type=None):
-        """Return the PV alias for a given dictionary entry."""
+        """Return the PV alias for a given dictionary entry.
+
+        :param dict: element dictionary
+        :type dict: dictionary
+        :param name: element name
+        :type name: str
+        :param param: element parameter, defaults to None
+        :type param: str, optional
+        :param rf_type: type of RF cavity, defaults to None
+        :type rf_type: str, optional
+        """
         if dict[name]['type'] == 'quadrupole':
             dict[name].update({"pv_suffix_alias": "SETI"})
             return "SETI"
@@ -39,9 +49,21 @@ class DBURT_to_data(object):
                 dict[name].update({"pv_root_alias": "CLA-S01-DIA-WCM-01"})
                 dict[name].update({"pv_suffix_alias": "Q"})
                 return "Q"
+        else:
+            dict[name].update({"pv_suffix_alias": "SETI"})
 
     def read_values_from_archiver(self, pv_name, time_from=None, time_to=None):
-        """Extract values from the archiver for a given PV."""
+        """Extract values from the archiver for a given PV.
+
+        :param pv_name: PV name to get values for
+        :type pv_name: str
+        :param time_from: start of time period to average values over, defaults to None
+        :type time_from: float, optional
+        :param time_to: end of time period to average values over, defaults to None
+        :type time_to: float, optional
+        :return: value extracted from the archiver
+        :rtype: float
+        """
         # NOTE: time_from and time_to must be in ISO 1806 format!!
         # see http://claraserv2.dl.ac.uk/cssi_wiki/doku.php/archiver:pulling_data?s[]=archiver
         if time_from is None:
@@ -57,14 +79,22 @@ class DBURT_to_data(object):
         return value
 
     def get_energy_gain(self, time_from=None, time_to=None):
-        """Return the calculated energy gain for an RF structure based on timstamps in the archiver."""
+        """Return the calculated energy gain for an RF structure based on timstamps in the archiver.
+
+        :param time_from: start of time period to average values over, defaults to None
+        :type time_from: float, optional
+        :param time_to: end of time period to average values over, defaults to None
+        :type time_to: float, optional
+        :return: total_energy_gain
+        :rtype: float
+        """
         for l in self.lattices:
             for key, value in self.parameterDict[l].items():
                 if value['type'] == 'cavity':
                     cavity_length = value['length']
                     pv_amp_alias = value['pv_root_alias'] + ":" + value['pv_field_amplitude_alias']
                     pv_phase_alias = value['pv_root_alias'] + ":" + value['pv_phase_alias']
-                    forward_power = self.read_values_from_archiver(pv_amp_alias, time_from, time_to) * 10 ** 6
+                    forward_power = self.read_values_from_archiver(pv_amp_alias, time_from, time_to) * 1.e6
                     phase = 0 # self.read_values_from_archiver(pv_phase_alias, time_from, time_to)
                     if value['controller_name'] == "GUN10":
                         pulse_length = 2.5
@@ -78,12 +108,17 @@ class DBURT_to_data(object):
                         value['field_amplitude'] = float(l01_energy_gain)
                     value['phase'] = phase
                     value['pulse_length'] = pulse_length
-        fudge = 0
-        total_energy_gain = gun_energy_gain + l01_energy_gain + fudge
+        total_energy_gain = gun_energy_gain + l01_energy_gain
         return total_energy_gain
 
     def generate_magnet_name(self, name):
-        """Return fully formed magnet name based on the framework element name."""
+        """Return fully formed magnet name based on the framework element name.
+
+        :param name: Framework element name
+        :type name: str
+        :return: tuple of (lattice name, magnet PV name)
+        :rtype: tuple of strings
+        """
         name_number = re.compile(r'(?P<name>[a-zA-Z]+)(?P<number>\d+)')
         name_nonumber = re.compile(r'(?P<name>[a-zA-Z]+)')
         split = name.split('-')
@@ -112,7 +147,13 @@ class DBURT_to_data(object):
         return None, None
 
     def read_values_from_DBURT(self, dburt):
-        """Extrtact values from a DBURT file and update the dictionaries."""
+        """Extrtact values from a DBURT file and update the dictionaries.
+
+        :param dburt: DBURT dictionary
+        :type dburt: dictionary
+        :return: magnet data
+        :rtype: dictionary
+        """
         data = self.parser.parse_DBURT(dburt)
         magnetdata = {}
         speed_of_light = constants.speed_of_light / 1e6
@@ -131,9 +172,7 @@ class DBURT_to_data(object):
             else:
                 value = {'type': None}
             mag['value'] = value
-            # print('fullname = ', self.generate_magnet_name(mag['name']))
-        # for key, mag in data['magnets'].items():
-            # value = mag['values']
+
             if value['type'] == 'quadrupole':
                 quad_pv_alias = key + ":" + value['pv_suffix_alias']
                 current = float(mag['setI'])
@@ -153,11 +192,18 @@ class DBURT_to_data(object):
                 effect = int_strength / value['magnetic_length']
                 value['field_amplitude'] = float(effect / value['magnetic_length'])
             magnetdata[mag['name']] = mag
-        # print(magnetdata)
         return magnetdata
 
     def read_values_from_epics(self, dict, time_from=None, time_to=None):
-        """Extrtact values from an EPICS PV and update the dictionary."""
+        """Extract values from an EPICS PV and update the dictionary.
+
+        :param dict: dictionary to be updated
+        :type dict: dictionary
+        :param time_from: start of time period to average values over, defaults to None
+        :type time_from: float, optional
+        :param time_to: end of time period to average values over, defaults to None
+        :type time_to: float, optional
+        """
         self.total_energy_gain = self.get_energy_gain(time_from, time_to)
         speed_of_light = constants.speed_of_light / 1e6
         for key, value in dict.items():
@@ -185,9 +231,19 @@ class DBURT_to_data(object):
                     value['value'] = charge * 1e-3
 
     def get_energy_from_rf(self, klystron_power, phase, pulse_length):
-        """Return the estimated energy gain from an RF cavity for the given RF parameters."""
-        bestcase = 0.407615 + 1.94185 * (((1 - math.exp((-1.54427 * 10 ** 6 * pulse_length * 10 ** -6))) * (
-                    0.0331869 + 6.05422 * 10 ** -7 * klystron_power)) * numpy.cos(phase)) ** 0.5
-        worstcase = 0.377 + 1.81689 * (((1 - math.exp((-1.54427 * 10 ** 6 * pulse_length * 10 ** -6))) * (
-                    0.0331869 + 6.05422 * 10 ** -7 * klystron_power)) * numpy.cos(phase)) ** 0.5
+        """Return the estimated energy gain from an RF cavity for the given RF parameters.
+
+        :param klystron_power: RF cavity forward power
+        :type klystron_power: float
+        :param phase: RF cavity phase
+        :type phase: float
+        :param pulse_length: RF cavity pulse length
+        :type pulse_length: float
+        :return: energy gain in RF cavity
+        :rtype: float
+        """
+        bestcase = 0.407615 + 1.94185 * (((1 - math.exp((-1.54427 * 1e6 * pulse_length * 1e6))) * (
+                    0.0331869 + 6.05422 * 1e-7 * klystron_power)) * numpy.cos(phase)) ** 0.5
+        worstcase = 0.377 + 1.81689 * (((1 - math.exp((-1.54427 * 1e6 * pulse_length * 1e6))) * (
+                    0.0331869 + 6.05422 * 1e-7 * klystron_power)) * numpy.cos(phase)) ** 0.5
         return numpy.mean([bestcase, worstcase])

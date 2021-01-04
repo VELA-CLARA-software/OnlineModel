@@ -616,10 +616,8 @@ class RunParameterController(QObject):
         for key, magnet in data.items():
             value = magnet['value']
             if value['type'] == "quadrupole":
-                # print(magnet['lattice'] + ':' + magnet['fullname'] + ':k1l', value['k1l'])
                 self.update_widgets_with_values(magnet['lattice'] + ':' + magnet['fullname'] + ':k1l', value['k1l'])
             if value['type'] == "solenoid":
-                # print(magnet['lattice'] + ':' + magnet['fullname'] + ':field_amplitude', value['field_amplitude'])
                 self.update_widgets_with_values(magnet['lattice'] + ':' + magnet['fullname'] + ':field_amplitude', value['field_amplitude'])
             if value['type'] == "cavity":
                 self.update_widgets_with_values(magnet['fullname'] + ':phase', value['phase'])
